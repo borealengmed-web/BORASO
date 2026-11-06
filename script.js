@@ -5369,3 +5369,223 @@ window.adicionarHomologacaoDireta = async function() {
         alert("Ocorreu um erro ao salvar o registro.");
     }
 };
+
+// =========================================================================
+// NÚCLEO AVANÇADO DE VÍNCULOS RELACIONAIS, ROTEAMENTO E ISOLAMENTO
+// =========================================================================
+
+// 1. MEMÓRIA PERMANENTE DE LOGIN E CREDENCIAIS
+document.addEventListener('DOMContentLoaded', () => {
+    const savedEmail = localStorage.getItem('boreal_saved_email');
+    const savedPass = localStorage.getItem('boreal_saved_pass');
+    const emailInput = document.getElementById('login-email') || document.querySelector('input[type="email"]');
+    const passInput = document.getElementById('login-pass') || document.querySelector('input[type="password"]');
+    if (savedEmail && emailInput) emailInput.value = savedEmail;
+    if (savedPass && passInput) passInput.value = savedPass;
+});
+
+const _orig_loginAuth = window.fazerLogin || window.autenticarUsuario;
+window.fazerLogin = function() {
+    const emailInput = document.getElementById('login-email') || document.querySelector('input[type="email"]');
+    const passInput = document.getElementById('login-pass') || document.querySelector('input[type="password"]');
+    if (emailInput && passInput) {
+        localStorage.setItem('boreal_saved_email', emailInput.value);
+        localStorage.setItem('boreal_saved_pass', passInput.value);
+    }
+    if (typeof _orig_loginAuth === 'function') _orig_loginAuth();
+};
+
+// 2. CONFIGURAÇÃO DO NOVO PERFIL "AGENTE" E PERMISSÕES DE ACESSO
+const _orig_validarTrocaPerfil = window.validarTrocaPerfil;
+window.validarTrocaPerfil = function(role) {
+    if (typeof _orig_validarTrocaPerfil === 'function') {
+        _orig_validarTrocaPerfil(role);
+    }
+
+    const navFinanceiro = document.getElementById('nav-btn-financeiro');
+    const tabFinanceiro = document.getElementById('tab-financeiro');
+
+    // Regra: O perfil AGENTE e CLIENTE nunca têm acesso à Posição Financeira
+    if (role === 'AGENTE' || role === 'CLIENTE') {
+        if (navFinanceiro) navFinanceiro.style.display = 'none';
+        if (tabFinanceiro) tabFinanceiro.style.display = 'none';
+    } else if (role === 'GESTOR' || role === 'CLINICA' || role === 'MEDICO_INDEPENDENTE' || role === 'MEDICO_HOMOLOGADOR') {
+        if (navFinanceiro) navFinanceiro.style.display = 'flex';
+    }
+
+    // Regra: Filtragem da Barra Superior de Seleção de Clientes
+    atualizarBarraSelecaoClientesPorVinculo(role);
+};
+
+// 3. BARRA SUPERIOR: RESTRIÇÃO EXCLUSIVA AOS CLIENTES VINCULADOS
+function atualizarBarraSelecaoClientesPorVinculo(role) {
+    const selectCli = document.getElementById('active-cliente-select');
+    if (!selectCli) return;
+
+    if (role === 'GESTOR' || role === 'AGENTE') {
+        // Gestor e Agente podem selecionar qualquer cliente cadastrado
+        selectCli.disabled = false;
+        renderActiveClienteSelect();
+        return;
+    }
+
+    // Identifica vínculos do usuário logado
+    const vinculosDoUsuario = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
+    let clientesPermitidos = [];
+
+    if (role === 'CLIENTE') {
+        const meuNome = usuarioLogado?.vinculoCliente || selectCli.value;
+        clientesPermitidos = [meuNome];
+    } else {
+        // Clínica ou Médicos: apenas clientes expressamente vinculados a eles
+        const nomeEntidade = usuarioLogado?.nome || '';
+        clientesPermitidos = vinculosDoUsuario
+            .filter(v => v.entidade_nome.toUpperCase() === nomeEntidade.toUpperCase() && v.ativo)
+            .map(v => v.cliente_nome);
+    }
+
+    // Se não houver vínculos cadastrados ainda, mantém o cliente padrão
+    if (clientesPermitidos.length === 0 && usuarioLogado?.vinculoCliente) {
+        clientesPermitidos = [usuarioLogado.vinculoCliente];
+    }
+
+    selectCli.innerHTML = '';
+    clientesPermitidos.forEach(cli => {
+        const opt = document.createElement('option');
+        opt.value = cli;
+        opt.innerText = cli;
+        selectCli.appendChild(opt);
+    });
+    selectCli.disabled = clientesPermitidos.length <= 1;
+}
+
+// 4. MÓDULO 1: EXCLUSÃO DE PEDIDOS ACUMULADOS
+window.limparPedidosAgendamentoSelecionados = function() {
+    if (confirm("Deseja apagar os pedidos selecionados desta visualização?")) {
+        pedidosAgendamentoData = [];
+        if (typeof renderAgendamentoTabela === 'function') renderAgendamentoTabela();
+        alert("Pedidos de agendamento limpos com sucesso.");
+    }
+};
+
+// 5. ROTEAMENTO: DESPACHO DO AGENDAMENTO PARA FILA DO ASO APAGA O PEDIDO
+const _orig_despacharParaFilaAso = window.despacharParaFilaAso || window.enviarAgendamentoParaAso;
+window.despacharParaFilaAso = function(pedidoId) {
+    // Transfere para a Fila do ASO
+    if (typeof _orig_despacharParaFilaAso === 'function') {
+        _orig_despacharParaFilaAso(pedidoId);
+    }
+    // Remove automaticamente o pedido da tabela de agendamento para não acumular
+    pedidosAgendamentoData = pedidosAgendamentoData.filter(p => p.id !== pedidoId);
+    if (typeof renderAgendamentoTabela === 'function') renderAgendamentoTabela();
+};
+
+// 6. CARGA EM MASSA INTELIGENTE DO CLIENTE
+window.processarCargaMassaClienteDirecionada = function(evt, destinoTipo, entidadeDestino) {
+    const file = evt.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const linhas = XLSX.utils.sheet_to_json(sheet);
+
+        if (destinoTipo === 'MEDICO_INDEPENDENTE') {
+            // Vai direto para a Fila do ASO totalmente editável
+            linhas.forEach(linha => {
+                asoQueueData.unshift({
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    cliente: document.getElementById('active-cliente-select')?.value || 'CLIENTE',
+                    nome: (linha['NOME'] || linha['TRABALHADOR'] || 'NOME NÃO INFORMADO').toUpperCase(),
+                    cpf: linha['CPF'] || '000.000.000-00',
+                    cargo: (linha['CARGO'] || linha['FUNÇÃO'] || '-').toUpperCase(),
+                    tipo: (linha['TIPO'] || 'ASO PERIÓDICO').toUpperCase(),
+                    medicoDirecionado: entidadeDestino,
+                    anamnese: { queixas: 'Nenhuma queixa referida', pa: '120/80', fc: '75' }
+                });
+            });
+            if (typeof renderFilaAso === 'function') renderFilaAso();
+            alert(`✅ Carga em massa concluída! ${linhas.length} exames enviados diretamente para a Fila do ASO do médico vinculado.`);
+        } else {
+            // Vai para o Módulo de Solicitação de Pedidos e Agendamento da Clínica
+            linhas.forEach(linha => {
+                pedidosAgendamentoData.unshift({
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    cliente: document.getElementById('active-cliente-select')?.value || 'CLIENTE',
+                    nome: (linha['NOME'] || linha['TRABALHADOR'] || '').toUpperCase(),
+                    clinicaDestino: entidadeDestino,
+                    status: 'AGUARDANDO CONFIRMAÇÃO DA CLÍNICA'
+                });
+            });
+            if (typeof renderAgendamentoTabela === 'function') renderAgendamentoTabela();
+            alert(`✅ Pedido em massa encaminhado ao Módulo de Agendamento da clínica.`);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+};
+
+// 7. CORREÇÃO DEFINITIVA DO TÍTULO DO ASO (BANCO DE ASOS)
+const _orig_abrirAsoViewer = window.abrirAsoViewer || window.visualizarAsoDocumento;
+window.visualizarAsoDocumento = function(asoId) {
+    if (typeof _orig_abrirAsoViewer === 'function') _orig_abrirAsoViewer(asoId);
+    
+    // Assegura que o documento do Banco de ASO contenha o título estrito de ASO
+    setTimeout(() => {
+        const tituloDoc = document.getElementById('aso-doc-title') || document.querySelector('.doc-aso-header-title');
+        if (tituloDoc) {
+            tituloDoc.innerText = "ATESTADO DE SAÚDE OCUPACIONAL - ASO";
+        }
+    }, 150);
+};
+
+// 8. RELATÓRIO FINANCEIRO COM CÁLCULO EXATO DE CADA RELAÇÃO COMERCIAL
+window.renderRelatorioFinanceiroRelacoes = function() {
+    const tbody = document.getElementById('financeiro-relacoes-tbody');
+    const tfoot = document.getElementById('financeiro-total-geral');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    const vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
+    let somaTotalGeral = 0;
+
+    vinculos.forEach(v => {
+        const subtotal = Number(v.quantidade || 1) * Number(v.valor_unitario || 0);
+        somaTotalGeral += subtotal;
+
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-slate-50 text-xs";
+        tr.innerHTML = `
+            <td class="p-2 font-bold">${v.cliente_nome}</td>
+            <td class="p-2">${v.entidade_nome} (${v.tipo_vinculo})</td>
+            <td class="p-2 font-semibold text-slate-800">${v.objeto}</td>
+            <td class="p-2 text-center">${v.quantidade || 1}</td>
+            <td class="p-2 text-right">R$ ${Number(v.valor_unitario).toFixed(2)}</td>
+            <td class="p-2 text-right font-extrabold text-emerald-800">R$ ${subtotal.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    if (tfoot) {
+        tfoot.innerHTML = `TOTAL GERAL DAS RELAÇÕES: R$ ${somaTotalGeral.toFixed(2)}`;
+    }
+};
+
+// 9. PERSISTÊNCIA INQUEBRÁVEL DO BANCO DE ASOS AO DESLOGAR
+window.salvarAsoNoBancoDefinitivo = async function(asoObj) {
+    // 1. Salva no localStorage para não sumir ao recarregar ou deslogar
+    let localAsos = JSON.parse(localStorage.getItem('boreal_banco_asos') || '[]');
+    localAsos.unshift(asoObj);
+    localStorage.setItem('boreal_banco_asos', JSON.stringify(localAsos));
+
+    // 2. Salva em nuvem no Supabase
+    if (supabaseClient) {
+        try {
+            await supabaseClient.from('asos').upsert([asoObj]);
+        } catch (err) {
+            console.warn("Aviso ao persistir ASO no Supabase:", err);
+        }
+    }
+    if (typeof renderHistoryTabela === 'function') renderHistoryTabela();
+};

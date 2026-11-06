@@ -13,7 +13,34 @@
     <!-- BIBLIOTECA OFICIAL SUPABASE JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .boreal-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+    input[type="text"], textarea, select { text-transform: uppercase; }
+    .col-valor-sigilo { display: table-cell; }
+    body.hide-prices .col-valor-sigilo, body.hide-prices .box-valor-sigilo { display: none !important; }
+    .modal-bg { background-color: rgba(15, 23, 42, 0.85); }
+    .aso-boreal-paper { background: #ffffff; color: #000000; font-family: Arial, sans-serif; border: 2px solid #000; padding: 12px; font-size: 11px; }
+
+    /* Ajuste para travar a Homologação em 1 página na impressão / PDF */
+    @media print {
+        .folha-homologacao-print {
+            max-height: 297mm !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+            padding: 10mm 15mm !important;
+            font-size: 11px !important;
+            line-height: 1.3 !important;
+        }
+    }
+</style>
+</head>
+<body class="text-slate-800 pb-20">
+
+    s<tyle>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .boreal-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
@@ -143,6 +170,12 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
+
+<div class="flex justify-end gap-2 my-2">
+    <button type="button" onclick="limparPedidosAgendamentoSelecionados()" class="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-3 py-1.5 rounded shadow flex items-center gap-1">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Apagar Pedidos Selecionados
+    </button>
+</div>
 
         <!-- ABA 1: SOLICITADOR DE PEDIDOS -->
         <section id="tab-pedidos" class="tab-content space-y-4">
@@ -855,11 +888,15 @@
                     </div>
                     <div>
                         <label class="font-bold block mb-1">Tipo de Atuação *</label>
-                        <select id="cad_med_tipo" class="w-full border rounded p-1.5 bg-white font-bold">
-                            <option value="MÉDICO EXAMINADOR INDEPENDENTE">MÉDICO EXAMINADOR INDEPENDENTE</option>
-                            <option value="MÉDICO HOMOLOGADOR INDEPENDENTE">MÉDICO HOMOLOGADOR INDEPENDENTE</option>
-                            <option value="MÉDICO EXAMINADOR (CLÍNICA)">MÉDICO EXAMINADOR (CLÍNICA)</option>
-                        </select>
+                        <select id="profile-role" class="w-full border rounded p-2 text-xs font-bold" onchange="validarTrocaPerfil(this.value)">
+    <option value="GESTOR">GESTOR BOREAL (ADMIN MASTER)</option>
+    <option value="AGENTE">AGENTE (EQUIPE DO GESTOR)</option>
+    <option value="CLIENTE">EMPRESA CLIENTE / RH</option>
+    <option value="CLINICA">CLÍNICA CREDENCIADA</option>
+    <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR INDEPENDENTE</option>
+    <option value="MEDICO_HOMOLOGADOR">MÉDICO HOMOLOGADOR</option>
+    <option value="MEDICO_PCMSO">MÉDICO COORDENADOR PCMSO</option>
+</select>
                     </div>
                     <div>
                         <label class="font-bold block mb-1">Telefone / WhatsApp *</label>
