@@ -281,7 +281,7 @@
                 </div>
             </div>
 
-            <!-- TABELA DE MONITORAMENTO COM TECLA APAGAR INDIVIDUAL E EM LOTE -->
+            <!-- TABELA DE MONITORAMENTO COM TECLA RESPONDER E APAGAR (ITEM 1) -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1.5">
@@ -303,7 +303,7 @@
                                 <th class="p-2 text-center col-valor-sigilo">Valor (R$)</th>
                                 <th class="p-2">Destinatário</th>
                                 <th class="p-2">Resposta / Status</th>
-                                <th class="p-2 text-center">Ações</th>
+                                <th class="p-2 text-center">Ações / Responder</th>
                             </tr>
                         </thead>
                         <tbody id="monitor-requests-tbody" class="divide-y divide-slate-200">
@@ -349,13 +349,13 @@
             </div>
         </section>
 
-        <!-- ABA 3: BANCO DE ASOs CONCLUÍDOS E ARQUIVADOS -->
+        <!-- ABA 3: BANCO DE ASOs CONCLUÍDOS E ARQUIVADOS (ITEM 2 E 3) -->
         <section id="tab-historico" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
                 <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
                     <i data-lucide="archive" class="w-5 h-5 text-indigo-700"></i> Banco de ASOs Concluídos & Fichas Digitais
                 </h2>
-                <p class="text-xs text-slate-500 mt-1">Acervo permanente salvo em nuvem e persistido no navegador. Não é apagado ao deslogar.</p>
+                <p class="text-xs text-slate-500 mt-1">Acervo permanente salvo em nuvem e persistido no navegador com layout fiel e completo.</p>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -396,7 +396,7 @@
             <pre id="esocial-preview-container" class="bg-slate-900 text-emerald-400 font-mono p-4 rounded-xl text-xs overflow-x-auto max-h-96">// Clique no botão acima para compilar o lote de XMLs...</pre>
         </section>
 
-        <!-- ABA 5: MÓDULO HOMOLOGAÇÃO DE ATESTADOS OCUPACIONAIS -->
+        <!-- ABA 5: MÓDULO HOMOLOGAÇÃO DE ATESTADOS OCUPACIONAIS (ITEM 4) -->
         <section id="tab-homologacao" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
                 <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
@@ -404,15 +404,11 @@
                         <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
                             <i data-lucide="file-check" class="w-5 h-5 text-purple-700"></i> Homologação de Atestados Médicos Externos
                         </h2>
-                        <p class="text-xs text-slate-500">Cadastre o empregado e anexe o atestado para homologação médica abaixo.</p>
+                        <p class="text-xs text-slate-500">Cadastre o empregado e anexe o atestado para homologação médica ocupacional.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <label id="btn-upload-planilha-homologacao" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded cursor-pointer flex items-center shadow">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1"></i> Upload Planilha Afastados (.XLSX)
-                            <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaAtestados(event)">
-                        </label>
                         <button type="button" onclick="gerarRelatorioPdfHomologacao()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📄 Relatório de Afastamentos (PDF / E-mail)
+                            📄 Relatório de Absenteísmo (PDF / Visualizar)
                         </button>
                     </div>
                 </div>
@@ -478,7 +474,7 @@
             </div>
         </section>
 
-        <!-- ABA 6: MATRIZ PCMSO SEQUENCIAL (NR-07) -->
+        <!-- ABA 6: MATRIZ PCMSO SEQUENCIAL (NR-07) (ITENS 5, 7, 8, 9) -->
         <section id="tab-pcmso-matriz" class="tab-content hidden space-y-4">
             <div id="pcmso-medico-header-info" class="bg-sky-900 text-white p-3.5 rounded-xl flex flex-wrap justify-between items-center gap-2 shadow border border-sky-700">
                 <div class="text-xs">
@@ -500,18 +496,11 @@
                         <p class="text-xs text-slate-500">Gestão das exposições a riscos, exames exigidos e planos de ação em saúde.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <label id="btn-upload-matriz-pcmso" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded cursor-pointer flex items-center shadow">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1"></i> Upload Matriz PCMSO (.XLSX)
-                            <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaPcmso(event)">
-                        </label>
                         <button type="button" onclick="gerarRelatorioPdfMatrizPcmso()" class="bg-sky-800 hover:bg-sky-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📄 Relatório Matriz (PDF / E-mail)
+                            📄 Relatório Matriz (PDF / Imprimir)
                         </button>
                         <button type="button" onclick="exportarMatrizPcmsoWord()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📝 Baixar Matriz em Word (.docx)
-                        </button>
-                        <button type="button" onclick="window.print()" class="bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📄 Imprimir PCMSO
+                            📝 Baixar Matriz em Word (.doc)
                         </button>
                     </div>
                 </div>
@@ -562,11 +551,16 @@
                         </select>
                         <input type="text" id="pcmso_add_per_custom" placeholder="DIGITAR OUTRA PERIODICIDADE..." class="border p-1.5 rounded font-semibold bg-white">
                     </div>
-                    <div>
-                        <input type="text" id="pcmso_add_plano_gestor" placeholder="PLANO DE AÇÃO EM SAÚDE / PREVENÇÃO (EDITÁVEL)..." class="w-full border p-1.5 rounded bg-amber-50 font-semibold text-slate-800">
+                    <div class="space-y-1.5">
+                        <input type="text" id="pcmso_add_plano_gestor" placeholder="PLANO DE AÇÃO DO GESTOR / MEDIDAS DE PREVENÇÃO AMBIENTAL..." class="w-full border p-1.5 rounded bg-amber-50 font-semibold text-slate-800">
+                        <div id="pcmso_box_plano_medico">
+                            <input type="text" id="pcmso_add_plano_medico" placeholder="PLANO DE AÇÃO MÉDICO (EXCLUSIVO MÉDICO RESPONSÁVEL DO PCMSO)..." class="w-full border border-blue-400 p-1.5 rounded bg-blue-50 font-bold text-blue-950">
+                        </div>
                     </div>
                     <div class="flex justify-end">
-                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 text-white font-bold px-4 py-1.5 rounded uppercase">➕ Incluir Linha no PCMSO</button>
+                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2 rounded uppercase shadow">
+                            ➕ Carregar Linha no PCMSO
+                        </button>
                     </div>
                 </div>
 
@@ -604,7 +598,7 @@
                         <p class="text-xs text-slate-500">Síntese dos resultados dos exames ocupacionais para acompanhamento epidemiológico.</p>
                     </div>
                     <button type="button" onclick="gerarRelatorioPdfAnaliticoPcmso()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                        📄 Relatório Analítico (PDF / E-mail)
+                        📄 Imprimir Relatório Analítico (PDF)
                     </button>
                 </div>
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -628,7 +622,7 @@
             </div>
         </section>
 
-        <!-- ABA 8: MÓDULO FINANCEIRO (POSIÇÃO CONSOLIDADA) -->
+        <!-- ABA 8: MÓDULO FINANCEIRO (POSIÇÃO CONSOLIDADA) (ITENS 6, 10, 11) -->
         <section id="tab-producao" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
                 <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
@@ -641,9 +635,6 @@
                     <div class="flex flex-wrap gap-2">
                         <button type="button" onclick="gerarRelatorioPdfFinanceiroProducao()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
                             📄 Fechamento Financeiro (PDF / E-mail)
-                        </button>
-                        <button type="button" onclick="window.print()" class="bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            <i data-lucide="printer" class="w-4 h-4"></i> Imprimir Posição Financeira (PDF)
                         </button>
                     </div>
                 </div>
@@ -659,6 +650,7 @@
                                 <th class="p-2.5 text-center">Qtd Real Executada</th>
                                 <th class="p-2.5 text-center col-valor-sigilo">Valor Unit. (R$)</th>
                                 <th class="p-2.5 text-center font-bold text-emerald-400 bg-slate-900 col-valor-sigilo">Subtotal (R$)</th>
+                                <th class="p-2.5 text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="relatorio-producao-tbody" class="divide-y divide-slate-200">
@@ -690,6 +682,7 @@
                                 <option value="CLIENTE">CLIENTE / RH</option>
                                 <option value="CLÍNICA">CLÍNICA CREDENCIADA</option>
                                 <option value="MÉDICO EXAMINADOR">MÉDICO EXAMINADOR</option>
+                                <option value="MÉDICO PCMSO">MÉDICO PCMSO</option>
                             </select>
                         </div>
                         <div>
@@ -699,6 +692,7 @@
                                 <option value="CLIENTE">CLIENTE / RH</option>
                                 <option value="GESTOR BOREAL">GESTOR BOREAL</option>
                                 <option value="MÉDICO EXAMINADOR">MÉDICO EXAMINADOR</option>
+                                <option value="MÉDICO PCMSO">MÉDICO PCMSO</option>
                             </select>
                         </div>
                     </div>
@@ -809,10 +803,6 @@
                     <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
                         <i data-lucide="building" class="w-4 h-4 text-blue-700"></i> Cadastro de Clientes & Médico Responsável pelo PCMSO
                     </h2>
-                    <label class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1 rounded cursor-pointer flex items-center gap-1 shadow">
-                        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Upload Clientes (.XLSX)
-                        <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaClientes(event)">
-                    </label>
                 </div>
                 
                 <div id="box-form-cliente" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
@@ -893,10 +883,6 @@
                     <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
                         <i data-lucide="hospital" class="w-4 h-4 text-emerald-700"></i> Cadastro de Clínicas Credenciadas (com Endereço Atendimento)
                     </h2>
-                    <label class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1 rounded cursor-pointer flex items-center gap-1 shadow">
-                        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Upload Clínicas (.XLSX)
-                        <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaClinicas(event)">
-                    </label>
                 </div>
 
                 <div id="box-form-clinica" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
@@ -952,10 +938,6 @@
                     <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
                         <i data-lucide="user-plus" class="w-4 h-4 text-indigo-700"></i> Cadastro de Médicos (Examinadores & Homologadores)
                     </h2>
-                    <label class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1 rounded cursor-pointer flex items-center gap-1 shadow">
-                        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Upload Médicos (.XLSX)
-                        <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaMedicos(event)">
-                    </label>
                 </div>
 
                 <div id="box-form-medico" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
@@ -1015,7 +997,7 @@
             </div>
         </section>
 
-    <!-- MODAL DE RESPOSTA DE AGENDAMENTO -->
+    <!-- MODAL DE RESPOSTA DE AGENDAMENTO (ITEM 1) -->
     <div id="modal-resposta-agendamento" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl border p-5 space-y-3 text-xs">
             <div class="flex justify-between items-center border-b pb-2">
@@ -1038,13 +1020,13 @@
             </div>
             <div class="flex justify-end gap-2 border-t pt-3">
                 <button type="button" onclick="confirmarRespostaAgendamento()" class="bg-emerald-700 text-white font-bold px-4 py-1.5 rounded uppercase shadow">
-                    📲 Enviar Resposta
+                    📲 Enviar Resposta (Transferir p/ Fila ASO)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: FICHA DE ANAMNESE OCUPACIONAL -->
+    <!-- MODAL: FICHA DE ANAMNESE OCUPACIONAL (ITEM 3) -->
     <div id="modal-anamnese" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-5 space-y-4 max-h-[90vh] overflow-y-auto text-xs">
             <div class="flex justify-between items-center border-b pb-2">
@@ -1129,7 +1111,7 @@
         </div>
     </div>
 
-    <!-- MODAL: FORMULÁRIO DO ASO BOREAL COM TODOS OS CAMPOS TOTALMENTE EDITÁVEIS -->
+    <!-- MODAL: FORMULÁRIO DO ASO BOREAL COM TODOS OS CAMPOS TOTALMENTE EDITÁVEIS (ITEM 2) -->
     <div id="modal-aso" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-2 overflow-y-auto">
         <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-4 space-y-3 max-h-[95vh] overflow-y-auto text-xs">
             <div class="flex justify-between items-center border-b pb-2">
