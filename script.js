@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     atualizarDropdownsClientes();
     atualizarDropdownsClinicas();
     atualizarListaParceirosVinculo();
+    atualizarSeletorDestinoCargaMassa();
+    atualizarSeletorDestinoPedidoManual();
     popularDropdownCid10();
     popularDropdownExamesPcmso();
 });
@@ -143,6 +145,10 @@ window.switchTab = async function(tabId) {
     if (tabId === 'producao') {
         renderProducaoTable();
     }
+    if (tabId === 'pedidos') {
+        atualizarSeletorDestinoCargaMassa();
+        atualizarSeletorDestinoPedidoManual();
+    }
 };
 
 window.validarTrocaPerfil = function(role) {
@@ -167,11 +173,9 @@ window.validarTrocaPerfil = function(role) {
 
     // REGRAS ESTRITAS DE ISOLAMENTO
     if (currentRole === 'AGENTE') {
-        // AGENTE: Acesso a todos os módulos operacionais, MENOS o Financeiro
         if (nav.producao) nav.producao.style.display = 'none';
         window.switchTab('pedidos');
     } else if (currentRole === 'CLIENTE') {
-        // CLIENTE: Nunca vê Posição Financeira, nem Fila de Atendimento, nem Módulo Cadastros
         document.body.classList.add('hide-prices');
         if (nav.atendimento) nav.atendimento.style.display = 'none';
         if (nav.producao) nav.producao.style.display = 'none';
@@ -189,7 +193,6 @@ window.validarTrocaPerfil = function(role) {
             if (nav.cadastros) nav.cadastros.style.display = 'none';
             window.switchTab('homologacao');
         } else if (currentRole === 'MEDICO_EXAMINADOR_IND') {
-            // Médico Independente edita ASOs e Anamnese na Fila e no Banco de ASOs
             if (nav.pedidos) nav.pedidos.style.display = 'none';
             if (nav.homologacao) nav.homologacao.style.display = 'none';
             if (nav.esocial) nav.esocial.style.display = 'none';
@@ -238,7 +241,167 @@ function atualizarBarraSelecaoClientesPorVinculo(role) {
     selectCli.disabled = permitidos.length <= 1;
 }
 
-// 4. MÓDULO 1: SOLICITADOR DE PEDIDOS E APAGAR (INDIVIDUAL E EM LOTE)
+window.aoTrocarClienteFiltro = function() {
+    renderPcmsoMatriz();
+    renderHistoryTabela();
+    renderHomologacaoTabela();
+    renderMonitorTable();
+    renderProducaoTable();
+    atualizarHeaderPcmsoMedico();
+    atualizarSeletorDestinoCargaMassa();
+    atualizarSeletorDestinoPedidoManual();
+};
+
+// 4. MÓDULO 1: SELETOR DE DESTINO DINÂMICO E CARGA EM MASSA INTELIGENTE
+window.atualizarSeletorDestinoCargaMassa = function() {
+    const tipo = document.getElementById('carga_destino_tipo')?.value;
+    const sel = document.getElementById('carga_destino_parceiro');
+    if (!sel) return;
+    sel.innerHTML = '';
+
+    if (tipo === 'MEDICO_INDEPENDENTE') {
+        medicosCadastrados
+            .filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'))
+            .forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome; opt.innerText = `${m.nome} (${m.crm})`;
+                sel.appendChild(opt);
+            });
+    } else {
+        clinicasCadastradas.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.nome; opt.innerText = c.nome;
+            sel.appendChild(opt);
+        });
+    }
+};
+
+window.atualizarSeletorDestinoPedidoManual = function() {
+    const tipo = document.getElementById('ped_destino_tipo')?.value;
+    const sel = document.getElementById('ped_destino_parceiro');
+    if (!sel) return;
+    sel.innerHTML = '';
+
+    if (tipo === 'MEDICO_INDEPENDENTE') {
+        medicosCadastrados
+            .filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'))
+            .forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome; opt.innerText = `${m.nome} (${m.crm})`;
+                sel.appendChild(opt);
+            });
+    } else {
+        clinicasCadastradas.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.nome; opt.innerText = c.nome;
+            sel.appendChild(opt);
+        });
+    }
+};
+
+// Carga em Massa Direcionada: vai direto para Fila do ASO (Médico) ou para Agendamento (Clínica)
+window.processarCargaMassaDirecionada = function(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+
+    const tipoDestino = document.getElementById('carga_destino_tipo')?.value;
+    const parceiroNome = document.getElementById('carga_destino_parceiro')?.value || 'PARCEIRO NÃO INFORMADO';
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'CLIENTE';
+    const clientePadrao = activeCli === 'ALL' ? (clientesCadastrados[0]?.nome || 'CLIENTE') : activeCli;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet);
+
+            if (tipoDestino === 'MEDICO_INDEPENDENTE') {
+                // Rota 1: Vai DIRETO para a Fila do ASO totalmente preenchido e editável
+                rows.forEach((r, idx) => {
+                    const nomeTrab = r.NOME || r.TRABALHADOR || r.EMPREGADO || `FUNCIONÁRIO ${idx+1}`;
+                    const cpfTrab = r.CPF || "000.000.000-00";
+                    const cargoTrab = r.CARGO || r.FUNCAO || "OPERACIONAL";
+                    const tipoAso = r.TIPO || r.EXAME || "ASO PERIÓDICO";
+
+                    asoQueueData.unshift({
+                        id: Date.now() + idx,
+                        nome: String(nomeTrab).toUpperCase(),
+                        cpf: String(cpfTrab),
+                        nasc: r.NASCIMENTO || r.DATA_NASC || '',
+                        matricula: r.MATRICULA || '-',
+                        cliente: String(r.CLIENTE || clientePadrao).toUpperCase(),
+                        cargo: String(cargoTrab).toUpperCase(),
+                        funcao: String(r.FUNCAO || cargoTrab).toUpperCase(),
+                        lotacao: String(r.SETOR || r.LOTACAO || 'OPERACIONAL').toUpperCase(),
+                        tipo: String(tipoAso).toUpperCase(),
+                        riscos: r.RISCOS || r.AGENTES || 'AUSÊNCIA DE RISCOS ESPECÍFICOS',
+                        medicoDestino: parceiroNome,
+                        status: "AGUARDANDO",
+                        anamnese: null
+                    });
+                });
+                renderFilaAso();
+                alert(`✅ Sucesso! ${rows.length} ASOs enviados diretamente para a FILA DE ATENDIMENTO do ${parceiroNome}.\nOs campos estão abertos para edição do médico.`);
+            } else {
+                // Rota 2: Vai para o Módulo de Solicitação de Pedidos e Agendamento da Clínica
+                let novosPedidos = [];
+                rows.forEach((r, idx) => {
+                    const pId = Date.now() + idx;
+                    const nomeTrab = r.NOME || r.TRABALHADOR || r.EMPREGADO || `FUNCIONÁRIO ${idx+1}`;
+                    const cpfTrab = r.CPF || "000.000.000-00";
+                    const trabCompleto = `${nomeTrab} - ${cpfTrab}`;
+                    const objPed = r.TIPO || r.EXAME || r.OBJETO || "ASO PERIÓDICO";
+
+                    const pedidoItem = {
+                        id: pId,
+                        fecha: new Date().toLocaleDateString('pt-BR'),
+                        cliente: String(r.CLIENTE || clientePadrao).toUpperCase(),
+                        trab: trabCompleto,
+                        obj: objPed,
+                        qtd: 1,
+                        valor: "85,00",
+                        clinica: parceiroNome,
+                        respostaAgendamento: "Aguardando confirmação de horário na clínica",
+                        status: "PENDENTE"
+                    };
+                    monitorRequestsData.unshift(pedidoItem);
+                    novosPedidos.push(pedidoItem);
+                });
+
+                salvarPedidosLocalStorage();
+                if (supabaseClient && novosPedidos.length > 0) {
+                    try {
+                        await supabaseClient.from('pedidos_agendamento').upsert(novosPedidos.map(p => ({
+                            id: Math.floor(Number(p.id)),
+                            fecha: p.fecha,
+                            cliente: p.cliente,
+                            trab: p.trab,
+                            obj: p.obj,
+                            qtd: p.qtd,
+                            valor: p.valor,
+                            clinica: p.clinica,
+                            resposta_agendamento: p.respostaAgendamento,
+                            status: p.status
+                        })));
+                    } catch(e){}
+                }
+                renderMonitorTable();
+                renderProducaoTable();
+                alert(`✅ Sucesso! ${rows.length} pedidos de agendamento encaminhados para a clínica ${parceiroNome}.`);
+            }
+        } catch(err) {
+            console.error("Erro na carga:", err);
+            alert("Erro ao processar planilha de pedidos.");
+        } finally {
+            evt.target.value = '';
+        }
+    };
+    reader.readAsArrayBuffer(file);
+};
+
+// Solicitação Avulsa Manual
 window.verificarExameOutro = function() {
     const sel = document.getElementById('ped_objeto');
     const inp = document.getElementById('ped_objeto_custom');
@@ -295,53 +458,79 @@ window.renderOrderTable = function() {
 
 window.dispatchOrder = async function() {
     if (orderItemsList.length === 0) return alert("Adicione itens ao pedido!");
-    const clinicaNome = document.getElementById('ped_clinica_target')?.value || 'CLÍNICA CREDENCIADA';
+    const tipoDestino = document.getElementById('ped_destino_tipo')?.value;
+    const parceiroNome = document.getElementById('ped_destino_parceiro')?.value || 'PARCEIRO NÃO INFORMADO';
     const activeCli = document.getElementById('active-cliente-select')?.value || 'CLIENTE';
     const clienteNome = activeCli === 'ALL' ? (clientesCadastrados[0]?.nome || 'CLIENTE') : activeCli;
 
-    let novos = [];
-    orderItemsList.forEach(item => {
-        const pId = Date.now() + Math.floor(Math.random() * 10000);
-        const obj = {
-            id: pId,
-            fecha: new Date().toLocaleDateString('pt-BR'),
-            cliente: clienteNome,
-            trab: item.trab,
-            obj: item.obj,
-            qtd: parseInt(item.qtd) || 1,
-            valor: item.valor || '0,00',
-            clinica: clinicaNome,
-            respostaAgendamento: "Aguardando confirmação de horário na clínica",
-            status: "PENDENTE"
-        };
-        monitorRequestsData.push(obj);
-        novos.push(obj);
-    });
+    if (tipoDestino === 'MEDICO_INDEPENDENTE') {
+        // Envia direto para a Fila de Atendimento do ASO
+        orderItemsList.forEach(item => {
+            const partes = item.trab.split('-');
+            asoQueueData.unshift({
+                id: Date.now() + Math.floor(Math.random() * 10000),
+                nome: (partes[0] ? partes[0].trim() : item.trab).toUpperCase(),
+                cpf: partes[1] ? partes[1].trim() : "000.000.000-00",
+                nasc: '',
+                matricula: '-',
+                cliente: clienteNome,
+                cargo: "OPERACIONAL",
+                funcao: "OPERACIONAL",
+                lotacao: "OPERACIONAL",
+                tipo: item.obj,
+                riscos: 'AUSÊNCIA DE RISCOS ESPECÍFICOS',
+                medicoDestino: parceiroNome,
+                status: "AGUARDANDO",
+                anamnese: null
+            });
+        });
+        renderFilaAso();
+        alert(`✅ Pedidos despachados diretamente para a Fila de Atendimento do ${parceiroNome}!`);
+    } else {
+        // Envia para o Monitor de Agendamento da Clínica
+        let novos = [];
+        orderItemsList.forEach(item => {
+            const pId = Date.now() + Math.floor(Math.random() * 10000);
+            const obj = {
+                id: pId,
+                fecha: new Date().toLocaleDateString('pt-BR'),
+                cliente: clienteNome,
+                trab: item.trab,
+                obj: item.obj,
+                qtd: parseInt(item.qtd) || 1,
+                valor: item.valor || '0,00',
+                clinica: parceiroNome,
+                respostaAgendamento: "Aguardando confirmação de horário na clínica",
+                status: "PENDENTE"
+            };
+            monitorRequestsData.unshift(obj);
+            novos.push(obj);
+        });
 
-    salvarPedidosLocalStorage();
-
-    if (supabaseClient && novos.length > 0) {
-        try {
-            await supabaseClient.from('pedidos_agendamento').upsert(novos.map(p => ({
-                id: Math.floor(Number(p.id)),
-                fecha: p.fecha,
-                cliente: p.cliente,
-                trab: p.trab,
-                obj: p.obj,
-                qtd: p.qtd,
-                valor: p.valor,
-                clinica: p.clinica,
-                resposta_agendamento: p.respostaAgendamento,
-                status: p.status
-            })));
-        } catch(e){}
+        salvarPedidosLocalStorage();
+        if (supabaseClient && novos.length > 0) {
+            try {
+                await supabaseClient.from('pedidos_agendamento').upsert(novos.map(p => ({
+                    id: Math.floor(Number(p.id)),
+                    fecha: p.fecha,
+                    cliente: p.cliente,
+                    trab: p.trab,
+                    obj: p.obj,
+                    qtd: p.qtd,
+                    valor: p.valor,
+                    clinica: p.clinica,
+                    resposta_agendamento: p.respostaAgendamento,
+                    status: p.status
+                })));
+            } catch(e){}
+        }
+        renderMonitorTable();
+        renderProducaoTable();
+        alert(`✅ Solicitação de agendamento despachada para a clínica ${parceiroNome}!`);
     }
 
     orderItemsList = [];
     renderOrderTable();
-    renderMonitorTable();
-    renderProducaoTable();
-    alert("Solicitação de agendamento disparada com sucesso!");
 };
 
 // TECLA APAGAR INDIVIDUAL DA TABELA DE PEDIDOS
@@ -382,56 +571,6 @@ function carregarPedidosLocalStorage() {
 }
 
 // 5. MÓDULO 2 & 3: FILA DO ASO E BANCO DE ASOS DEFINITIVO
-// Carga em Massa cai DIRETO na Fila de ASO para o Médico Independente Editar
-window.processarCargaMassaExcel = function(evt) {
-    const file = evt.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet);
-            const activeCli = document.getElementById('active-cliente-select')?.value || 'CLIENTE';
-            const clientePadrao = activeCli === 'ALL' ? (clientesCadastrados[0]?.nome || 'CLIENTE') : activeCli;
-
-            rows.forEach((r, idx) => {
-                const nomeTrab = r.NOME || r.TRABALHADOR || r.EMPREGADO || `FUNCIONÁRIO ${idx+1}`;
-                const cpfTrab = r.CPF || "000.000.000-00";
-                const cliNome = r.CLIENTE || r.EMPRESA || clientePadrao;
-                const cargoTrab = r.CARGO || r.FUNCAO || "OPERACIONAL";
-                const tipoAso = r.TIPO || r.EXAME || "ASO PERIÓDICO";
-
-                asoQueueData.unshift({
-                    id: Date.now() + idx,
-                    nome: String(nomeTrab).toUpperCase(),
-                    cpf: String(cpfTrab),
-                    nasc: r.NASCIMENTO || r.DATA_NASC || '',
-                    matricula: r.MATRICULA || '',
-                    cliente: String(cliNome).toUpperCase(),
-                    cargo: String(cargoTrab).toUpperCase(),
-                    funcao: String(r.FUNCAO || cargoTrab).toUpperCase(),
-                    lotacao: String(r.SETOR || r.LOTACAO || 'OPERACIONAL').toUpperCase(),
-                    tipo: String(tipoAso).toUpperCase(),
-                    riscos: r.RISCOS || r.AGENTES || 'AUSÊNCIA DE RISCOS ESPECÍFICOS',
-                    status: "AGUARDANDO",
-                    anamnese: null
-                });
-            });
-
-            renderFilaAso();
-            alert(`✅ ${rows.length} ASOs importados com sucesso!\nOs dados caíram na Fila de Atendimento com todos os campos totalmente editáveis para o Médico.`);
-        } catch(err) {
-            alert("Erro ao ler planilha de ASOs.");
-        } finally {
-            evt.target.value = '';
-        }
-    };
-    reader.readAsArrayBuffer(file);
-};
-
 window.salvarAsoAvulso = function() {
     const nome = document.getElementById('avulso_nome').value.trim();
     const cpf = document.getElementById('avulso_cpf').value.trim();
@@ -440,7 +579,7 @@ window.salvarAsoAvulso = function() {
 
     if (!nome || !cpf) return alert("Preencha Nome e CPF.");
 
-    asoQueueData.push({
+    asoQueueData.unshift({
         id: Date.now(),
         nome, cpf, cliente,
         cargo: "OPERACIONAL",
@@ -929,7 +1068,7 @@ window.salvarNovoVinculoComercial = async function() {
         entidade_nome: parceiro,
         objeto: objeto,
         quantidade_solicitada: qtd,
-        quantidade_real: qtd, // Inicialmente igual, editável pelo usuário
+        quantidade_real: qtd,
         valor_unitario: unit,
         valor_total: qtd * unit,
         ativo: true
@@ -959,7 +1098,6 @@ window.salvarNovoVinculoComercial = async function() {
     alert("✅ Novo vínculo e ordem de serviço comercial gravados com sucesso!");
 };
 
-// Célula de Quantidade Sempre Editável Diretamente na Tabela
 window.alterarQtdRealVinculo = function(idx, novaQtd) {
     let vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
     if (!vinculos[idx]) return;
@@ -970,7 +1108,7 @@ window.alterarQtdRealVinculo = function(idx, novaQtd) {
 
     localStorage.setItem('boreal_vinculos_db', JSON.stringify(vinculos));
     renderTabelaVinculos();
-    renderProducaoTable(); // Atualiza a Posição Financeira em tempo real!
+    renderProducaoTable();
 };
 
 window.renderTabelaVinculos = function() {
@@ -1308,8 +1446,8 @@ function atualizarDropdownsClientes() {
 }
 
 function atualizarDropdownsClinicas() {
-    const s = document.getElementById('ped_clinica_target');
-    if (s) {
+    const s = document.getElementById('ped_destino_parceiro');
+    if (s && document.getElementById('ped_destino_tipo')?.value === 'CLINICA') {
         s.innerHTML = '';
         clinicasCadastradas.forEach(c => {
             const o = document.createElement('option');
@@ -1528,7 +1666,6 @@ window.renderMonitorTable = function() {
             <td class="p-2 text-center col-valor-sigilo font-bold text-emerald-700">R$ ${r.valor}</td>
             <td class="p-2 font-bold">${r.clinica}</td>
             <td class="p-2 text-blue-950 font-semibold bg-blue-50/50">${r.respostaAgendamento}</td>
-            <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">${r.status}</span></td>
             <td class="p-2 text-center">
                 <button onclick="apagarPedidoIndividual(${r.id})" class="text-rose-600 font-bold hover:underline text-xs flex items-center gap-1 mx-auto">
                     🗑️ Apagar

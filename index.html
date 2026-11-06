@@ -126,7 +126,7 @@
 
                 <div id="cliente-filter-container" class="bg-slate-900/90 border border-blue-400/30 px-2 py-1 rounded-lg flex items-center gap-1">
                     <span class="text-blue-300 font-bold">CLIENTE:</span>
-                    <select id="active-cliente-select" onchange="renderPcmsoMatriz(); renderHistoryTabela(); atualizarHeaderPcmsoMedico();" class="bg-slate-800 text-white font-bold rounded px-2 py-0.5 border border-slate-700">
+                    <select id="active-cliente-select" onchange="aoTrocarClienteFiltro()" class="bg-slate-800 text-white font-bold rounded px-2 py-0.5 border border-slate-700">
                         <option value="ALL">TODOS OS CLIENTES</option>
                     </select>
                 </div>
@@ -171,18 +171,45 @@
 
     <main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
 
-        <!-- ABA 1: SOLICITADOR DE PEDIDOS -->
+        <!-- ABA 1: SOLICITADOR DE PEDIDOS (ROTEAMENTO DINÂMICO PARA CLÍNICA OU MÉDICO) -->
         <section id="tab-pedidos" class="tab-content space-y-4">
+            
+            <!-- ÁREA DE CARGA EM MASSA DO CLIENTE / GESTOR DIRECIONADA -->
+            <div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-xl shadow-md p-4 space-y-3">
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h2 class="font-extrabold text-sm md:text-base uppercase flex items-center gap-2">
+                            <i data-lucide="upload-cloud" class="w-5 h-5 text-amber-400"></i> Pedido em Massa via Planilha (.XLSX)
+                        </h2>
+                        <p class="text-xs text-blue-200 mt-0.5">
+                            O pedido em massa para <strong>Médico Independente vai DIRETO para a Fila do ASO</strong> preenchido. O pedido para <strong>Clínica vai para o Agendamento</strong>.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="carga_destino_tipo" onchange="atualizarSeletorDestinoCargaMassa()" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white">
+                            <option value="MEDICO_INDEPENDENTE">➔ ENVIAR P/ MÉDICO INDEPENDENTE (DIRETO FILA ASO)</option>
+                            <option value="CLINICA">➔ ENVIAR P/ CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
+                        </select>
+                        <select id="carga_destino_parceiro" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white"></select>
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded cursor-pointer flex items-center gap-1.5 shadow">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Carregar Planilha (.XLSX)
+                            <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaDirecionada(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULÁRIO DE PEDIDO AVULSO ITEM A ITEM -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
                 <div class="flex flex-wrap justify-between items-center gap-2 border-b pb-2">
                     <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                        <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-800"></i> Solicitador de Pedidos Multi-Objetos & Agendamento
+                        <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-800"></i> Inclusão de Pedido Avulso & Agendamento
                     </h2>
                     <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border">CLIENTE & GESTOR BOREAL</span>
                 </div>
 
                 <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg space-y-2">
-                    <span class="text-xs font-bold text-blue-950 uppercase block">Adicionar Objeto / Exame ao Pedido de Agendamento:</span>
+                    <span class="text-xs font-bold text-blue-950 uppercase block">Adicionar Objeto / Exame ao Pedido:</span>
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-2 text-xs">
                         <div class="md:col-span-2">
                             <label class="font-bold block text-slate-700 mb-0.5">Trabalhador & CPF *</label>
@@ -208,7 +235,7 @@
                         <div>
                             <label id="lbl_ped_qtd_valor" class="font-bold block text-slate-700 mb-0.5">Qtd / Valor Unit. (R$)</label>
                             <div class="flex gap-1">
-                                <input type="number" id="ped_qtd" value="1" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold">
+                                <input type="number" id="ped_qtd" value="1" min="1" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold">
                                 <input type="text" id="ped_valor" value="85,00" class="w-full border border-slate-300 rounded p-1.5 text-center font-bold col-valor-sigilo">
                             </div>
                         </div>
@@ -237,24 +264,28 @@
                     </table>
                 </div>
 
-                <div class="flex justify-between items-center bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                <div class="flex flex-wrap justify-between items-center bg-emerald-50 border border-emerald-200 p-3 rounded-lg gap-2">
                     <div class="text-xs text-emerald-950 font-bold uppercase">
-                        Selecione a Clínica Credenciada vinculada para direcionamento:
+                        Selecione para qual parceiro vinculado direcionar o pedido:
                     </div>
-                    <div class="flex gap-2">
-                        <select id="ped_clinica_target" class="border border-emerald-400 rounded px-2 py-1 text-xs font-bold bg-white">
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <select id="ped_destino_tipo" onchange="atualizarSeletorDestinoPedidoManual()" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white">
+                            <option value="CLINICA">CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
+                            <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR (FILA DE ASO)</option>
                         </select>
-                        <button type="button" onclick="dispatchOrder()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-2 rounded flex items-center shadow">
-                            📲 Enviar Solicitação de Agendamento
+                        <select id="ped_destino_parceiro" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white"></select>
+                        <button type="button" onclick="dispatchOrder()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs px-4 py-2 rounded flex items-center shadow">
+                            📲 Despachar Pedido
                         </button>
                     </div>
                 </div>
             </div>
 
+            <!-- TABELA DE MONITORAMENTO COM TECLA APAGAR INDIVIDUAL E EM LOTE -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
                 <div class="flex justify-between items-center border-b pb-2">
                     <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1.5">
-                        <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> 📋 Tabela de Monitoramento de Agendamentos
+                        <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> 📋 Tabela de Monitoramento de Agendamentos & Pedidos da Clínica
                     </h3>
                     <button type="button" onclick="limparPedidosAgendamentoSelecionados()" class="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-3 py-1 rounded shadow flex items-center gap-1">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Apagar Todos os Pedidos
@@ -270,9 +301,8 @@
                                 <th class="p-2">Objeto</th>
                                 <th class="p-2 text-center">Qtd</th>
                                 <th class="p-2 text-center col-valor-sigilo">Valor (R$)</th>
-                                <th class="p-2">Clínica Credenciada</th>
-                                <th class="p-2">Resposta Agendamento</th>
-                                <th class="p-2 text-center">Status</th>
+                                <th class="p-2">Destinatário</th>
+                                <th class="p-2">Resposta / Status</th>
                                 <th class="p-2 text-center">Ações</th>
                             </tr>
                         </thead>
@@ -293,10 +323,6 @@
                     <p class="text-xs text-slate-500 mt-0.5">Carga em massa cai preenchida aqui. O Médico Examinador Independente pode corrigir qualquer dado.</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded cursor-pointer flex items-center shadow">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4 mr-1"></i> Upload Planilha Carga ASOs (.XLSX)
-                        <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaExcel(event)">
-                    </label>
                     <button type="button" onclick="abrirModalNovoAso()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center shadow">
                         <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Novo ASO Avulso
                     </button>
@@ -758,7 +784,6 @@
                     </button>
                 </div>
 
-                <!-- Tabela de Vínculos Registrados com Célula de Quantidade Sempre Editável -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border">
                         <thead class="bg-slate-100 text-slate-700 font-bold border-b">
@@ -1109,7 +1134,7 @@
         <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-4 space-y-3 max-h-[95vh] overflow-y-auto text-xs">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-extrabold text-sm text-slate-900 uppercase">
-                    🩺 FORMULÁRIO OFICIAL DO ASO BOREAL ENGMED (CAMPOS EDITÁVEIS)
+                    🩺 FORMULÁRIO OFICIAL DO ASO BOREAL ENGMED (CAMPOS TOTALMENTE EDITÁVEIS)
                 </h3>
                 <button type="button" onclick="fecharModal('modal-aso')" class="text-slate-500 font-bold text-lg">✕</button>
             </div>
@@ -1117,11 +1142,11 @@
             <div id="aso-boreal-documento-oficial" class="aso-boreal-paper space-y-3 text-[11px]">
                 <div class="border-b-2 border-black pb-2 flex justify-between items-center">
                     <div>
-                        <strong class="text-sm block font-black">Boreal Engenharia e Medicina</strong>
-                        <span class="text-[10px]">CRM Nº 1011385 | Tel. 19 99156-7153</span>
+                        <strong class="text-sm block font-black uppercase text-blue-950">Boreal Engenharia e Medicina</strong>
+                        <span class="text-[10px] text-slate-600 font-semibold">CRM Nº 1011385 | Tel. 19 99156-7153</span>
                     </div>
                     <div class="text-right">
-                        <strong class="text-base font-black uppercase">ATESTADO DE SAÚDE OCUPACIONAL - ASO</strong>
+                        <strong class="text-base font-black uppercase tracking-tight">ATESTADO DE SAÚDE OCUPACIONAL - ASO</strong>
                     </div>
                 </div>
 
