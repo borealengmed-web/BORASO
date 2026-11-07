@@ -505,60 +505,118 @@
                     </div>
                 </div>
 
-                <div id="pcmso-form-container" class="bg-slate-50 border p-3 rounded-lg space-y-2 text-xs">
-                    <span class="font-bold text-slate-800 block uppercase">Incluir Novo Cargo / Setor no PCMSO:</span>
+                <div id="pcmso-form-container" class="bg-slate-50 border p-3 rounded-lg space-y-3 text-xs">
+                    <span class="font-extrabold text-slate-800 block uppercase">➕ Incluir Novo Cargo / Perigo / Risco na Matriz do PCMSO:</span>
+                    
+                    <!-- 1. Dados Organizacionais do Cargo -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <input type="text" id="pcmso_add_lotacao" placeholder="LOTAÇÃO / SETOR" class="border p-1.5 rounded font-bold bg-white">
-                        <input type="text" id="pcmso_add_processo" placeholder="PROCESSO OPERACIONAL" class="border p-1.5 rounded bg-white">
-                        <input type="text" id="pcmso_add_cargo" placeholder="CARGO" class="border p-1.5 rounded font-bold bg-white">
-                        <input type="number" id="pcmso_add_qtd" value="1" placeholder="QUANT." class="border p-1.5 rounded text-center font-bold bg-white">
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <select id="pcmso_add_cat" onchange="filtrarRiscosCat('pcmso_add_cat', 'pcmso_add_agente')" class="border p-1.5 rounded font-bold text-sky-900 bg-white">
-                            <option value="">-- Categoria de Risco (IRO) --</option>
-                            <option value="ACIDENTES_AMPLIADOS">Riscos de Acidentes Ampliados</option>
-                            <option value="BIOLOGICOS_AMPLIADOS">Riscos Biológicos Ampliados</option>
-                            <option value="ERGONOMICOS_BIOMECANICOS">Ergonômicos Biomecânicos</option>
-                            <option value="ERGONOMICOS_ORGANIZACIONAIS">Ergonômicos Organizacionais</option>
-                            <option value="ERGONOMICOS_COGNITIVOS">Ergonômicos Cognitivos</option>
-                            <option value="PSICOSSOCIAIS">Riscos Psicossociais</option>
-                            <option value="ACIDENTES">Riscos de Acidentes</option>
-                            <option value="FISICOS">Riscos Físicos</option>
-                            <option value="QUIMICOS_PGR">Riscos Químicos PGR</option>
-                            <option value="QUIMICOS_NR15_11">Riscos Químicos (NR-15 Anexo 11)</option>
-                            <option value="QUIMICOS_NR15_13">Riscos Químicos (NR-15 Anexo 13)</option>
-                            <option value="QUIMICOS_AGRESSIVOS">Riscos Químicos Agressivos</option>
-                            <option value="BIOLOGICOS">Riscos Biológicos</option>
-                            <option value="BIOLOGICOS_AGRESSIVOS">Riscos Biológicos Agressivos</option>
-                            <option value="PERICULOSOS">Riscos Periculosos</option>
-                            <option value="FISICOS_AGRESSIVOS">Riscos Físicos Agressivos</option>
-                            <option value="ASSOCIACAO">Associação de Agentes Nocivos</option>
-                        </select>
-                        <select id="pcmso_add_agente" onchange="autoPreencherExamePcmso()" class="border p-1.5 rounded md:col-span-2 bg-white">
-                            <option value="">-- Selecione o Agente do Inventário PGR --</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <select id="pcmso_add_exame" class="border p-1.5 rounded font-semibold bg-white">
-                            <option value="">-- Selecione o Exame --</option>
-                        </select>
-                        <input type="text" id="pcmso_add_exame_custom" placeholder="DIGITAR OUTRO EXAME..." class="border p-1.5 rounded font-semibold bg-white">
-                        <select id="pcmso_add_periodicidade" class="border p-1.5 rounded font-bold bg-white">
-                            <option value="Anual">Anual</option>
-                            <option value="Bienal (24 meses)">Bienal (24 meses)</option>
-                            <option value="Semestral">Semestral</option>
-                            <option value="Admissional / Demissional">Admissional / Demissional</option>
-                        </select>
-                        <input type="text" id="pcmso_add_per_custom" placeholder="DIGITAR OUTRA PERIODICIDADE..." class="border p-1.5 rounded font-semibold bg-white">
-                    </div>
-                    <div class="space-y-1.5">
-                        <input type="text" id="pcmso_add_plano_gestor" placeholder="PLANO DE AÇÃO DO GESTOR / MEDIDAS DE PREVENÇÃO AMBIENTAL..." class="w-full border p-1.5 rounded bg-amber-50 font-semibold text-slate-800">
-                        <div id="pcmso_box_plano_medico">
-                            <input type="text" id="pcmso_add_plano_medico" placeholder="PLANO DE AÇÃO MÉDICO (EXCLUSIVO MÉDICO RESPONSÁVEL DO PCMSO)..." class="w-full border border-blue-400 p-1.5 rounded bg-blue-50 font-bold text-blue-950">
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Lotação / Setor *</label>
+                            <input type="text" id="pcmso_add_lotacao" placeholder="LOTAÇÃO / SETOR" class="w-full border p-1.5 rounded font-bold bg-white">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Processo Operacional</label>
+                            <input type="text" id="pcmso_add_processo" placeholder="PROCESSO OPERACIONAL" class="w-full border p-1.5 rounded bg-white">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Cargo / Função *</label>
+                            <input type="text" id="pcmso_add_cargo" placeholder="CARGO / FUNÇÃO" class="w-full border p-1.5 rounded font-bold bg-white">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Qtd Expostos *</label>
+                            <input type="number" id="pcmso_add_qtd" value="1" placeholder="QUANT." class="w-full border p-1.5 rounded text-center font-bold bg-white">
                         </div>
                     </div>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2 rounded uppercase shadow">
+
+                    <!-- 2. Seleção de Grupo e Perigo do Inventário PGR -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Grupo / Categoria do Inventário *</label>
+                            <select id="pcmso_add_cat" onchange="filtrarRiscosCat('pcmso_add_cat', 'pcmso_add_agente')" class="w-full border p-1.5 rounded font-bold text-sky-900 bg-white">
+                                <option value="">-- Selecione o Grupo do Inventário --</option>
+                                <option value="ACIDENTES">Riscos de Acidentes</option>
+                                <option value="ACIDENTES_AMPLIADOS">Riscos de Acidentes Ampliados</option>
+                                <option value="FISICOS">Riscos Físicos</option>
+                                <option value="QUIMICOS">Riscos Químicos</option>
+                                <option value="BIOLOGICOS">Riscos Biológicos</option>
+                                <option value="BIOLOGICOS_AMPLIADOS">Riscos Biológicos Ampliados</option>
+                                <option value="ERGONOMICOS_BIOMECANICOS">Ergonômicos Biomecânicos e Organizacionais</option>
+                                <option value="ERGONOMICOS_COGNITIVOS">Ergonômicos Cognitivos</option>
+                                <option value="PSICOSSOCIAIS">Riscos Psicossociais (COPSOQ)</option>
+                                <option value="PERICULOSOS">Riscos Periculosos</option>
+                                <option value="ASSOCIACAO">Associação de Agentes Nocivos</option>
+                                <option value="AUSENCIA">Ausência de Riscos (Decreto 3.048/99)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="font-bold text-slate-700 block mb-0.5">Perigo Selecionado do Inventário PGR (Preenchimento Automático) *</label>
+                            <select id="pcmso_add_agente" onchange="autoPreencherPerigoRiscoPlano()" class="w-full border p-1.5 rounded bg-white font-semibold">
+                                <option value="">-- Selecione o Grupo Acima Primeiro --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Campos Novos Editáveis: Novo Perigo e Novo Risco -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Novo Perigo (Digitar caso não esteja na lista):</label>
+                            <input type="text" id="pcmso_add_perigo_custom" placeholder="DIGITE UM NOVO PERIGO CASO NECESSÁRIO..." class="w-full border p-1.5 rounded font-bold bg-white text-blue-950">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Risco / Agravo à Saúde (Editável):</label>
+                            <input type="text" id="pcmso_add_risco" placeholder="RISCO / DANOS / AGRAVOS À SAÚDE..." class="w-full border p-1.5 rounded font-semibold bg-white text-rose-900">
+                        </div>
+                    </div>
+
+                    <!-- 4. Exames Complementares e Periodicidades -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Exame Obrigatório</label>
+                            <select id="pcmso_add_exame" class="w-full border p-1.5 rounded font-semibold bg-white">
+                                <option value="CLÍNICO">CLÍNICO</option>
+                                <option value="AUDIOMETRIA">AUDIOMETRIA</option>
+                                <option value="ESPIROMETRIA">ESPIROMETRIA</option>
+                                <option value="ACUIDADE VISUAL">ACUIDADE VISUAL</option>
+                                <option value="ECG">ECG</option>
+                                <option value="EEG">EEG</option>
+                                <option value="HEMOGRAMA COMPLETO">HEMOGRAMA COMPLETO</option>
+                                <option value="GLICEMIA DE JEJUM">GLICEMIA DE JEJUM</option>
+                                <option value="RAIO-X DE TÓRAX">RAIO-X DE TÓRAX</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Novo Exame (Digitar Manual):</label>
+                            <input type="text" id="pcmso_add_exame_custom" placeholder="NOVO EXAME..." class="w-full border p-1.5 rounded font-semibold bg-white">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Periodicidade</label>
+                            <select id="pcmso_add_periodicidade" class="w-full border p-1.5 rounded font-bold bg-white">
+                                <option value="Anual">Anual</option>
+                                <option value="Bienal (24 meses)">Bienal (24 meses)</option>
+                                <option value="Semestral">Semestral</option>
+                                <option value="Admissional / Demissional">Admissional / Demissional</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-0.5">Nova Periodicidade (Digitar):</label>
+                            <input type="text" id="pcmso_add_per_custom" placeholder="NOVA PERIODICIDADE..." class="w-full border p-1.5 rounded font-semibold bg-white">
+                        </div>
+                    </div>
+
+                    <!-- 5. Planos de Ação em Linhas Grandes e Separadas -->
+                    <div class="space-y-2 pt-1">
+                        <div>
+                            <label class="font-bold text-amber-950 block mb-0.5">📋 Novo Plano de Ação do Gestor / PGR (Medidas de Engenharia, EPI/EPC e Prevenção):</label>
+                            <textarea id="pcmso_add_plano_gestor" rows="2" placeholder="DESCREVA AS MEDIDAS PREVENTIVAS, TREINAMENTOS, EPC/EPI E ORDENS DE SERVIÇO DO PGR..." class="w-full border p-2 rounded bg-amber-50 font-semibold text-slate-800 text-xs shadow-sm"></textarea>
+                        </div>
+                        <div id="pcmso_box_plano_medico">
+                            <label class="font-bold text-blue-950 block mb-0.5">🩺 Novo Plano de Ação Médico (Exclusivo Médico do PCMSO - Vigilância e Acompanhamento Clínico):</label>
+                            <textarea id="pcmso_add_plano_medico" rows="2" placeholder="DESCREVA AS DIRETRIZES CLÍNICAS, CONDUTAS EM CASO DE AGRAVOS, VIGILÂNCIA EPIDEMIOLÓGICA E CONTROLES AMBULATORIAIS..." class="w-full border border-blue-400 p-2 rounded bg-blue-50 font-bold text-blue-950 text-xs shadow-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-2 rounded uppercase shadow flex items-center gap-2">
                             ➕ Carregar Linha no PCMSO
                         </button>
                     </div>

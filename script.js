@@ -34,82 +34,1508 @@ let monitorRequestsData = [];
 
 // Catálogo de Riscos e Agentes Ocupacionais para a Matriz PCMSO (NR-07 / PGR)
 const CATALOGO_RISCOS = {
-    "ACIDENTES_AMPLIADOS": [
-        { agente: "RISCO DE INCÊNDIO / EXPLOSÃO", risco: "Queimaduras, traumas múltiplos", exame: "CLÍNICO", per: "Anual" },
-        { agente: "VAZAMENTO DE PRODUTOS QUÍMICOS EM GRANDE ESCALA", risco: "Intoxicação aguda, asfixia", exame: "CLÍNICO", per: "Anual" }
-    ],
-    "BIOLOGICOS_AMPLIADOS": [
-        { agente: "PATÓGENOS DE TRANSMISSÃO AÉREA EM SURTO", risco: "Doenças infecciosas agudas graves", exame: "CLÍNICO", per: "Anual" },
-        { agente: "CONTATO COM RESÍDUOS BIOLÓGICOS CLASSE 3 / 4", risco: "Infecções severas e contaminação cruzada", exame: "HEMOGRAMA COMPLETO", per: "Semestral" }
-    ],
-    "ERGONOMICOS_BIOMECANICOS": [
-        { agente: "LEVANTAMENTO E TRANSPORTE MANUAL DE CARGAS", risco: "Lombalgia, discopatias vertebrais", exame: "CLÍNICO", per: "Anual" },
-        { agente: "POSTURA ESTÁTICA / INADEQUADA PROLONGADA", risco: "Mialgias, cervicobralgias, dorsalgias", exame: "CLÍNICO", per: "Anual" },
-        { agente: "MOVIMENTOS REPETITIVOS DE MEMBROS SUPERIORES", risco: "LER/DORT, tendinites, bursites, epicondilites", exame: "CLÍNICO", per: "Anual" }
-    ],
-    "ERGONOMICOS_ORGANIZACIONAIS": [
-        { agente: "RITMO INTENSO DE TRABALHO E SOBRECARGA DE METAS", risco: "Fadiga física e estresse crônico", exame: "CLÍNICO", per: "Anual" },
-        { agente: "JORNADA PROLONGADA E TURNOS REVEZADOS", risco: "Distúrbios do ciclo circadiano, fadiga crônica", exame: "CLÍNICO", per: "Anual" }
-    ],
-    "ERGONOMICOS_COGNITIVOS": [
-        { agente: "ALTA EXIGÊNCIA DE CONCENTRAÇÃO E ATENÇÃO VISUAL", risco: "Fadiga mental, astenopia, cefaleia", exame: "ACUIDADE VISUAL", per: "Anual" },
-        { agente: "PROCESSAMENTO COMPLEXO DE INFORMAÇÕES SOB PRESSÃO", risco: "Ansiedade e esgotamento psíquico", exame: "CLÍNICO", per: "Anual" }
-    ],
-    "PSICOSSOCIAIS": [
-        { agente: "ESTRESSE OCUPACIONAL CRÔNICO", risco: "Síndrome de Burnout, transtornos de ansiedade", exame: "CLÍNICO", per: "Anual" },
-        { agente: "CONFLITOS INTERPESSOAIS / ASSÉDIO MORAL", risco: "Episódios depressivos, estresse pós-traumático", exame: "CLÍNICO", per: "Anual" }
-    ],
     "ACIDENTES": [
-        { agente: "TRABALHO EM ALTURA (NR-35)", risco: "Queda de nível, traumatismo craniano/múltiplo", exame: "CLÍNICO + ECG + GLICEMIA", per: "Anual" },
-        { agente: "ESPAÇO CONFINADO (NR-33)", risco: "Asfixia, intoxicação, perda de consciência", exame: "CLÍNICO + ECG + ESPIROMETRIA", per: "Anual" },
-        { agente: "MÁQUINAS E EQUIPAMENTOS SEM PROTEÇÃO (NR-12)", risco: "Prensamento, esmagamento, amputação", exame: "CLÍNICO", per: "Anual" },
-        { agente: "RISCO DE CHOQUE ELÉTRICO (NR-10)", risco: "Queimaduras elétricas, fibrilação ventricular", exame: "CLÍNICO + ECG", per: "Anual" },
-        { agente: "PISO ESCORREGADIO OU IRREGULAR", risco: "Queda de mesmo nível, entorses, fraturas", exame: "CLÍNICO", per: "Anual" }
+        {
+            "perigo": "SERVIÇOS COM SERRA",
+            "fonte": "",
+            "risco": "CORTE E/OU PANCADA NAS MÃOS",
+            "agravo": "PANCADA, LESÃO E DILACERAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FISCALIZAR A UTILIZAÇÃO DE EPI E EPC E ELABORAR ORDEM DE SERVIÇO."
+        },
+        {
+            "perigo": "TRABALHOS EM ESPAÇO CONFINADO",
+            "fonte": "",
+            "risco": "GASES TÓXICOS, INCÊNDIOS E PÂNICO",
+            "agravo": "HEMORRAGIA SUBARACNÓIDE HEMORRAGIA INTRACEREBRAL INFARTO CEREBRAL ACIDENTE VASCULAR CEREBRAL, NÃO ESPECIFIADO COMO HEMORRÁGICO OU ISQUÊMICO. PANCADA, QUEIMADURA, DILACERAÇÃO E MORTE",
+            "exame": "CLÍNICO + ECG + GLICEMIA",
+            "per": "Anual",
+            "plano": "ELABORAR ORDEM DE SERVIÇO, PROMOVER CURSO DE IMPLANTAÇÃO E RECICLAGEM DE NR10, NR 35, NR 33, FORNECER E FISCALIZAR A UTILIZAÇÃO DOS EPI’S E EPC’S. MANTER MANUTENÇÃO DO VEÍCULO ATUALIZADA, PROMOVER CURSO DE DIREÇÃO DEFENSIVA, REALIZAR OS EXAMES DEFINIDOS NO PCMSO"
+        },
+        {
+            "perigo": "TRABALHO EM ALTURA",
+            "fonte": "",
+            "risco": "QUEDAS, SÚBITOS",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO + ECG + GLICEMIA",
+            "per": "Anual",
+            "plano": "PROMOVER TREINAMENTO EM NR 35, RELAIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, ELABORAR ORDEM DE SERVIÇO COM APR"
+        },
+        {
+            "perigo": "MANUTENÇÃO EM SISTEMAS ELÉTRICOS",
+            "fonte": "",
+            "risco": "CHOQUE ELÉTRICO",
+            "agravo": "ATAQUES CARDÍACOS, QUEIMADURA, MORTE",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "PROMOVER TREINAMENTO EM NR 10, RELAIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, TRABALHAR SEMPRE EM DUPLA"
+        },
+        {
+            "perigo": "MANUTENÇÃO EM SISTEMAS E EQUIPAMENTOS MECÂNICOS",
+            "fonte": "",
+            "risco": "CHOQUE MECÂNICO",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER TREINAMENTO EM NR 12, RELAIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, ELABORAR ORDEM DE SERVIÇO COM APR"
+        },
+        {
+            "perigo": "DIREÇÃO DE VEÍCULOS",
+            "fonte": "",
+            "risco": "ACIDENTES DE TRÂNSITO",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER CURSO DE DIREÇÃO DEFENSIVA, MONITORAR A SAÚDE DO MOTORISTA"
+        },
+        {
+            "perigo": "ILUMINAÇÃO INADEQUADA",
+            "fonte": "",
+            "risco": "DIFICULDADE DE ACESSO E DETECÇÃO DE MATERIAIS",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ANALISAR ÁREA DE TRABALHO, PROMOVER ILUMINAÇÃO MÓVEL"
+        },
+        {
+            "perigo": "MÁQUINAS E EQUIPAMENTOS SEM PROTEÇÃO",
+            "fonte": "",
+            "risco": "CORTES, DILACERAÇÃO, CHOQUE ELÉTRICO",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR EQUIPMANTOS E MÁQUINAS, PROMOVER PROTEÇÕES CONFORME NR 12"
+        },
+        {
+            "perigo": "MÁQUINAS E EQUIPAMENTOS COM PROTEÇÃO INADEQUADA",
+            "fonte": "",
+            "risco": "INCÊNDIO E EXPLOSÃO (PROBABILIDADE)",
+            "agravo": "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FISICOS, DILACERAÇÃO FÍSICA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR EQUIPMANTOS E MÁQUINAS, PROMOVER PROTEÇÕES CONFORME NR 12"
+        },
+        {
+            "perigo": "ARMAZENAMENTO INADEQUADO, ACÚMULO DE ENTULHOS",
+            "fonte": "",
+            "risco": "QUEDAS DE OBJETO, INSATISFAÇÃO ERGONÔMICA",
+            "agravo": "PANCADA, ESCORIAÇÃO, DANOS FISICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ORGANIZAR E ADEQUAR MATERIAIS, EXPEDIR MATERIAIS SEM UTILIDADE, IMPLEMENTAR ESTANTES DE ORGANIZAÇÃO, SEPARAR MATERIAIS POR CATEGORIA EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO."
+        },
+        {
+            "perigo": "FERRAMENTAS INADEQUADAS OU DEFEITUOSAS",
+            "fonte": "",
+            "risco": "CORTES E PERFURAÇÕES",
+            "agravo": "PANCADA, ESCORIAÇÃO, DANOS FISICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ORGANIZAR E ADEQUAR MATERIAIS, EXPEDIR MATERIAIS SEM UTILIDADE, IMPLEMENTAR ESTANTES DE ORGANIZAÇÃO, SEPARAR MATERIAIS POR CATEGORIA EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO."
+        },
+        {
+            "perigo": "TRABALHOS EM ENCOSTAS E ATERROS",
+            "fonte": "",
+            "risco": "SOTERRAMENTO",
+            "agravo": "MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO."
+        },
+        {
+            "perigo": "TRABALHOS EM MEIO A VEGETAÇÕES",
+            "fonte": "",
+            "risco": "ANIMAIS PEÇONHENTOS, EFEITO TÓXICO DE CONTATO COM ANIMAIS VENENOSOS",
+            "agravo": "DOENÇA DE CHAGAS, FEBRE MACULOSA, ENVENENAMENTO, RAIVA, OUTRAS DOENÇAS CORRELATAS, SÚBITOS ELÉRGICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER EQUIPAMENTO DE PROTEÇÃO INDIVIDUAL E COLETIVO. UTILIZAR ROUPAS CLARAS PARA DETECÇÃO DE PARASITAS"
+        },
+        {
+            "perigo": "TRABALHOS ADMINISTRATIVOS EXTERNOS",
+            "fonte": "",
+            "risco": "ANIMAIS DOMÉSTICOS/RISCO A ACIDENTES DE ATAQUE DE MARGINAIS",
+            "agravo": "DOENÇA DE CHAGAS, FEBRE MACULOSA, ENVENENAMENTO, RAIVA, OUTRAS DOENÇAS CORRELATAS, SÚBITOS ELÉRGICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER EQUIPAMENTO DE PROTEÇÃO INDIVIDUAL E COLETIVO. UTILIZAR ROUPAS CLARAS PARA DETECÇÃO DE PARASITAS"
+        },
+        {
+            "perigo": "SUPERVISIONAR OPERAÇÃO DE MANUTENÇÃO DE TANQUES DE COMBUSTIVEL",
+            "fonte": "",
+            "risco": "EXPLOSÃO, INCÊNDIO",
+            "agravo": "QUEIMADURA, LESÃO, DILACERAÇÃO E MORTE.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO."
+        },
+        {
+            "perigo": "TRABALHOS EXTERNOS, OU DE ASSISTÊNCIAS, CONTROLE E ATENDIMENTO HUMANO.",
+            "fonte": "",
+            "risco": "AGRESSÕES FÍSICAS E MORAL DE PESSOAS E/OU PESSOAS MARGINAIS",
+            "agravo": "DANOS FÍSICOS, DANOS PSICOLÓGICOS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER TREINAMENTO PARA LIDAR COM SITUAÇÕES DE AGRESSÕES DE PESSOAS E ATAQUES DE BANDIDOS, PROMOVER MEIOS DE"
+        },
+        {
+            "perigo": "TRABALHOS EM MATAS E FLORESTAS",
+            "fonte": "",
+            "risco": "ANIMAIS SELVAGENS/RISCO A ACIDENTES DE ATAQUE",
+            "agravo": "DOENÇA DE CHAGAS, FEBRE MACULOSA, ENVENENAMENTO, RAIVA, OUTRAS DOENÇAS CORRELATAS, SÚBITOS ELÉRGICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ACUIDADE VISUAL; AUDIOMETRIA OCUPACIONAL; ELETROCARDIOGRAMA; ELETROENCEFALOGRAMA; GLICEMIA DE JEJUM; HEMOGRAMA COMPLETO; AVALIAÇÃO PSICOSSOCIAL."
+        }
+    ],
+    "ACIDENTES_AMPLIADOS": [
+        {
+            "perigo": "CIRCULAÇÃO DE VEÍCULOS NA RUA DA ÁREA EXTERNA OU ESTACIONAMENTO DA UNIDADE",
+            "fonte": "",
+            "risco": "ACIDENTE DE TRÂNSITO E ATROPELAMENTO",
+            "agravo": "DANOS FÍSICOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR SINALIZAÇÃO HORIZONTAL E VERTICAL DA ÁREA COM FITAS, CONES E PLACAS PARA O TRÁFEGO DE VEÍCULOS E PESSOAS"
+        },
+        {
+            "perigo": "ÁRVORES COM GALHOS SECOS SEM PODA OU CUIDADOS NA ÁREA DE CIRCULAÇÃO EXTERNA",
+            "fonte": "",
+            "risco": "QUEDA DE GALHOS E FRUTOS",
+            "agravo": "PANCADAS, ESCORIAÇÃO E LUXAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR A PODAGEM DE ÁRVORES OBSERVAR A INTEGRIDADE DAS ÁRVORES, CONTROLAR SEU CRESCIMENTO"
+        },
+        {
+            "perigo": "PISO IRREGULAR OU QUEBRADO EM ÁREAS DE CIRCULAÇÃO",
+            "fonte": "",
+            "risco": "QUEDA DO MESMO NIVEL, TROPEÇO",
+            "agravo": "FRATURA E LUXAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "SINALIZAR A ÁREA E REPARAR O PISO"
+        },
+        {
+            "perigo": "UTILIZAÇÃO DE ESCADA DE ACESSO AOS PAVIMENTOS SUPERIORES",
+            "fonte": "",
+            "risco": "QUEDAS OU TROPEÇOS",
+            "agravo": "TORÇÃO OU FRATURAS, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAR FITA ANTIDERRAPANTE NOS DEGRAUS, VERIFICAR OU INSTALAR O CORRIMÃO, INSTALAR LAMPADA DE PRESENÇA"
+        },
+        {
+            "perigo": "UTILIZAÇÃO DE ELEVADOR DE PASSAGEIRO",
+            "fonte": "",
+            "risco": "ROMPIMENTO DO CABO DE AÇO, QUEDA DO ELEVADOR",
+            "agravo": "FRATURAS, SÉRIO DILACERAÇÃO, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "SINALIZAR COM ADVERTÊNCIA DE LIMITE DE PESO, INSTALAR DISPOSITIVO DE EXCESSO DE PESO QUE IMPEÇA A PARTIDA, MANATER RELATÓRIO DE MANUTENÇÃO ATUALIZADO."
+        },
+        {
+            "perigo": "EXTINTORES DE INCÊNDIO NO CHÃO OU OBSTRUÍDOS",
+            "fonte": "",
+            "risco": "AGRAVAMENTO DE COMBATE AO PRÍNCÍPIO DE INCÊNDIO  E INCÊNDIO",
+            "agravo": "PÂNICO, QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "ADEQUAR E POSICIONAR OS EXTINTORES COM SINALIZAÇÃO ADEQUADA"
+        },
+        {
+            "perigo": "INEXISTÊNCIA DE BRIGADA CONTRA INCÊNDIO EM UNIDADES ACIMA DE 10 E 20 TRABALHADORES COM MATERIAIS INFLAMÁVEIS",
+            "fonte": "",
+            "risco": "IMPOSSIBILIDADE DE COMBATE AO PRINCÍPIO DE INCÊNDIO E MAXIMIZAÇÃO DO INCÊNDIO",
+            "agravo": "PÂNICO, QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INSTITUIR E CAPACITAR BRGADA DE INCÊNDIO PARA UNIDADES COM CONTIGENTE A PARTIR  DE 10 FUNCIONÁRIOS, CONFORME INSTRUÇÃO TÉCNICA 17 DOS BM-SP COM 6 BRIGADISTAS A PARTIR DE 10 PESSOAS MAIS 1 BRIGADISTA POR GRUPO EXTRA DE 20 PESSOAS."
+        },
+        {
+            "perigo": "AUSÊNCIA DE AUTO DE VISTORIA DO CORPO DE BOMBEIROS – AVCB EM UNIDADES ACIMA DE 250M² E 750 TRABALHADORES",
+            "fonte": "",
+            "risco": "INCÊNDIO POR NÃO ATENDER AS NORMAS DE SEGURANÇA CONTRA INCÊNDIO",
+            "agravo": "PÂNICO, QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INICIAR OU CONCLUIR PROCESSO DE ADEQUAÇÕES PARA ATENDIMENTO ÀS NORMAS DO BOMBEIRO E SOLICITAR O AUTO DE VISTORIA DO CORPO DE BOMBEIRO"
+        },
+        {
+            "perigo": "PISO ENCERADO SEM ANTIDERRAPANTE",
+            "fonte": "",
+            "risco": "QUEDA NO MESMO NÍVEL OU TROPEÇO",
+            "agravo": "TORÇÃO, FRATURAS OU LUXAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "SINALIZAR ÁREA NO MOMENTO DE LIMPEZA, TROCAR PISO ESCORREGADIO OU APLICAR MATERIAL POROSO PARA EVITAR ESCORREGAMENTO"
+        },
+        {
+            "perigo": "SISTEMA ELÉTRICO DA REDE CENTRAL DETERIORADO",
+            "fonte": "",
+            "risco": "CURTO CIRCUITO CAUSANDO INCÊNDIO",
+            "agravo": "QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INSPECIONAR REDE ELÉTRICA ATRAVÉS DE TÉCNICO ESPECIALIZADO, TROCAR CONDUTORES OU DIMENSIONAR CONFORME CARAG REQUERIDA"
+        },
+        {
+            "perigo": "CONDUTORES E DISJUNTORES ELÉTRICOS SUBDIMENSIONADOS",
+            "fonte": "",
+            "risco": "AQUECIMENTO DE CABOS E CONEXÕES CAUSANDO INCÊNDIOS",
+            "agravo": "QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "CONTRATR TÉCNICO PARA CALCULAR DEMANDA DE POTÊNCIA E REDIMENSIONAR OS CONDUTORES E QUADRO DE LUZ DA REDE CENTRAL"
+        },
+        {
+            "perigo": "CORES DAS TUBULAÇÕES ELÉTRICAS E HIDRÁULICAS EM DESACORDO COM A NR26 E ABNT NBR 6493 / 7195",
+            "fonte": "",
+            "risco": "CHOQUE ELÉTRICO E CONFUSÃO DIANTE UMA EMERGÊNCIA DE INCÊNDIO",
+            "agravo": "CHOQUE ELÉTRICO, QUEIMADURA E DILACERAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REGULARIZAR TUBULAÇÕES DE ACORDO COM O QUE A NORMA PEDE E ELABORAR PLANO DE PREVENÇÃO E COMBATE A INCÊNDIO, DEIXAR O PRÉDIO EM CONFORMIDADE PARA OBTENÇÃO DE AVCB."
+        },
+        {
+            "perigo": "FUNCIONAMENTO DE GERADOR DE ENERGIA ELÉTRICA DENTRO DO PRÉDIO DA UNIDADE",
+            "fonte": "",
+            "risco": "INCÊNDIO POR AQUECIMENTO OU CURTO CIRCUITO DOS COMPONENTES ELÉTRICOS",
+            "agravo": "QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR MANUTENÇÃO RIGOROSA DO EQUIPAMENTO, MATER EXTINTOR DE DIÓXIDO DE CARBONO - CO2, TREINAR BRIGADA DE INCÊNDIO E INSTALAR SENSOR DE TEMPERATURA COM ALARLME DE INCÊNDIO E CHUVEIROS AUTOMÁTICOS"
+        },
+        {
+            "perigo": "RECIPIENTE DE GLP OU OUTROS GASES INFLAMÁVEIS NO INTERIOR DA UNIDADE",
+            "fonte": "",
+            "risco": "VAZAMENTO DE GÁS E COMBUSTÃO CAUSANDO EXPLOSÃO E INCÊNDIO",
+            "agravo": "QUEIMADURAS, INTOXICAÇÃO E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "RETIRAR BOTIJÃO OU CILINDRO DO GÁS DO INTERIOR DO PRÉDIO E INSTALAR EM LOCAL EXTERNO VENTILADO PROTEGIDO E VENTILADO"
+        }
     ],
     "FISICOS": [
-        { agente: "RUÍDO CONTÍNUO OU INTERMITENTE", risco: "PAIR (Perda Auditiva Induzida por Ruído)", exame: "AUDIOMETRIA TONAL", per: "Anual" },
-        { agente: "CALOR EXCREDENTE (IBUTG)", risco: "Desidratação, fadiga térmica, choque térmico", exame: "CLÍNICO", per: "Semestral" },
-        { agente: "VIBRAÇÃO DE CORPO INTEIRO (VCI)", risco: "Lesões osteoarticulares na coluna vertebral", exame: "CLÍNICO", per: "Anual" },
-        { agente: "VIBRAÇÃO DE MÃOS E BRAÇOS (VMB)", risco: "Síndrome dos dedos brancos de Raynaud", exame: "CLÍNICO", per: "Anual" },
-        { agente: "RADIAÇÕES NÃO IONIZANTES (SOLAR / UV)", risco: "Queimaduras cutâneas, câncer de pele", exame: "CLÍNICO", per: "Anual" }
+        {
+            "perigo": "TRABALHOS DE PESQUISAS E TESTES EM TELECOMUNICAÇÃO",
+            "fonte": "",
+            "risco": "INFRASSOM E SONS DE BAIXA FREQUÊNCIA",
+            "agravo": "POSSÍVEL ALTERAÇÕES EM RADICAIS LIVRES, EFEITOS PSICOLÓGICOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR ESTUDOS DE EFEITOS DE INFASSONS NA SAÚDE POUCO DIFUNDIDO"
+        },
+        {
+            "perigo": "TRABALHOS COM FUNCIONAMENTO DE EQUIPAMENTOS, MÁQUINAS E VEÍCULOS",
+            "fonte": "",
+            "risco": "EFEITOS PREJUDICIAIS DO RUÍDO SOBRE O OUVIDO INTERNO",
+            "agravo": "SURDEZ TEMPORÁRIA, SURDEZ PERMANENTE, TRAUMA ACÚSTICO",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "FORNECER EQUPAIMENTO DE PROTEÇÃO AUDITIVA, TREINAMENTO DO USO DE EPI E FISCALIZAÇÃO DO USO DO EPI, COMO TMABÉM O MONIORAMENTO DA EXPOSIÇÃO E IMPLEMENTAÇÃO DE PPA."
+        },
+        {
+            "perigo": "PROCESSO DE PRODUÇÃO COM CHOQUE DE SUPERFÍCIES",
+            "fonte": "",
+            "risco": "RUÍDO IMPULSIVO OU DE IMPACTO",
+            "agravo": "SURDEZ TEMPORÁRIA, SURDEZ PERMANENTE, TRAUMA ACÚSTICO",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "FORNECER EQUPAIMENTO DE PROTEÇÃO AUDITIVA, TREINAMENTO DO USO DE EPI E FISCALIZAÇÃO DO USO DO EPI, COMO TMABÉM O MONIORAMENTO DA EXPOSIÇÃO E IMPLEMENTAÇÃO DE PPA."
+        },
+        {
+            "perigo": "TRABALHOS EM TELECOMUNICAÇÕES NA EXISTÊNCIA DE ULTRASSOM DE ALTA FREQUENCIA",
+            "fonte": "",
+            "risco": "EFEITO A ADVERSOS PARA QUEM TEM UMA CONDIÇÃO FÍSICA DESFAVORÁVEL",
+            "agravo": "ZUMBIDO (TINNITUS): SENSAÇÃO DE APITO CONSTANTE NOS OUVIDOS APÓS A EXPOSIÇÃO. PERDA AUDITIVA TEMPORÁRIA: FADIGA DAS CÉLULAS CILIADAS DA CÓCLEA, QUE PODE SE TORNAR PERMANENTE COM A EXPOSIÇÃO PROLONGADA. DANOS AO LABIRINTO: PODE CAUSAR TONTURAS, NÁUSEAS E PERDA DE EQUILÍBRIO, JÁ QUE O SISTEMA VESTIBULAR É SENSÍVEL A VIBRAÇÕES DE ALTA FREQUÊNCIA.",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE."
+        },
+        {
+            "perigo": "TRABALHOS DE MANUTENÇÃO, PRODUÇÃO, FABRICAÇÃO, TELECOMUNICAÇÃO E TESTES E ANÁLISES LABORATORIAIS",
+            "fonte": "",
+            "risco": "CAMPOS MAGNÉTICOS ESTÁTICOS",
+            "agravo": "CEFALEIAS, ALTERAÇÕES NA CAPACIDADE DE CONCENTRAÇÃO, VERTIGEM, NÁUSEA, GOSTO METÁLICO E ALTERAÇÕES VISUAIS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE."
+        },
+        {
+            "perigo": "TRABALHOS DE MANUTENÇÃO, PRODUÇÃO, FABRICAÇÃO, TELECOMUNICAÇÃO E TESTES E ANÁLISES LABORATORIAIS",
+            "fonte": "",
+            "risco": "CAMPOS MAGNÉTICOS DE SUB-RADIOFREQUÊNCIA (30 KHZ E ABAIXO)",
+            "agravo": "NEOPLASIA MALIGNA DO ENCÉFALO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "TRABALHOS DE MANUTENÇÃO, PRODUÇÃO, FABRICAÇÃO, TELECOMUNICAÇÃO E TESTES E ANÁLISES LABORATORIAIS",
+            "fonte": "",
+            "risco": "SUB-RADIOFREQUÊNCIA (30 KHZ E ABAIXO) E CAMPOS ELETROSTÁTICOS",
+            "agravo": "CATARATAS, OUTRAS, QUEIMADURAS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "TRABALHOS DE MANUTENÇÃO, PRODUÇÃO, FABRICAÇÃO, TELECOMUNICAÇÃO E TESTES E ANÁLISES LABORATORIAIS",
+            "fonte": "",
+            "risco": "RADIAÇÃO DE RADIOFREQUÊNCIA E MICRO-ONDAS",
+            "agravo": "QUEIMADURAS PROFUNDAS: EXPOSIÇÃO A ALTOS NÍVEIS DE RF/MICRO-ONDAS (COMO EM AMBIENTES INDUSTRIAIS, RADARES DE ALTA POTÊNCIA OU VAZAMENTOS DE FORNOS DE MICRO-ONDAS) PODE CAUSAR QUEIMADURAS NOS TECIDOS INTERNOS, SEM NECESSARIAMENTE QUEIMAR A PELE, POIS A ENERGIA É ABSORVIDA INTERNAMENTE. DANOS A ÓRGÃOS COM BAIXO FLUXO SANGUÍNEO: ÓRGÃOS QUE NÃO CONSEGUEM DISSIPAR BEM O CALOR (POR TEREM POUCO SUPRIMENTO SANGUÍNEO) SÃO MAIS VULNERÁVEIS: OLHOS: O CRISTALINO DO OLHO, QUE NÃO POSSUI VASOS SANGUÍNEOS PARA RESFRIAMENTO, É O MAIS SUSCETÍVEL. A EXPOSIÇÃO INTENSA PODE CAUSAR CATARATA (OPACIFICAÇÃO DO CRISTALINO) DEVIDO À COAGULAÇÃO DE PROTEÍNAS PELO CALOR. TESTÍCULOS: O AUMENTO DA TEMPERATURA PODE AFETAR A PRODUÇÃO E A VIABILIDADE DOS ESPERMATOZOIDES, POTENCIALMENTE CAUSANDO INFERTILIDADE TEMPORÁRIA OU PERMANENTE. ESTRESSE TÉRMICO SISTÊMICO: EM CASOS DE EXPOSIÇÃO CORPORAL TOTAL DE ALTA INTENSIDADE, O CORPO PODE SOFRER UM AUMENTO PERIGOSO DA TEMPERATURA CORPORAL, LEVANDO A UM GOLPE DE CALOR OU HIPERTERMIA.",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "TRABALHOS DE MANUTENÇÃO, PRODUÇÃO, FABRICAÇÃO, TELECOMUNICAÇÃO E TESTES E ANÁLISES LABORATORIAIS",
+            "fonte": "",
+            "risco": "RADIAÇÃO VISÍVEL E INFRAVERMELHO PRÓXIMO",
+            "agravo": "CERATOCONJUNTIVITE CATARATAS, OUTRAS OUTROS TRANSTORNOS DO CRISTALINO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "TRABALHOS DE SOLDAGEM",
+            "fonte": "",
+            "risco": "RADIAÇÃO ULTRAVIOLETA",
+            "agravo": "DANOS OCULARES CERATOCONJUNTIVITE FOTOELÉTRICA (ARCO DE SOLDA): É O DANO MAIS COMUM E AGUDO. A EXPOSIÇÃO À UVC OU UVB CAUSA UMA INFLAMAÇÃO DOLOROSA DA CÓRNEA (CERATITE) E DA CONJUNTIVA, GERALMENTE 6 A 12 HORAS APÓS A EXPOSIÇÃO. SINTOMAS: DOR INTENSA, SENSAÇÃO DE AREIA NOS OLHOS E FOTOFOBIA (SENSIBILIDADE À LUZ). CATARATA: A EXPOSIÇÃO CRÔNICA AO UVB E UVA ACELERA A OPACIFICAÇÃO DO CRISTALINO, LEVANDO À CATARATA. PTERÍGIO E PINGUÉCULA: CRESCIMENTOS ANORMAIS NA CONJUNTIVA, ASSOCIADOS À EXPOSIÇÃO SOLAR CRÔNICA.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "PROCESSOS INDUSTRIAS E LABORATORIAIS COM RAIO LASER",
+            "fonte": "",
+            "risco": "IRADIAÇÃO DE RAIO LASERS",
+            "agravo": "QUEIMADURA DA RETINA: A RADIAÇÃO VISÍVEL E INFRAVERMELHA PRÓXIMA (400 NM A 1400 NM) É ABSORVIDA PELA RETINA. A EXPOSIÇÃO CAUSA UM AUMENTO DE TEMPERATURA QUE PODE LEVAR À FOTOCOAGULAÇÃO E À DESTRUIÇÃO DAS CÉLULAS FOTORRECEPTORAS. CONSEQUÊNCIA: PERDA DE VISÃO IMEDIATA E PERMANENTE (MANCHA ESCURA NO CAMPO VISUAL), CEGUEIRA PARCIAL OU TOTAL. LESÃO DE CÓRNEA E CRISTALINO: RADIAÇÃO ULTRAVIOLETA E INFRAVERMELHA DISTANTE (QUE NÃO É FOCADA NA RETINA) É ABSORVIDA PELAS CAMADAS ANTERIORES DO OLHO. CONSEQUÊNCIA: CATARATA (OPACIFICAÇÃO DO CRISTALINO) E CERATITE (INFLAMAÇÃO E DOR NA CÓRNEA).",
+            "exame": "ACUIDADE VISUAL",
+            "per": "Anual",
+            "plano": "FORNECER INFORMAÇÃO/ FORMAÇÃO/ INSTRUÇÕES AOS TRABALHADORES IMPLEMENTAR BLINDAGEM/ ISOLAMENTO COM CHAPA OU MALHA METÁLICA, CERÂMICA, PLÁSTICO OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE DOS CEM PROTEÇÃO COM CORTINAS DE LUZ, APARELHOS DE LEITURA E TAPETES SENSÍVEIS À PRESSÃO DISPOSITIVO DE CONTROLE. OU VIDRO, BLOQUEIO DE ACESSO À PROXIMIDADE DA FONTE PROMOVER INFORMAÇÕES SOBRE O AGENTE E SUAS REPERCUSSÕES, FORNECER ÓCULOS DE PROTEÇÃO E/OU MÁSCARA DE SOLDA"
+        },
+        {
+            "perigo": "TRABALHOS COM SUBSTÂNCIAS E MATERIAIS RADIOATIVOS EM EMBALAGENS, EQUIPAMENTOS E APARELHOS",
+            "fonte": "",
+            "risco": "CONTAMINAÇÃO PELA FUGA DE RADIAÇÃO POR ACIDENTE EM CASOS DE FALHA NA BLINDAGEM DA EMBALAGEM, FUSILAGEM DA MÁQUINA, EQUIPAMENTO, APARELHO OU CONTENÇÃO",
+            "agravo": "LEUCEMIA, CÂNCER DE TIREOIDE CÂNCER DE PULMÃO (ESPECIALMENTE COM RADÔNIO) CÂNCER DE MAMA CÂNCER DE PELE (NÃOMELANOMA) CÂNCER DE ESTÔMAGO, FÍGADO E OSSOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "MANTER NO LOCAL DE TRABALHO E À DISPOSIÇÃO DE INSPEÇÕES O PLANO DE PROTEÇÃO RADIOLÓGICA (PPR) PROVADO PELA CNEN E PELA VIGILÂNCIA SANITÁRIA PARA OS CASOS DE RADIODIAGNÓSTICO. ENTRE DIVERSAS FINALIDADES, O PPR DEVE: – SER PERSONALIZADO PARA A INSTALAÇÃO, AMBIENTES, EQUIPAMENTOS, PROCEDIMENTOS E ROTINA OPERACIONAL E ETC.; AS ÁREAS DA INSTALAÇÃO RADIATIVA DEVEM SER CLASSIFICADAS, SINALIZADAS E TER ACESSO CONTROLADO."
+        },
+        {
+            "perigo": "SUBSTÂNCIAS E MATERIAIS RADIOATIVOS COM EXPOSIÇÃO ACIMA DOS LIMITES DE DOSES DE RADIAÇÃO FETIVA OU EQUIVALENTE",
+            "fonte": "",
+            "risco": "CONTAMINAÇÃO COM RADIAÇÕES IONIZANTES",
+            "agravo": "POLINEUROPATIAS ESPECIFICADAS, OUTRAS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "COMUNICAR A CNEN SOBRE O LIMITE EXCEDIDO DE RADIAÇÃO, REALIZAR EXAMES DO PCMSO"
+        },
+        {
+            "perigo": "TRABALHOS COM FERRAMENTAS E MÁQUINAS OU DIREÇÃO DE VEÍCULOS",
+            "fonte": "",
+            "risco": "VIBRAÇÕES LOCALIZADAS NAS MÃOS E BRAÇOS",
+            "agravo": "TRANSTORNOS DE DISCOS INTERVERTEBRAIS, OUTROS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR REVEZAMENTO DE EQUIPE DE TRABALHO, REALIZAR A MANUTENÇÃO PERIÓDICA DE MÁQUINAS E EQUIPAMENTOS, PARA MINIMIZAR A VIBRAÇÃO; TREINAR A EQUIPE SOBRE O CORRETO USO DOS EQUIPAMENTOS VISANDO MINIMIZAR A VIBRAÇÃO"
+        },
+        {
+            "perigo": "TRABALHOS COM FERRAMENTAS E MÁQUINAS OU VEÍCULOS",
+            "fonte": "",
+            "risco": "VIBRAÇÃO DE CORPO INTEIRO",
+            "agravo": "ARTROSES, OUTRAS, SÍNDROME CERVICOBRAQUIAL",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR REVEZAMENTO DE EQUIPE DE TRABALHO, REALIZAR A MANUTENÇÃO PERIÓDICA DE MÁQUINAS E EQUIPAMENTOS, PARA MINIMIZAR A VIBRAÇÃO; TREINAR A EQUIPE SOBRE O CORRETO USO DOS EQUIPAMENTOS VISANDO MINIMIZAR A VIBRAÇÃO"
+        },
+        {
+            "perigo": "TRABALHOS EM CÉU ABERTO OU EM PROCESSOS INTERNOS MEDIANTE A CHAMA DE FOGO OU VAPORES QUENTES",
+            "fonte": "",
+            "risco": "ESTRESSE E SOBRECARGA FISIOLÓGICA POR CALOR",
+            "agravo": "FRAQUEZA EXTREMA, TONTURA, SUOR EXCESSIVO, PELE FRIA E ÚMIDA, DOR DE CABEÇA, NÁUSEAS E VÔMITOS , QUEDA DE PRESSÃO ARTERIAL, DESMAIOS (SÍNCOPE POR CALOR",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, DISPONIBILIZAR E INCENTIVAR O CONSUMO DE ÁGUA"
+        },
+        {
+            "perigo": "TRABALHO EM BAIXAS ALTITUDES, EM CÂMARAS, TUBULÕES OU EM ÁGUAS PROFUNDAS.",
+            "fonte": "",
+            "risco": "PRESSÃO HIPERBÁRICA, MUDANÇAS NA COMPOSIÇÃO DE GASES DOS PULMÕES.",
+            "agravo": "OTITE MÉDIA NÃO- SUPURATIVA, NÃO ESPECIFICADA, SINUSITE BAROTRAUMÁTICA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "MANTER O MONITORAMENTO PELA REALIZAÇÃO DOS EXAMES COMPLEMENTARES"
+        },
+        {
+            "perigo": "TRABALHO EM BAIXAS ALTITUDES, EM CÂMARAS, TUBULÕES OU EM ÁGUAS PROFUNDAS.",
+            "fonte": "",
+            "risco": "PRESSÃO HIPERBÁRICA, MUDANÇAS NA COMPOSIÇÃO DE GASES DOS PULMÕES.",
+            "agravo": "OTITE MÉDIA NÃO- SUPURATIVA, NÃO ESPECIFICADA, SINUSITE BAROTRAUMÁTICA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "MANTER O MONITORAMENTO PELA REALIZAÇÃO DOS EXAMES COMPLEMENTARES"
+        },
+        {
+            "perigo": "TRABALHOS EM ALTAS ALTITUDES, COMO AVIÕES, MONTANHAS E REGIÕES ELEVADAS.",
+            "fonte": "",
+            "risco": "PRESSÃO HIPOBÁRICA",
+            "agravo": "MAL DOS CAIXÕES [DOENÇA DE DESCOMPRESSÃO] FALTA DE AR, TONTURAS, NÁUSEAS E DORES DE CABEÇA, LABIRINTITE E HIPÓXIA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROPOR INGESTÃO DE MUITA ÁGUA E USO DE BOMBAS DE OXIGÊNIO, MANTER O MONITORAMENTO PELA REALIZAÇÃO DOS EXAMES COMPLEMENTARES"
+        },
+        {
+            "perigo": "TRABALHOS EM ALTAS ALTITUDES, COMO AVIÕES, MONTANHAS E REGIÕES ELEVADAS.",
+            "fonte": "",
+            "risco": "PRESSÃO HIPOBÁRICA",
+            "agravo": "MAL DOS CAIXÕES [DOENÇA DE DESCOMPRESSÃO] FALTA DE AR, TONTURAS, NÁUSEAS E DORES DE CABEÇA, LABIRINTITE E HIPÓXIA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROPOR INGESTÃO DE MUITA ÁGUA E USO DE BOMBAS DE OXIGÊNIO, MANTER O MONITORAMENTO PELA REALIZAÇÃO DOS EXAMES COMPLEMENTARES"
+        },
+        {
+            "perigo": "TRABALHOS COM LAVAGENS OU EM CULTURAS DE LAVOURAS OU DENTRO D’ÁGUA",
+            "fonte": "",
+            "risco": "UMIDADE NO CORPO",
+            "agravo": "AFECÇÕES DAS UNHAS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECIMENTO DE MACACÃO IMPERMEÁVEL"
+        },
+        {
+            "perigo": "TRABALHOS EM FRIGORÍFICOS E CÂMARAS DE REFRIGERAÇÃO",
+            "fonte": "",
+            "risco": "ESTRESSE POR FRIO (HIPOTERMIA)",
+            "agravo": "URTICÁRIA DEVIDA A FRIO, SÍNDROME DE RAYNAUD, GELADURA SUPERFICIAL",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "FORNECIMENTO DE JAQUETA, CALÇA E BOTA E REVEZAMENTO DE EQUIPE DE TRABALHO"
+        },
+        {
+            "perigo": "Ruído — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Ruído: Abaixo do nível de ação",
+            "agravo": "Zumbido, fadiga auditiva e perda auditiva induzida por ruído",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Ruído — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Ruído: No nível de ação",
+            "agravo": "Zumbido, fadiga auditiva e perda auditiva induzida por ruído",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Ruído — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Ruído: Acima do nível de ação e abaixo do limite de tolerância",
+            "agravo": "Zumbido, fadiga auditiva e perda auditiva induzida por ruído",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Ruído — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Ruído: Acima do limite de tolerância",
+            "agravo": "Zumbido, fadiga auditiva e perda auditiva induzida por ruído",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Calor — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Calor: Abaixo do nível de ação",
+            "agravo": "Desidratação, exaustão térmica, câimbras e golpe de calor",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Calor — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Calor: No nível de ação",
+            "agravo": "Desidratação, exaustão térmica, câimbras e golpe de calor",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Calor — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Calor: Acima do nível de ação e abaixo do limite de tolerância",
+            "agravo": "Desidratação, exaustão térmica, câimbras e golpe de calor",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Calor — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Calor: Acima do limite de tolerância",
+            "agravo": "Desidratação, exaustão térmica, câimbras e golpe de calor",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Vibração — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Vibração: Abaixo do nível de ação",
+            "agravo": "Alterações vasculares, neurológicas e osteomusculares",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Vibração — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Vibração: No nível de ação",
+            "agravo": "Alterações vasculares, neurológicas e osteomusculares",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Vibração — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Vibração: Acima do nível de ação e abaixo do limite de tolerância",
+            "agravo": "Alterações vasculares, neurológicas e osteomusculares",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Vibração — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Vibração: Acima do limite de tolerância",
+            "agravo": "Alterações vasculares, neurológicas e osteomusculares",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Frio — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Frio: Abaixo do nível de ação",
+            "agravo": "Hipotermia, lesões cutâneas e redução de destreza",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Frio — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Frio: No nível de ação",
+            "agravo": "Hipotermia, lesões cutâneas e redução de destreza",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Frio — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Frio: Acima do nível de ação e abaixo do limite de tolerância",
+            "agravo": "Hipotermia, lesões cutâneas e redução de destreza",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Frio — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Frio: Acima do limite de tolerância",
+            "agravo": "Hipotermia, lesões cutâneas e redução de destreza",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Radiação — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Radiação: Abaixo do nível de ação",
+            "agravo": "Lesões cutâneas e oculares, efeitos térmicos ou biológicos conforme o agente",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Radiação — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Radiação: No nível de ação",
+            "agravo": "Lesões cutâneas e oculares, efeitos térmicos ou biológicos conforme o agente",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Radiação — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Radiação: Acima do nível de ação e abaixo do limite de tolerância",
+            "agravo": "Lesões cutâneas e oculares, efeitos térmicos ou biológicos conforme o agente",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        },
+        {
+            "perigo": "Radiação — avaliação quantitativa",
+            "fonte": "",
+            "risco": "Radiação: Acima do limite de tolerância",
+            "agravo": "Lesões cutâneas e oculares, efeitos térmicos ou biológicos conforme o agente",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "Realizar avaliação quantitativa, adotar controles na fonte e no ambiente, sinalizar a área, fornecer EPI adequado, capacitar trabalhadores e monitorar a eficácia."
+        }
     ],
-    "QUIMICOS_PGR": [
-        { agente: "POEIRAS INERTES / MINERAIS", risco: "Irritação de vias aéreas, pneumoconioses", exame: "ESPIROMETRIA", per: "Bienal (24 meses)" },
-        { agente: "FUMOS METÁLICOS (SOLDA)", risco: "Febre dos fumos metálicos, bronquite crônica", exame: "ESPIROMETRIA + HEMOGRAMA", per: "Anual" },
-        { agente: "VAPORES ORGÂNICOS / SOLVENTES", risco: "Cefaleia, dermatite de contato, hepatotoxicidade", exame: "HEMOGRAMA COMPLETO", per: "Semestral" }
-    ],
-    "QUIMICOS_NR15_11": [
-        { agente: "TOLUENO / XILENO (ANEXO 11)", risco: "Intoxicação crônica do sistema nervoso central", exame: "HEMOGRAMA + ÁCIDO HIPÚRICO", per: "Semestral" },
-        { agente: "ÁCIDO CLORÍDRICO / SULFÚRICO", risco: "Queimaduras químicas, erosão dental, bronquite", exame: "ESPIROMETRIA", per: "Anual" }
-    ],
-    "QUIMICOS_NR15_13": [
-        { agente: "HIDROCARBONETOS AROMÁTICOS (ANEXO 13)", risco: "Depressão do SNC, aplasia medular", exame: "HEMOGRAMA COMPLETO", per: "Semestral" },
-        { agente: "CHUMBO INORGÂNICO E SEUS COMPOSTOS", risco: "Saturnismo, anemia, neuropatia periférica", exame: "HEMOGRAMA COMPLETO", per: "Semestral" }
-    ],
-    "QUIMICOS_AGRESSIVOS": [
-        { agente: "BENZENO", risco: "Mielotoxicidade grave, leucemia ocupacional", exame: "HEMOGRAMA COM PLAQUETAS", per: "Semestral" },
-        { agente: "SÍLICA LIVRE CRISTALIZADA", risco: "Silicose pulmonar, fibrose irreversível", exame: "ESPIROMETRIA + RAIO-X TÓRAX", per: "Anual" }
+    "QUIMICOS": [
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE GASES OU VAPORES DE AGENTES QUÍMICOS ABAIXO DO NÍVEL DE AÇÃO OU CONTATO MANUAL COM PRODUTOS QUÍMICOS EM QUANTIDADES ÍNFIMAS SEM RELEVÂNCIA EM RELAÇÃO A DANOS BIOLÓGICOS",
+            "fonte": "",
+            "risco": "CONTATO (PELE), INALAÇÃO (RESPIRAÇÃO) DA SUBSTÂNCIA POR UM INDIVÍDUO SENSIBILIZADO.",
+            "agravo": "DANOS DERMATOLÓGICOS (PELE) DANOS: URTICÁRIA (PLACAS VERMELHAS QUE COÇAM), DERMATITE DE CONTATO, ECZEMA E ANGIOEDEMA (INCHAÇO PROFUNDO SOB A PELE, GERALMENTE NAS PÁLPEBRAS E LÁBIOS). 2. DANOS RESPIRATÓRIOS DANOS: RINITE ALÉRGICA (ESPIRROS E CORIZA), ASMA OCUPACIONAL (ESTREITAMENTO DAS VIAS AÉREAS COM CHIADO NO PEITO), DISPNEIA (FALTA DE AR) E EDEMA DE GLOTE (INCHAÇO DA GARGANTA QUE IMPEDE A PASSAGEM DO AR). 3. DANOS OCULARES DANOS: CONJUNTIVITE ALÉRGICA, VERMELHIDÃO INTENSA, LACRIMEJAMENTO EXCESSIVO E FOTOFOBIA (DOR AO OLHAR PARA A LUZ). 4. DANOS SISTÊMICOS GRAVES POR ALERGIA (CHOQUE ANAFILÁTICO) QUEDA BRUSCA DA PRESSÃO ARTERIAL (CHOQUE), ARRITMIA CARDÍACA, DESMAIO E PARADA CARDIORRESPIRATÓRIA.",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "FORNECER EQUIPAMENTO DE PROTEÇÃO PARA TRABALHADORES COM REAÇÕES ALÉGICAS PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, MANIPULAR PRODUTOS EM AMBIENTES QUE NÃO SEJAM CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS PARA CASOS DE ACIDENTES DE DERRAMAMENTO DE PRODUTOS QUÍMICOS."
+        },
+        {
+            "perigo": "ATIVIDADES EM CONTATO MANUAL COM PRODUTOS QUÍMICOS DE FORMA INTENSA EM GRANDE QUANTIDADE",
+            "fonte": "",
+            "risco": "ABSORÇÃO DA SUBSTÂNCIA QUÍMICA PELA PELE E OLHOS",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA,IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE GASES OU VAPORES DE AGENTES QUÍMICOS EM NÍVEL DE AÇÃO",
+            "fonte": "",
+            "risco": "INALAÇÃO DE GASES OU VAPORES DE AGENTES QUÍMICOS EM NÍVEL DE ATENÇÃO",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA,IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE GASES OU VAPORES DE AGENTES QUÍMICOS ACIMA DO NÍVEL DE AÇÃO",
+            "fonte": "",
+            "risco": "INALAÇÃO DE GASES OU VAPORES DE AGENTES QUÍMICOS ACIMA DO NÍVEL DE AÇÃO",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA,IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE GASES OU VAPORES DE AGENTES QUÍMICOS ACIMA DO LT",
+            "fonte": "",
+            "risco": "INALAÇÃO DE GASES OU VAPORES DE AGENTES QUÍMICOS ACIMA DO LIMITE DE TOLERÂNCIA",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA,IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE AEROSISPERSÓIDES NÃO FIBROGÊNICOS",
+            "fonte": "",
+            "risco": "INALAÇÃO DE AEROSISPERSÓIDES NÃO FIBROGÊNICOS",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "fonte": "",
+            "risco": "INALAÇÃO DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "fonte": "",
+            "risco": "INALAÇÃO DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "fonte": "",
+            "risco": "INALAÇÃO DE AEROSISPERSÓIDES FIBROGÊNICOS",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM PRESENÇA DE POEIRA CONTENDO SÍLICA, ASBESTO OU CARVÃO MINERAL",
+            "fonte": "",
+            "risco": "INALAÇÃO DE POEIRA CONTENDO SÍLICA, ASBESTO OU CARVÃO MINERAL",
+            "agravo": "ANEMIA APLÁSTICA DEVIDA A OUTROS AGENTES EXTERNOS ANEMIA APLÁSTICA NÃO ESPECIﬁCADA ANEMIAS, OUTRAS PÚRPURA E OUTRAS AFECÇÕES HEMORRÁGICAS AGRANULOCITOSE TRANSTORNOS ESPECIﬁCADOS DOS GLÓBULOS BRANCOS, OUTROS METEMOGLOBINEMIA HIPOTIREOIDISMO, OUTROSBÓCIO NÃO-TÓXICO, NÃO ESPECIﬁCADO DEMÊNCIA EM OUTRAS DOENÇAS ESPECÍﬁCAS CLASSIFICADAS TRANSTORNOS MENTAIS DEVIDOS À LESÃO E DISFUNÇÃO CEREBRAL E A DOENÇA FÍSICA, OUTROS PARKINSONISMO SECUNDÁRIO DEVIDO A OUTROS AGENTES EXTERNOS TRANSTORNOS DOS NERVOS CRANIANOS EM DOENÇAS CLASSIﬁCADAS EM OUTRA PARTE DIVERSAS PATOLOGIAS CONFORME TIPO E PRINCÍPIO ATIVO DO PQ",
+            "exame": "ESPIROMETRIA",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        },
+        {
+            "perigo": "ATIVIDADES EM CONTATO COM AGENTES QUÍMICOS DA LINACH CONSIDERADOS CANCERÍGENOS",
+            "fonte": "",
+            "risco": "INALAÇÃO DE OU ABSORÇÃO DE AGENTES QUÍMICOS DA LINACH CONSIDERADOS CANCERÍGENOS",
+            "agravo": "LEUCEMIAS DE CÉLULAS DE TIPO ESPECIﬁCADO, OUTRAS, NEOPLASIAS DIVERSAS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR INVENTÁRIO DE PRODUTOS QUÍMICOS, REALIZAR AVALIAÇÃO QUANTITAIVA E ANALISAR CONCENTRAÇÃO MÉDIA, FORNECER EQUIPAMENTO DE PROTEÇÃO RESPIRATÓRIA, IMPLEMENTAR PROGRAMA DE PROTEÇÃO RESPIRATÓRIA,PROMOVER CURSO SOBRE MANIPULAÇÃO DE PRODUTOS QUÍMICOS, PROMOVER VENTILAÇÃO E CIRCULAÇÃO DE AR, IMPLEMTAR CAPELA DE EXAUSTÃO EM AMBIENTES INTERNOS E CONFINADOS, IMPLANTAR CHUVEIROS LAVA OLHOS. IMPLENTAR MONITORAMENTO BIOLÓGICO"
+        }
     ],
     "BIOLOGICOS": [
-        { agente: "VÍRUS, BACTÉRIAS E FUNGOS (GERAL)", risco: "Infecções ocupacionais respiratórias ou cutâneas", exame: "CLÍNICO", per: "Anual" },
-        { agente: "CONTATO COM ESGOTO / ÁGUAS PLUVIAIS", risco: "Leptospirose, hepatite A, parasitoses intestinais", exame: "CLÍNICO", per: "Anual" }
+        {
+            "perigo": "TRABALHO OU OPERAÇÕES, EM CONTATO PERMANENTE COM PACIENTES EM ISOLAMENTO POR DOENÇAS INFECTO-CONTAGIOSAS, BEM COMO OBJETOS DE SEU USO, NÃO PREVIAMENTE ESTERILIZADOS.",
+            "fonte": "",
+            "risco": "TRANSMISSÃO DE DOENÇAS AÉREAS (TUBERCULOSE, INFLUENZA, COVID-19) E CONTATO.",
+            "agravo": "TUBERCULOSE, INFECÇÕES RESPIRATÓRIAS GRAVES (INFLUENZA, COVID-19), MENINGITE.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROPRICIAR SISTEMA DE VENTILAÇÃO ADEQUADO NOS RECINTOS FECHADOS; 6) INSTALAR EQUIPAMENTOS DE CONTENÇÃO, COMO CAPELA E DIVISÓRIAS DE ACRÍLICO 7) PROMOVER TREINAMENTO DE DESCARTE CORRETO DOS RESÍDUOS; 8) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 9) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 10) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 11) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 12) APLICAR E CUMPRIR TODAS DIRETRIZES DA NR 32"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE COM PACIENTES, OU COM MATERIAL INFECTO-CONTAGIANTE, EM HOSPITAIS, SERVIÇOS DE EMERGÊNCIA, ENFERMARIAS, AMBULATÓRIOS, POSTOS DE VACINAÇÃO E OUTROS ESTABELECIMENTOS DESTINADOS AOS CUIDADOS DA SAÚDE HUMANA (APLICA SE UNICAMENTE AO PESSOAL QUE TENHA CONTATO COM OS PACIENTES, BEM COMO AOS QUE MANUSEIAM OBJETOS DE USO DESSES PACIENTES, NÃO PREVIAMENTE ESTERILIZADOS).",
+            "fonte": "",
+            "risco": "INFECÇÕES HOSPITALARES, EXPOSIÇÃO A PATÓGENOS VEICULADOS PELO SANGUE (HIV, HEPATITES B E C).",
+            "agravo": "HIV, HEPATITES B E C, INFECÇÕES HOSPITALARES, SEPTICEMIA.",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROPRICIAR SISTEMA DE VENTILAÇÃO ADEQUADO NOS RECINTOS FECHADOS; 6) INSTALAR EQUIPAMENTOS DE CONTENÇÃO, COMO CAPELA E DIVISÓRIAS DE ACRÍLICO 7) PROMOVER TREINAMENTO DE DESCARTE CORRETO DOS RESÍDUOS; 8) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 9) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 10) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 11) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 12) APLICAR E CUMPRIR TODAS DIRETRIZES DA NR 32"
+        },
+        {
+            "perigo": "TRABALHO OU OPERAÇÕES, EM CONTATO PERMANENTE COM LIXO URBANO (COLETA E INDUSTRIALIZAÇÃO)",
+            "fonte": "",
+            "risco": "INFECÇÕES GASTROINTESTINAIS, TÉTANO, PARASITOSES E LEPTOSPIROSE.",
+            "agravo": "LEPTOSPIROSE, TÉTANO, PARASITOSES, INFECÇÕES GASTROINTESTINAIS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHO OU OPERAÇÕES, EM CONTATO PERMANENTE COM ESGOTOS (GALERIAS E TANQUES)",
+            "fonte": "",
+            "risco": "ALTA CARGA BACTERIANA (COLIFORMES), LEPTOSPIROSE, HEPATITE A E DOENÇAS ENTÉRICAS.",
+            "agravo": "HEPATITE A, FEBRE TIFOIDE, LEPTOSPIROSE, DIARREIAS BACTERIANAS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHO OU OPERAÇÕES, EM CONTATO PERMANENTE COM CARNES, GLÂNDULAS, VÍSCERAS, SANGUE, OSSOS, COUROS, PÊLOS E DEJEÇÕES DE ANIMAIS PORTADORES DE DOENÇAS INFECTO-CONTAGIOSAS (CARBUNCULOSE, BRUCELOSE, TUBERCULOSE)",
+            "fonte": "",
+            "risco": "ZOONOSES SEVERAS (CARBÚNCULO/ANTRAZ, BRUCELOSE, TUBERCULOSE BOVINA).",
+            "agravo": "BRUCELOSE, CARBÚNCULO (ANTRAZ), TUBERCULOSE BOVINA.",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE COM PACIENTES, ANIMAIS OU COM MATERIAL INFECTO-CONTAGIANTE, EM HOSPITAIS, AMBULATÓRIOS, POSTOS DE VACINAÇÃO E OUTROS ESTABELECIMENTOS DESTINADOS AO ATENDIMENTO E TRATAMENTO DE ANIMAIS (APLICA SE APENAS AO PESSOAL QUE TENHA CONTATO COM TAIS ANIMAIS)",
+            "fonte": "",
+            "risco": "ZOONOSES, ARRANHADURAS, MORDEDURAS E INFECÇÕES POR PATÓGENOS ESPECÍFICOS (RAIVA, LEPTOSPIROSE).",
+            "agravo": "RAIVA, ZOONOSES VARIADAS, INFECÇÕES CUTÂNEAS, ESPOROTRICOSE.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE COM MATERIAL INFECTO-CONTAGIANTE, EM CONTATO EM LABORATÓRIOS, COM ANIMAIS DESTINADOS AO PREPARO DE SORO, VACINAS E OUTROS PRODUTOS",
+            "fonte": "",
+            "risco": "ACIDENTES COM MATERIAL PERFUROCORTANTE, INALAÇÃO DE AEROSSÓIS INFECCIOSOS, CULTURAS BACTERIANAS/VIRAIS.",
+            "agravo": "RISCOS VARIADOS CONFORME O PATÓGENO MANIPULADO (VÍRUS/BACTÉRIAS DE ALTA PERICULOSIDADE).",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE COM MATERIAL INFECTO-CONTAGIANTE, EM LABORATÓRIOS DE ANÁLISE CLÍNICA E HISTOPATOLOGIA (APLICA-SE TÃO- SÓ AO PESSOAL TÉCNICO);",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A PATÓGENOS REMANESCENTES EM RESTOS MORTAIS, INFECÇÕES CUTÂNEAS OU RESPIRATÓRIAS.",
+            "agravo": "INFECÇÕES POR PATÓGENOS DESCONHECIDOS, CONTAMINAÇÃO ACIDENTAL COM AMOSTRAS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE MATERIAL INFECTO-CONTAGIANTE, EM CEMITÉRIOS (EXUMAÇÃO DE CORPOS);",
+            "fonte": "",
+            "risco": "INTOXICAÇÕES BIOLÓGICAS, EXPOSIÇÃO A FUNGOS, BACTÉRIAS DE DECOMPOSIÇÃO E ZOONOSES.",
+            "agravo": "INFECÇÕES FÚNGICAS, PATÓGENOS REMANESCENTES EM TECIDOS DECOMPOSTOS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM COM MATERIAL INFECTO-CONTAGIANTE, EM RESÍDUOS DE ANIMAIS DETERIORADOS.",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A MICRORGANISMOS ENTÉRICOS, GASES TÓXICOS E MATERIAL FECAL PATOGÊNICO.",
+            "agravo": "ZOONOSES, INFECÇÕES SISTÊMICAS, PATÓGENOS DA DECOMPOSIÇÃO (EX: CLOSTRÍDIOS).",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 10) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 11 BOA HIGIENE PESSOAL 12) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHO DE EXUMAÇÃO DE CORPOS",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A PATÓGENOS DESCONHECIDOS, CONTATO COM TECIDOS INFECTADOS.",
+            "agravo": "INFECÇÕES SISTÊMICAS, RISCOS BIOLÓGICOS POR CONTATO DIRETO COM RESTOS MORTAIS.",
+            "exame": "HEMOGRAMA COMPLETO",
+            "per": "Semestral",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) PROTOCOLO DE MANUSEIO DE CADÁVERES E PREVENÇÃO PARA DOENÇAS INFECTO CONTAGIOSAS. 10) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 11) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 12) BOA HIGIENE PESSOAL 13) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "ESVAZIAMENTO DE BIODIGESTORES",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A MICRORGANISMOS ENTÉRICOS, GASES TÓXICOS E MATERIAL FECAL PATOGÊNICO",
+            "agravo": "INFECÇÕES ENTÉRICAS GRAVES, EXPOSIÇÃO A GASES TÓXICOS E MATERIAL FECAL PATOGÊNICO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) PROTOCOLO DE MANUSEIO DE CADÁVERES E PREVENÇÃO PARA DOENÇAS INFECTO CONTAGIOSAS. 10) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 11) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 12) BOA HIGIENE PESSOAL 13) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        },
+        {
+            "perigo": "TRABALHOS E OPERAÇÕES EM CONTATO PERMANENTE COM PACIENTES, ANIMAIS OU COM MATERIAL INFECTO-CONTAGIANTE, EM GABINETES DE AUTÓPSIAS, DE ANATOMIA E HISTOANATOMOPATOLOGIA (APLICA-SE SOMENTE AO PESSOAL TÉCNICO)",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A PATÓGENOS DESCONHECIDOS, CONTATO COM TECIDOS INFECTADOS.",
+            "agravo": "RISCOS SEVEROS DE INFECÇÃO POR PATÓGENOS DESCONHECIDOS EM TECIDOS NECROPSIADOS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER A CULTURA DE HIGIENIZAÇÃO E DESINFECÇÃO FREQUENTE DAS MÃOS, ROUPAS E AMBIENTES; 2) REALIZAR HIGIENIZAÇÃO DAS SUPERFÍCIES; 3) FONECER E FISCALIZAR O USO DOS EPI’S ADEQUADOS; 4) PADRONIZAR OS PROCEDIMENTOS DE MANUSEIO, ESTOQUE, TRANSPORTE E USO DE OBJETOS PERFUROCORTANTES; 5) PROMOVER TREINAMENTO E CONSCIENTIZAÇÃO DOS TRABALHADORES A RESPEITO DOS RISCOS PRESENTES NO AMBIENTE DE TRABALHO 6) EVITAR O CONTATO DAS MÃOS COM O ROSTO; 7) NÃO UTILIZAR COSMÉTICOS E NEM CONSUMIR ALIMENTOS OU BEBIDAS NO LOCAL DE TRABALHO; 8) PROMOVER TREINAMENTO DO USO E HIEGIENIZAÇÃO DOS EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL CONSIDERADOS ESSENCIAIS PARA A SEGURANÇA 9) PROTOCOLO DE MANUSEIO DE CADÁVERES E PREVENÇÃO PARA DOENÇAS INFECTO CONTAGIOSAS. 10) COBRIR CORTES OU LESÕES COM CURATIVOS À PROVA D'ÁGUA. 11) LIMPEZA CUIDADOSA DE QUAISQUER FERIMENTOS SOFRIDOS DURANTE OS PROCEDIMENTOS. 12) BOA HIGIENE PESSOAL 13) USO DE VESTUÁRIO DE PROTEÇÃO ADEQUADO"
+        }
     ],
-    "BIOLOGICOS_AGRESSIVOS": [
-        { agente: "MATERIAL BIOLÓGICO CONTAMINADO (SANGUE / FLUIDOS)", risco: "Hepatite B, Hepatite C, HIV", exame: "HEMOGRAMA + ANTI-HBS", per: "Anual" },
-        { agente: "BACILO DA TUBERCULOSE EM AMBIENTE HOSPITALAR", risco: "Tuberculose ativa", exame: "CLÍNICO + RX DE TÓRAX", per: "Anual" }
+    "BIOLOGICOS_AMPLIADOS": [
+        {
+            "perigo": "PROLIFERAÇÃO DE INSETOS E PERNILONGOS DEVIDO AO EXCESSO DE VEGETAÇÃO OU FALTA DE CONDIÇÕES SANITÁRIAS NA ÁREA EXTERNA DA UNIDADE",
+            "fonte": "",
+            "risco": "PICADAS DE PERNILONGOS",
+            "agravo": "DENGUE, CHIKUNGUNYA, ZIKA.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR LIMPEZA, RETIRADA DE LIXO E EXCESSO DE VEGETAÇÃO REMOVER RECIPIENTE DE ACÚMULO DE ÁGUA"
+        },
+        {
+            "perigo": "INGESTÃO DE ÁGUA DO RESERVATÓRIO SEM LAUDO DE POTABILIDADE",
+            "fonte": "",
+            "risco": "INGESTÃO DE MICRORGANISMOS INFECTANTES",
+            "agravo": "COMPROMETIMENTO DO SISTEMA DIGESTIVO, DIARREIA, VÔMITO, DESIDRATAÇÃO, INFECÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER HIGIENIZAÇÃO DO RESERVATPORIO E ANÁLISE LABORATORIAL  DA ÁGUA"
+        },
+        {
+            "perigo": "AUSÊNCIA DE LIMPEZA DA CAIXA DE ÁGUA DE CONSUMO",
+            "fonte": "",
+            "risco": "INGESTÃO DE MICRORGANISMOS E/OU BACTÉRIAS",
+            "agravo": "COMPROMETIMENTO DO SISTEMA DIGESTIVO, DIARREIA, VÔMITO E DESIDRATAÇÃO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR A LIMPEZA E DESINFECÇÃO DA CAIXA D`ÁGUA, ADMINISTRAR E FAZER INVENTARIO DE MANUTENÇÃO"
+        },
+        {
+            "perigo": "FALTA DE PLACAS DE ADVERTÊNCIA COMO PROIBIDO FUMAR E SAÍDA DE EMERGÊNCIA",
+            "fonte": "",
+            "risco": "PRINCÍPIO DE INCÊNDIO, PÂNICO EM MOMENTO DE EMERGÊNCIA",
+            "agravo": "QUEIMADURAS, QUEDA E PERDA DE CONSCIÊNCIA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ELABORAR PLANO DE PREVENÇÃO E COMBATE A INCÊNDIO, DEIXAR O PRÉDIO EM CONFORMIDADE PARA OBTENÇÃO DE AVCB."
+        },
+        {
+            "perigo": "ÁGUA ESTACIONÁRIA DO SISTEMA DE CLIMATIZAÇÃO COM AR CONDICIONADO CENTRAL, SPLIT OU DE GAVETA",
+            "fonte": "",
+            "risco": "GERAÇÃO E POLIFERAÇÃO DE BACTÉRIA LEGIONELA",
+            "agravo": "PENEUMONIA OU MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLENTAR O PLANO DE MANUTENÇÃO OPERAÇÃO E CONTROLE – PMOC, CONFORME DECRETO 3.523 DA ANVISA, ATRAVÉS DE ENGENHIRO MECÂNICO COM EMISSÃO DE ART E VERIFICAR O CUMPRIMENTO DO PMOC, ATRAVÉS DE RELATÓRIO DE LIMPEZA E MANUTENÇÃO COM ASSINATURA DO USUÁRIO"
+        },
+        {
+            "perigo": "AMBIENTES FECHADOS PARA MANTER A CLIMATIZAÇÃO DO SISTEMA DE AR CONDICIONADO CENTRAL, SPLIT OU DE GAVETA",
+            "fonte": "",
+            "risco": "POLIFERAÇÃO DE MICRORGANISMOS",
+            "agravo": "RESSECAMENTO DO MUCO, RINITE ALÉRGICA, GRIPES E DOENÇAS OPORTUNISTAS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "EM SISTEMAS CENTRAIS DE REFRIGERAÇÃO, IMPLANTAR TOMADAS DE AR PARA RENOVAÇÃO DO AR CIRCULANTE, ABRIR JANELAS E/OU PORTAS PERIODICAMENTE PARA RENOVAÇÃO DO AR, QUANDO NECESSÁRIO INSTALAR UMIDIFICADOR DE AR"
+        },
+        {
+            "perigo": "ÁGUA ESTACIONÁRIA DE RESERVATÓRIO DE CHAFARIZ, TANQUES, CAIXAS, VALAS OU QUALQUER RECIPIENTE QUE MANTENHA ÁGUA PARADA",
+            "fonte": "",
+            "risco": "GERAÇÃO E POLIFERAÇÃO DE BACTÉRIA LEGIONELA E LARVAS DE MOSQUITOS",
+            "agravo": "GRIPES, PENUMONIA E MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REMOVER RECEPIENTE SEM TAMPA QUE ACUMULE ÁGUA OU IMPLEMENTAR CONDIÇÕES PARA CIRCULAÇÃO DA ÁGUA COM DEVIDO TRATAMENTO E VIGILÂNCIA"
+        },
+        {
+            "perigo": "ATRASO NA DISTRIBUIÇÃO DE EQUIPAMENTOS DE PROTEÇÃO INDIVIDUAL, DEFICIÊNCIA NA GESTÃO DE EPI, INEXISTÊNCIA DE FISCALIZAÇÃO, QUANTIDADE INSUFICIENTE DE EPI OU DESCONFORTO NA RELAÇÃO DE USO DO EPI.",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO DESPROTEGIDA A AGENTES DE RISCO; AUMENTO DA PROBABILIDADE DE ACIDENTES E DOENÇAS OCUPACIONAIS.",
+            "agravo": "PATOLOGIAS  INFECTOCONTAGIOSAS E ACIDENTES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR ALMOXARIFADO CENTRAL E EXCLUSIVO DE EPI E EPC PARA AS ATIVIDADES DE SAÚDE. DEFINIR ATRAVÉS DO SESMT, ORDEM DE SERVIÇO POR ATIVIDADE, ONDE CONTENHA OS TIPOS DE EPI DE ACORDO COM AS EXPOSIÇÕES LABORAIS. OUVIR OS TRABALHADORES PARA DEFINIR O MODELO DE EPI CONFORTÁVEL E O CONSUMO MENSAL DE CADA TRABALHADOR REALIZAR DISTRIBUIÇÃO PARA CADA SETOR DE TRABALHO ATRAVÉS DE CAUTELA DE EPI E EPC NOS PRAZOS DEFINIDOS. APLICAR TREINAMENTO DE USO DO EPI, HIGIENIZAÇÃO E MANTER FISCALIZAÇÃO PERIÓDICA DO  USO DO EPI."
+        }
+    ],
+    "ERGONOMICOS_BIOMECANICOS": [
+        {
+            "perigo": "EXIGÊNCIA DE POSTURAS INCÔMODAS OU POUCO CONFORTÁVEIS POR LONGOS PERÍODOS",
+            "fonte": "",
+            "risco": "DANOS OSTEOSMUSCULARES E FADIGA",
+            "agravo": "TRANSTORNOS DO PLEXO BRAQUIAL",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REALIZAR LAUDO ERGONÔMICO, ADEQUAR EQUIPAMENTOS, FERRAMENTAS E MATERIAS PARA DESENVOLVER A ATIVIDADE, IMPLEMNTAR PAUSAS DE DESCANSO"
+        },
+        {
+            "perigo": "POSTURA SENTADA POR LONGOS PERÍODOS",
+            "fonte": "",
+            "risco": "POSTURA INADEQUADA, DESCONFORTO",
+            "agravo": "DORES LOMBARES, LUMBAGO COM CIÁTICA, TRANSTORNOS DE DISCOS LOMBARES E DE OUTROS DISCOS INTERVERTEBRAIS COM MIELOPATIA.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAR TREINAMENTO CONTÍNUO SOBRE PRÁTICAS ERGONÔMICAS; INTRODUZIR PROGRAMAS DE EXERCÍCIOS DE ALONGAMENTO E FORTALECIMENTO MUSCULAR; DELIBERAR PAUSAS REGULARES DURANTE A JORNADA DE TRABALHO PARA ALTERNAR POSIÇÃO"
+        },
+        {
+            "perigo": "POSTURA DE PÉ POR LONGOS PERÍODOS",
+            "fonte": "",
+            "risco": "DANOS OSTEOSMUSCULARES",
+            "agravo": "DORES LOMBARES, TRANSTORNOS DE DISCOS LOMBARES E DE OUTROS DISCOS INTERVERTEBRAIS COM MIELOPATIA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAR TREINAMENTO CONTÍNUO SOBRE PRÁTICAS ERGONÔMICAS; INTRODUZIR PROGRAMAS DE EXERCÍCIOS DE ALONGAMENTO E FORTALECIMENTO MUSCULAR; DELIBERAR PAUSAS REGULARES DURANTE A JORNADA DE TRABALHO PARA ALTERNAR POSIÇÃO"
+        },
+        {
+            "perigo": "CONSTANTE DESLOCAMENTO A PÉ DURANTE A JORNADA DE TRABALHO",
+            "fonte": "",
+            "risco": "CANSAÇO, INSATISFAÇÃO",
+            "agravo": "MONONEUROPATIAS DOS MEMBROS SUPERIORES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAR TREINAMENTO CONTÍNUO SOBRE PRÁTICAS ERGONÔMICAS; INTRODUZIR PROGRAMAS DE EXERCÍCIOS DE ALONGAMENTO E FORTALECIMENTO MUSCULAR; DELIBERAR PAUSAS REGULARES DURANTE A JORNADA DE TRABALHO PARA ALTERNAR POSIÇÃO"
+        },
+        {
+            "perigo": "LEVANTAMENTO E TRANSPORTE MANUAL DE CARGAS OU VOLUMES",
+            "fonte": "",
+            "risco": "DANOS OSTEOSMUSCULARES",
+            "agravo": "VARIZES DOS MEMBROS INFERIORES, COXARTROSE [ARTROSE DO QUADRIL, GONARTROSE [ARTROSE DO JOELHO, TRANSTORNOS DOS DISCOS CERVICAIS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAR TREINAMENTO CONTÍNUO SOBRE TÉCNICAS DE POSTURA PARA LEVANTAMENTO E IÇAMENTO DE PESO; GERAR PROTOCOLO DE LEVANTAMENTO DE PESO; ANALISAR EQUIPAMENTOS DE SUPORTE PARA REMOÇÃO DE CARGA"
+        },
+        {
+            "perigo": "FREQUENTE AÇÃO DE PUXAR/EMPURRAR CARGAS OU VOLUMES",
+            "fonte": "",
+            "risco": "FADIGA, POSTURA INADEQUADA,",
+            "agravo": "HÉRNIAS ABDOMINAIS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "CULTIVAR A CULTURA DE TEMPO DE TRABALHO E DESCANSO, E SEGUIR ORIENTÇÕES DA ERGONOMISTA"
+        },
+        {
+            "perigo": "FREQUENTE EXECUÇÃO DE MOVIMENTOS REPETITIVOS",
+            "fonte": "",
+            "risco": "LESÃO DE ESFORÇO REPETITIVO",
+            "agravo": "ENTESOPATIAS NÃO CLASSIFICADAS EM OUTRA PARTE, OUTRAS E INFLAMAÇÕES, MONONEUROPATIAS DOS MEMBROS SUPERIORES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INCREMENTAR CONSCIENTIZAÇÃO DE TÉCNICA DE AJUSTE ROTINEIRO DE FERRAMENTAS E EQUIPAMENTOS, POSICIONADOS DE FORMA A MINIMIZAR MOVIMENTOS REPETITIVOS E POSTURAS INADEQUADAS; TREINAMENTO CONTÍNUO SOBRE PRÁTICAS ERGONÔMICAS; INTRODUZIR PROGRAMAS DE EXERCÍCIOS DE ALONGAMENTO E FORTALECIMENTO MUSCULAR; DELIBERAR PAUSAS REGULARES DURANTE OS JORNADA DE TRABALHO;"
+        },
+        {
+            "perigo": "ORTOSTATISMO PROLONGADO",
+            "fonte": "",
+            "risco": "DANOS CIRCULATÓRIOS",
+            "agravo": "VARIZES DOS MEMBROS INFERIORES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "DELIBERAR PAUSAS REGULARES DURANTE A JORNADA DE TRABALHO PARA ALTERNAR POSIÇÃO"
+        },
+        {
+            "perigo": "MOBILIÁRIO SEM MEIOS DE REGULAGEM DE AJUSTE",
+            "fonte": "",
+            "risco": "DESCONFORTO, DANOS OSTEOMUSCULAR OU ESTRESSE E SOBRECARGA COGNITIVA",
+            "agravo": "TRANSTORNOS DOS TECIDOS MOLES RELACIONADOS COM O USO, O USO EXCESSIVO E A PRESSÃO; SINOVITE CREPITANTE CRÔNICA DA MÃO E DO PUNHO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "SUBSTITUIR CADEIRA E MESA POR MODELOS QUE ATENDA OS REQUISITOS ERGONÔMICOS CONFORME ANTROPOMETRIA DO TRABALHADOR"
+        },
+        {
+            "perigo": "EQUIPAMENTOS, MONITOR E/OU MÁQUINAS SEM MEIOS DE REGULAGEM DE AJUSTE OU SEM CONDIÇÕES DE USO",
+            "fonte": "",
+            "risco": "DESCONFORTO, DANOS OSTEOMUSCULAR OU ESTRESSE E SOBRECARGA COGNITIVA",
+            "agravo": "TRANSTORNOS DOS TECIDOS MOLES RELACIONADOS COM O USO, O USO EXCESSIVO E A PRESSÃO; SINOVITE CREPITANTE CRÔNICA DA MÃO E DO PUNHO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "RELACIONAR EQUIPAMENTOS, MÁQUINAS, MOBÍLIA E TECNOLOGIA QUE PROVOCA ESFORÇO E DIFICULDADES DE MOVIMENTOS E ACIONAMENTO PARA ADEQUAÇÃO E SUBSTITUIÇÃO"
+        },
+        {
+            "perigo": "PERIGO",
+            "fonte": "FONTE GERADORA",
+            "risco": "RISCO",
+            "agravo": "LESÕES OU AGRAVOS À SAÚDE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PLANO DE AÇÃO"
+        },
+        {
+            "perigo": "RISCOS ERGONÔMICOS ORGANIZACIONAIS",
+            "fonte": "",
+            "risco": "RISCOS ERGONÔMICOS ORGANIZACIONAIS",
+            "agravo": "RISCOS ERGONÔMICOS ORGANIZACIONAIS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PLANO SINTÉTICO DE AÇÕES"
+        },
+        {
+            "perigo": "PERIGO/FONTE/CIRCUNSTÂNCIA",
+            "fonte": "",
+            "risco": "RISCO",
+            "agravo": "LESÕES OU AGRAVOS À SAÚDE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "MEDIDAS DE PREVENÇÃO A SEREM INTRODUZIDAS OU MANTIDAS"
+        },
+        {
+            "perigo": "AMBIENTE DE TRABALHO COM ILUMINAÇÃO AUSENTE OU DEFICIENTE.",
+            "fonte": "",
+            "risco": "DANOS OCULARES",
+            "agravo": "NISTAGMO E OUTROS MOVIMENTOS IRREGULARES DO OLHO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR E CORIGIR DEFICIÊNCIA DE ILUMINAÇÃO"
+        },
+        {
+            "perigo": "CONDIÇÕES DO AMBIENTE DE TRABALHO: DEFICIÊNCIA DE VENTILAÇÃO, DESCONFORTO TÉRMICO.",
+            "fonte": "",
+            "risco": "DESCONFORTO BAIXA PRODUTIVIDADE",
+            "agravo": "FATORES PSICOSSOCIAIS AGRAVANTES OU COADJUVANTES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR E CORRIGIR DEFICIÊNCIA DE CLIMATIZAÇÃO"
+        },
+        {
+            "perigo": "CONDIÇÕES DO AMBIENTE DE TRABALHO: DESCONFORTO ACÚSTICO",
+            "fonte": "",
+            "risco": "DESCONFORTO BAIXA PRODUTIVIDADE",
+            "agravo": "FATORES PSICOSSOCIAIS AGRAVANTES OU COADJUVANTES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR E CORRIGIR DEFICIÊNCIA DE CLIMATIZAÇÃO"
+        },
+        {
+            "perigo": "AUSÊNCIA DE PAUSAS PARA DESCANSO OU NÃO CUMPRIMENTO DESTAS DURANTE A JORNADA DE TRABALHO",
+            "fonte": "",
+            "risco": "FADIGA, ESTRESSE",
+            "agravo": "SÍNDROME DE BURNOUT, DISTÚRBIOS EMOCIONAIS, ESTRESSE. INEXISTENTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "DELIBERAR PAUSAS REGULARES DURANTE OS JORNADA DE TRABALHO; APLICAR MÉTODOS DE RELATÓRIOS PARA ABORDAR INCIDENTES OCORRIDOS E REUNIÕES PARA MELHORIA E AJUSTAR DIRETRIZES DESEMPENHADAS."
+        },
+        {
+            "perigo": "NECESSIDADE DE MANTER RITMOS INTENSOS DE TRABALHO",
+            "fonte": "",
+            "risco": "FADIGA, ESTRESSE",
+            "agravo": "DISTÚRBIOS METABÓLICOS NÃO ESPECIﬁCADOS, OUTROS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "AMPLIAR O QUADRO FUNCIONAL, EMPREGAR ALONGAMENTOS E MOVIMENTOS REGULARES PARA ALIVIAR A TENSÃO NO PESCOÇO, OMBROS E COSTAS."
+        },
+        {
+            "perigo": "TRABALHO COM NECESSIDADE DE VARIAÇÃO DE TURNOS",
+            "fonte": "",
+            "risco": "DISTÚRBIOS DO CICLO VIGÍLIA-SONO",
+            "agravo": "DIABETES MELLITUS NÃO INSULINODEPENDENTE, OBESIDADE, DISTÚRBIOS METABÓLICOS NÃO ESPECIFICADOS, OUTROS, DOENÇAS CARDIOVASCULARES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "OFERECER INFORMATIVOS IMPRESSOS COM INFORMAÇÕES GERAIS PARA UM MELHOR SONO NO PERÍODO DIURNO EVITANDO FADIGA E CANSAÇO NO DECORRER DE SUAS ATIVIDADES FAMILIARES, SOCIAIS E LABORAIS. INVESTIR EM AÇÕES DE PROMOÇÃO A SAÚDE, DESENVOLVENDO GINÁSTICA LABORAL, ATIVIDADES RECREATIVAS FORA DO SEU HORÁRIO DE TRABALHO, DISPONIBILIZAR ASSISTÊNCIA DE MÉDICOS ESPECIALIZADOS EM SONO E MASSOTERAPEUTA E UM LOCAL DE DESCANSO DURANTE OS INTERVALOS DO TRABALHO PRINCIPALMENTE PARA A EQUIPE DE SAÚDE QUE REALIZA CUIDADOS CONTINUO NÃO PERMITINDO ERROS."
+        },
+        {
+            "perigo": "POSTOS DE TRABALHO ISOLADO",
+            "fonte": "",
+            "risco": "MONOTONIA",
+            "agravo": "EPISÓDIOS DEPRESSIVOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INTRODUZIR DINÂMICAS PARA ROTATIVIDADE DE TAREFAS"
+        },
+        {
+            "perigo": "FATORES RELACIONADOS A GESTÃO ORGANIZACIONAL; E/OU CONTEXTO DA ORGANIZAÇÃO DO TRABALHO; E/OU CARACTERÍSTICA DAS RELAÇÕES SOCIAIS NO TRABALHO; E/OU CONTEÚDO DAS TAREFAS DO TRABALHO; E/OU CONDIÇÃO DO AMBIENTE DE TRABALHO; E/OU INTERAÇÃO PESSOA-TAREFA; E/OU JORNADA DE TRABALHO",
+            "fonte": "",
+            "risco": "SOBRECARGA MENTAL E EMOCIONAL, INSATISFAÇÃO",
+            "agravo": "TRANSTORNOS SOMATOFORMES, REAÇÕES AO \"STRESS\" GRAVE E TRANSTORNOS DE ADAPTAÇÃO, TRANSTORNOS DE ADAPTAÇÃO, TRANSTORNOS PSICÓTICOS AGUDOS E TRANSITÓRIOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "CONSIDERAR AS QUEIXAS NA ÁREA DO CONVÍVIO ENTRE OS TRABALHADORES E SUAS CHEFIAS, GERIR OS CONFLITOS COM DEDICAÇÃO, REALIZANDO AÇÕES PARA ESCLARECIMENTOS E RESOLUÇÃO DOS CONFLITOS. REALIZAR AVALIAÇÃO PSICOSSOCIAL, IMPLEMENTAR AS MEDIDAS PROPOSTAS CONFORME O LEVANTAMENTO ERGONÔMICO E PSICOSSOCIAL."
+        },
+        {
+            "perigo": "COBRANÇA DE METAS IMPOSSÍVEL OU DIFÍCIL DE ATINGIR",
+            "fonte": "",
+            "risco": "SOBRECARGA MENTAL E ESTRESSE",
+            "agravo": "SÍNDROME DE BURNOUT, DISTÚRBIOS EMOCIONAIS, ESTRESSE.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "CULTIVAR A CULTURA DE TEMPO DE TRABALHO E DESCANSO E SEGUIR ORIENTÇÕES DA ERGONOMISTA."
+        },
+        {
+            "perigo": "INEXISTÊNCIA DE CONDIÇÕES HUMANISTAS NO INTERIOR DOS LOCAIS DE TRABALHO, COMO: PLANTAS, MATERIAIS DECORATIVOS, QUADROS E OUTROS.",
+            "fonte": "",
+            "risco": "CARACTERIZAÇÃO DE LOCAL INÓSPITO, DESCONFORTÁVEL E DESUMANO",
+            "agravo": "SÍNDROMES DE DEPRESSÃO, PREJUÍZO DO CLIMA ORGANIZACIONAL",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER DECORAÇÃO DO INTERIOR DAS ÁREAS DE TRABALHO HUMANÍSTICA E CONFORTÁVEL"
+        },
+        {
+            "perigo": "DEFICIÊNCIA NO LAYOUT DE TRABALHO, MOBILIA, EQUIPAMENTO, PRATELEIRA OU BANCADA DESAJUSTADAS OU ACÚMULO DE MATERIAIS NO AMBIENTE",
+            "fonte": "",
+            "risco": "DESCONFORTO BAIXA PRODUTIVIDADE",
+            "agravo": "FATORES COGNITIVOS COADJUVANTES, BAIXA PRODUÇÃO E TRANSTORNOS BIOMECÂNICOS",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ADEQUAR E CORRIGIR DEFICIÊNCIA DE LAYOUT, CONDIÇÕES DE MOBÍLIA, ESTRUTURA FÍSICA E SUPORTES DE TRABALHO"
+        },
+        {
+            "perigo": "ILUMINAÇÃO INADEQUADA",
+            "fonte": "",
+            "risco": "DIFICULDADE DE ACESSO E DETECÇÃO DE MATERIAIS",
+            "agravo": "",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ANALISAR ÁREA DE TRABALHO, PROMOVER ILUMINAÇÃO MÓVEL"
+        },
+        {
+            "perigo": "ARRANJO FÍSICO INADEQUADO",
+            "fonte": "",
+            "risco": "DESORGANIZAÇÃO, ESTRESSE E BAIXA PRODUÇÃO",
+            "agravo": "QUEDAS DE OBJETOS, PROPAGAÇÃO DE FOGO, INSATISFAÇÃO, PERTURBAÇÃO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ORGANIZAR E ADEQUAR MATERIAIS E MOBÍLIAS EXPEDIR MATERIAIS SEM UTILIDADE, REMOVER PESSOAS CONFORME CAPACIDADE DE ESPAÇOS"
+        },
+        {
+            "perigo": "ARMAZENAMENTO INADEQUADO, ACÚMULO DE ENTULHOS",
+            "fonte": "",
+            "risco": "QUEDAS DE OBJETO, INSATISFAÇÃO ERGONÔMICA",
+            "agravo": "PANCADA, ESCORIAÇÃO, DANOS FISICOS,",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ORGANIZAR E ADEQUAR MATERIAIS, EXPEDIR MATERIAIS SEM UTILIDADE, IMPLEMENTAR ESTANTES DE ORGANIZAÇÃO, SEPARAR MATERIAIS POR CATEGORIA EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO."
+        }
+    ],
+    "ERGONOMICOS_COGNITIVOS": [
+        {
+            "perigo": "EXIGÊNCIA DE ALTO NÍVEL DE CONCENTRAÇÃO OU ATENÇÃO",
+            "fonte": "",
+            "risco": "SOBRECARGA DE TRABALHO MENTAL",
+            "agravo": "SÍNDROME DE BURNOUT, LARINGOTRAQUEÍTE AGUDA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "CULTIVAR A CULTURA DE TEMPO DE TRABALHO E DESCANSO E SEGUIR ORIENTÇÕES DA ERGONOMISTA."
+        },
+        {
+            "perigo": "FATORES RELACIONADOS A GESTÃO ORGANIZACIONAL: DEFICIÊNCIAS NA ADMINISTRAÇÃO DE RECURSOS HUMANOS CARACTERÍSTICAS DAS RELAÇÕES SOCIAIS NO TRABALHO; ESPECIFICAÇÃO DE SISTEMAS DE CONTROLE E DEFINIÇÃO DE FUNÇÕES, ENTRE OUTROS",
+            "fonte": "",
+            "risco": "DEFICIÊNCIA NO CLIMA DAS RELAÇÕES, COESÃO E QUALIDADE DAS INTERAÇÕES, INCLUSIVE TRABALHO EM EQUIPE, CONTEÚDO DAS TAREFAS DO TRABALHO; DEMANDAS EMOCIONAIS (PELO ATENDIMENTO AO CLIENTE) DEFICIÊNCIA NAS FORMAS DE COMUNICAÇÃO, TECNOLOGIA, MODALIDADE DE ORGANIZAÇÃO DO TRABALHO E DEMANDAS QUALITATIVAS E QUANTITATIVAS DO TRABALHO, ENTRE OUTROS.",
+            "agravo": "TRANSTORNOS NEURÓTICOS ESPECIFICADOS ENCEFALOPATIA HIPERTENSIVA ISQUEMIA CEREBRAL TRANSITÓRIA NÃO ESPECIﬁCADA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ANALISAR DESEMPENHO E ESTRATÉGIAS PARA GERENCIAR MUDANÇAS QUE AFETAM AS PESSOAS, ENTRE OUTROS. CONTEXTO DA ORGANIZAÇÃO DO TRABALHO. APLICAR MÉTODOS DE RELATÓRIOS PARA ABORDAR INCIDENTES OCORRIDOS E REUNIÕES PARA MELHORIA E AJUSTAR DIRETRIZES DESEMPENHADAS. AVALIAR A RELEVÂNCIA DO CONHECIMENTO E DAS HABILIDADES QUE A PESSOA POSSUI EM RELAÇÃO ÀS DEMANDAS DA TAREFA, OS NÍVEIS DE INICIATIVA E AUTONOMIA PERMITIDOS E DE RECONHECIMENTO, BEM COMO A IDENTIFICAÇÃO DA PESSOA COM A TAREFA E COM A ORGANIZAÇÃO"
+        },
+        {
+            "perigo": "JORNADA DE TRABALHO: PROBLEMAS NA ORGANIZAÇÃO E DURAÇÃO DA JORNADA DE TRABALHO; EXISTÊNCIA OU AUSÊNCIA DE PAUSAS DURANTE O DIA",
+            "fonte": "",
+            "risco": "TRABALHO EM TURNO E NOTURNO; TIPO E FREQUÊNCIA DE ROTAÇÃO DOS TURNOS; NÚMERO E FREQUÊNCIA DE HORAS EXTRAS MENSAIS E DURAÇÃO E FREQUÊNCIA DE INTERVALOS SEMANAIS; TRABALHO INTERMITENTE",
+            "agravo": "TRANSTORNOS ANSIOSOS, OUTROS. REAÇÕES AO \"STRESS\" GRAVE E TRANSTORNOS DE ADAPTAÇÃO, NEURASTENIA",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ANALISAR DESEMPENHO E ESTRATÉGIAS PARA GERENCIAR MUDANÇAS QUE AFETAM AS PESSOAS, ENTRE OUTROS. CONTEXTO DA ORGANIZAÇÃO DO TRABALHO. APLICAR MÉTODOS DE RELATÓRIOS PARA ABORDAR INCIDENTES OCORRIDOS E REUNIÕES PARA MELHORIA E AJUSTAR DIRETRIZES DESEMPENHADAS."
+        }
+    ],
+    "PSICOSSOCIAIS": [
+        {
+            "perigo": "COPSOQ 1-3 — CARGA E RITMO DE TRABALHO (ACÚMULO, FALTA DE TEMPO, RAPIDEZ)",
+            "fonte": "",
+            "risco": "SOBRECARGA QUANTITATIVA E PRESSÃO TEMPORAL.",
+            "agravo": "BURNOUT, ANSIEDADE, FADIGA CRÔNICA, DISTÚRBIOS DO SONO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REDIMENSIONAMENTO DE TAREFAS; CONTRATAÇÃO OU AUTOMAÇÃO; PAUSAS OBRIGATÓRIAS."
+        },
+        {
+            "perigo": "COPSOQ 4-6 — DEMANDA COGNITIVA E EMOCIONAL (ATENÇÃO, DECISÕES DIFÍCEIS, CARGA EMOCIONAL)",
+            "fonte": "",
+            "risco": "ESTRESSE OCUPACIONAL E FADIGA MENTAL.",
+            "agravo": "EXAUSTÃO EMOCIONAL, DEPRESSÃO, IRRITABILIDADE, ERROS COGNITIVOS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "TREINAMENTO DE RESILIÊNCIA; SUPORTE PSICOLÓGICO; RODÍZIO DE FUNÇÕES COMPLEXAS."
+        },
+        {
+            "perigo": "COPSOQ 7-9 — FALTA DE AUTONOMIA E ESTAGNAÇÃO (BAIXA INFLUÊNCIA, POUCA INICIATIVA, SEM APRENDIZADO)",
+            "fonte": "",
+            "risco": "MONOTONIA E DESMOTIVAÇÃO (SUBUTILIZAÇÃO DE COMPETÊNCIAS).",
+            "agravo": "DESPERSONALIZAÇÃO, BAIXA AUTOESTIMA, DESENGAJAMENTO TOTAL.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROGRAMAS DE JOB ENRICHMENT (ENRIQUECIMENTO DO CARGO) E PLANOS DE T&D."
+        },
+        {
+            "perigo": "COPSOQ 10-12 — DÉFICIT DE COMUNICAÇÃO E PAPÉIS (FALTA DE INFORMAÇÃO, INCERTEZA DE FUNÇÕES)",
+            "fonte": "",
+            "risco": "AMBIGUIDADE E CONFLITO DE PAPÉIS.",
+            "agravo": "ESTRESSE POR INCERTEZA, INSEGURANÇA, DORES DE CABEÇA TENSIONAIS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REUNIÕES SEMANAIS DE ALINHAMENTO; REVISÃO DE MANUAIS DE CARGOS E FUNÇÕES."
+        },
+        {
+            "perigo": "COPSOQ 13-15 — FALTA DE SUPORTE E JUSTIÇA, INJUSTIÇA, FALTA DE APOIO",
+            "fonte": "",
+            "risco": "ISOLAMENTO SOCIAL E PERCEPÇÃO DE INJUSTIÇA.",
+            "agravo": "TRANSTORNOS ADAPTATIVOS, QUEIXAS PSICOSSOMÁTICAS, ABANDONO DO",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR POLÍTICA DE FEEDBACK E RECONHECIMENTO; TREINAMENTO DE LIDERANÇA."
+        },
+        {
+            "perigo": "COPSOQ 16-18 — RELACIONAMENTO E PLANEJAMENTO (CLIMA RUIM, PLANEJAMENTO INEFICAZ)",
+            "fonte": "",
+            "risco": "CONFLITOS INTERPESSOAIS E DESORGANIZAÇÃO.",
+            "agravo": "ESTRESSE INTERPESSOAL, HOSTILIDADE NO AMBIENTE, ISOLAMENTO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "DINÂMICAS DE GRUPO; CONSULTORIA EM GESTÃO DE PROCESSOS E FLUXOGRAMAS."
+        },
+        {
+            "perigo": "COPSOQ 19-21 — RELAÇÕES DE CONFIANÇA E CONFLITO (FALTA DE CONFIANÇA, CONFLITOS MAL RESOLVIDOS)",
+            "fonte": "",
+            "risco": "QUEBRA DO CONTRATO PSICOLÓGICO.",
+            "agravo": "PARANOIA FUNCIONAL, ANSIEDADE SOCIAL, SOMATIZAÇÃO DE DOENÇAS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR CANAL DE DENÚNCIAS; MEDIAÇÃO DE CONFLITOS PROFISSIONAL; TRANSPARÊNCIA GESTORA."
+        },
+        {
+            "perigo": "COPSOQ 22-23 — DISTRIBUIÇÃO E EFICÁCIA (DESIGUALDADE NA CARGA, SENSAÇÃO DE IMPOTÊNCIA)",
+            "fonte": "",
+            "risco": "INEQUIDADE E BAIXA AUTOEFICÁCIA.",
+            "agravo": "SENTIMENTO DE INJUSTIÇA, FRUSTRAÇÃO SEVERA, DEPRESSÃO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "AUDITORIA DE DISTRIBUIÇÃO DE CARGA; MENTORIA PARA RESOLUÇÃO DE PROBLEMAS."
+        },
+        {
+            "perigo": "COPSOQ 24-27 — SIGNIFICADO E SATISFAÇÃO (TRABALHO SEM VALOR, INSATISFAÇÃO GLOBAL)",
+            "fonte": "",
+            "risco": "CRISE EXISTENCIAL OCUPACIONAL E ALIENAÇÃO.",
+            "agravo": "DEPRESSÃO MAIOR, CRISE DE IDENTIDADE, ABSENTEÍSMO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROGRAMAS DE CULTURA ORGANIZACIONAL; REALINHAMENTO DE PROPÓSITO E VALORES."
+        },
+        {
+            "perigo": "COPSOQ 28 — INSEGURANÇA CONTRATUAL (MEDO DO DESEMPREGO)",
+            "fonte": "",
+            "risco": "INSEGURANÇA LABORAL CRONIFICADA.",
+            "agravo": "TRANSTORNO DE ANSIEDADE GENERALIZADA (TAG), PÂNICO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "COMUNICAÇÃO CLARA SOBRE A SAÚDE DA EMPRESA; PLANOS DE RETENÇÃO E BENEFÍCIOS."
+        },
+        {
+            "perigo": "COPSOQ 30-31 — CONFLITO TRABALHO-VIDA PRIVADA (ENERGIA E TEMPO AFETANDO A VIDA PESSOAL)",
+            "fonte": "",
+            "risco": "DESEQUILÍBRIO ENTRE VIDA PROFISSIONAL E PESSOAL (WORK-LIFE BALANCE).",
+            "agravo": "ESGOTAMENTO, CONFLITOS FAMILIARES, ISOLAMENTO SOCIAL, FADIGA CRÓNICA.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "REVISÃO DE CARGAS HORÁRIAS; POLÍTICA DE \"DIREITO AO DESLIGAMENTO\"; FLEXIBILIDADE DE HORÁRIO/TELETRABALHO."
+        },
+        {
+            "perigo": "COPSOQ 32 — DISTÚRBIOS DO SONO (ACORDAR VÁRIAS VEZES, INSÓNIA)",
+            "fonte": "",
+            "risco": "HIPERVIGILÂNCIA E INCAPACIDADE DE RECUPERAÇÃO PSICOFISIOLÓGICA.",
+            "agravo": "DÉFICE COGNITIVO, RISCO DE ACIDENTES, DOENÇAS CARDIOVASCULARES, DEPRESSÃO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "ENCAMINHAMENTO PARA MEDICINA DO TRABALHO; HIGIENE DO SONO; REDUÇÃO DE PRESSÃO POR METAS."
+        },
+        {
+            "perigo": "COPSOQ 33-34 — EXAUSTÃO FÍSICA E EMOCIONAL",
+            "fonte": "",
+            "risco": "SÍNDROME DE BURNOUT (FASE AVANÇADA).",
+            "agravo": "COLAPSO FÍSICO, APATIA SEVERA, BAIXA IMUNIDADE, IDEAÇÃO DEPRESSIVA.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "AFASTAMENTO TEMPORÁRIO OU REDUÇÃO IMEDIATA DE CARGA; APOIO PSICOLÓGICO CLÍNICO."
+        },
+        {
+            "perigo": "COPSOQ 35-37 — SINTOMAS PSICOLÓGICOS (IRRITABILIDADE, ANSIEDADE, TRISTEZA)",
+            "fonte": "",
+            "risco": "DETERIORAÇÃO DA SAÚDE MENTAL E DO CLIMA ORGANIZACIONAL.",
+            "agravo": "TRANSTORNOS DE ANSIEDADE, DEPRESSÃO MAJOR, CRISES DE PÂNICO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROGRAMAS DE SAÚDE MENTAL; REDUÇÃO DE FATORES DE STRESS; CANAL DE ESCUTA ATIVA."
+        },
+        {
+            "perigo": "COPSOQ 38 — VIOLÊNCIA VERBAL (INSULTOS OU PROVOCAÇÕES)",
+            "fonte": "",
+            "risco": "ASSÉDIO MORAL (MOBBING) OU AMBIENTE HOSTIL.",
+            "agravo": "STRESS PÓS-TRAUMÁTICO, BAIXA AUTOESTIMA, DESEJO DE DEMISSÃO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "APLICAÇÃO DO CÓDIGO DE ÉTICA; MEDIDAS DISCIPLINARES AOS AGRESSORES; APOIO À VÍTIMA."
+        },
+        {
+            "perigo": "COPSOQ 39 — ASSÉDIO SEXUAL",
+            "fonte": "",
+            "risco": "CRIME E VIOLAÇÃO DA DIGNIDADE HUMANA.",
+            "agravo": "TRAUMAS PROFUNDOS, FOBIA SOCIAL, DEPRESSÃO, PROCESSOS JUDICIAIS.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "DENÚNCIA FORMAL; APOIO JURÍDICO/PSICOLÓGICO; DEMISSÃO/PUNIÇÃO IMEDIATA DO AGRESSOR."
+        },
+        {
+            "perigo": "COPSOQ 40-41 — VIOLÊNCIA FÍSICA OU AMEAÇAS",
+            "fonte": "",
+            "risco": "RISCO DE VIDA E INTEGRIDADE FÍSICA.",
+            "agravo": "LESÕES FÍSICAS, TRANSTORNO DE STRESS PÓS-TRAUMÁTICO (TEPT), PÂNICO.",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INTERVENÇÃO DE SEGURANÇA/POLICIAL; AFASTAMENTO IMEDIATO DO AGRESSOR; PROTEÇÃO À VÍTIMA."
+        }
     ],
     "PERICULOSOS": [
-        { agente: "INFLAMÁVEIS E COMBUSTÍVEIS LÍQUIDOS/GASOSOS", risco: "Queimaduras térmicas, explosão e politrauma", exame: "CLÍNICO", per: "Anual" },
-        { agente: "ENERGIA ELÉTRICA EM ALTA TENSÃO", risco: "Eletrocussão e parada cardiorrespiratória", exame: "CLÍNICO + ECG", per: "Anual" }
-    ],
-    "FISICOS_AGRESSIVOS": [
-        { agente: "RADIAÇÃO IONIZANTE (RAIO-X / GAMAGRAFIA)", risco: "Radiodermite, mutagênese celular, neoplasias", exame: "HEMOGRAMA COM PLAQUETAS", per: "Semestral" }
+        {
+            "perigo": "ATIVIDADES E OPERAÇÕES PERIGOSAS COM EXPLOSIVOS OU DE QUALQUER ATIVIDADE DENTRO DO RAIO DE PROTEÇÃO.",
+            "fonte": "",
+            "risco": "EXPLOSÃO",
+            "agravo": "IMPACTOS, DILACERAÇÃO, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "IMPLEMENTAR ORDEM DE SERVIÇO, PROMOVER TREINAMENTO SOBRE OPERAÇÃO COM EXPLOSIVOS, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, TRABALHAR SEMPRE EM DUPLA"
+        },
+        {
+            "perigo": "ATIVIDADES E OPERAÇÕES PERIGOSAS COM INFLAMÁVEIS OU DE QUALQUER ATIVIDADE FORA DO RAIO DE PROTEÇÃO.",
+            "fonte": "",
+            "risco": "INCÊNDIO, EXPLOSÃO",
+            "agravo": "QUEIMADURA, INTOXICAÇÃO, ASFIXICIAÇÃO, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "INSTALAR DETECTOR DE GÁS, SINALIZAR ÁREA PROIBIR O ATO DE FUMAR, IMPLEMENTAR ORDEM DE SERVIÇO, PROMOVER TREINAMENTO SOBRE NR 20, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, MANTER EXTINTOR DE INCÊNDIO APROPRIADO E ACESSÍVEL JUNTO AO ARAMAZENAMENTO DE INFLAMÁVEIS"
+        },
+        {
+            "perigo": "ATIVIDADES E OPERAÇÕES PERIGOSAS COM RADIAÇÕES IONIZANTES OU SUBSTÂNCIAS RADIOATIVAS.",
+            "fonte": "",
+            "risco": "FUGA DE RADIAÇÃO POR ACIDENTE EM CASOS DE FALHA NA BLINDAGEM DA EMBALAGEM, FUSILAGEM DA MÁQUINA, EQUIPAMENTO, APARELHO OU CONTENÇÃO",
+            "agravo": "CONTAMINAÇÃO COM RADIAÇÕES IONIZANTES",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "MANTER NO LOCAL DE TRABALHO E À DISPOSIÇÃO DE INSPEÇÕES O PLANO DE PROTEÇÃO RADIOLÓGICA (PPR) APROVADO PELA CNEN E PELA VIGILÂNCIA SANITÁRIA PARA OS CASOS DE RADIODIAGNÓSTICO. ENTRE DIVERSAS FINALIDADES, O PPR DEVE: – SER PERSONALIZADO PARA A INSTALAÇÃO, AMBIENTES, EQUIPAMENTOS, PROCEDIMENTOS E ROTINA OPERACIONAL E ETC.; AS ÁREAS DA INSTALAÇÃO RADIATIVA DEVEM SER CLASSIFICADAS, SINALIZADAS E TER ACESSO CONTROLADO."
+        },
+        {
+            "perigo": "ATIVIDADES E OPERAÇÕES PERIGOSAS COM EXPOSIÇÃO A ROUBOS OU OUTRAS ESPÉCIES DE VIOLÊNCIA FÍSICA NAS ATIVIDADES PROFISSIONAIS DE SEGURANÇA PESSOAL OU PATRIMONIAL.",
+            "fonte": "",
+            "risco": "ATAQUES DE MARGINAIS",
+            "agravo": "VIOLÊNCIA FÍSICA, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER CURSO DE VIGILÂNCIA, FORNECER MEIO DE COMUNICAÇÃO EFICIENTE EM CASO DE URGÊNCIA"
+        },
+        {
+            "perigo": "ATIVIDADES E OPERAÇÕES PERIGOSAS COM ENERGIA ELÉTRICA.",
+            "fonte": "",
+            "risco": "CHOQUE ELÉTRICO",
+            "agravo": "ATAQUES CARDÍACOS, QUEIMADURA, MORTE",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "PROMOVER TREINAMENTO EM NR 10, RELAIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, TRABALHAR SEMPRE EM DUPLA, IMPLEMENTAR INVENTÁRIOS DAS INSTALAÇÕES EM UNIDADES ACIMA DE 750KW"
+        },
+        {
+            "perigo": "ATIVIDADES REALIZADAS COM A UTILIZAÇÃO DE MOTOCICLETA.",
+            "fonte": "",
+            "risco": "ACIDENTE DE TRÂNSITO",
+            "agravo": "IMPACTOS, DILACERAÇÃO, MORTE",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": "PROMOVER TREINAMENTO EM NR 10, RELAIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, TRABALHAR SEMPRE EM DUPLA"
+        },
+        {
+            "perigo": "ATIVIDADES PROFISSIONAIS DOS AGENTES DAS AUTORIDADES DE TRÂNSITO",
+            "fonte": "",
+            "risco": "COLISÕES, ATROPELAMENTOS OU OUTRAS ESPÉCIES DE ACIDENTES OU VIOLÊNCIAS",
+            "agravo": "ATAQUES CARDÍACOS, AGRESSÕES QUEIMADURA E MORTE",
+            "exame": "CLÍNICO + ECG",
+            "per": "Semestral",
+            "plano": "1. PROMOVER CURSO DE PILOTAGEM SEGURA; 2. FORNECER OS SEGUINTES EQUIPAMENTOS: 3. VISEIRA; 4. ÓCULOS; 5. JAQUETA; 6. LUVAS; 7. CALÇAS; 8. BOTAS; 9. APARADOR DE LINHA; 10. PROTETOR DE PERNAS; 11. ANTENA CORTA PIPA; 12. COLETE SINALIZADOR REFLETIVO; 13. ADESIVOS REFLEXIVOS NO CAPACETE; 14. ADESIVOS REFLEXIVOS O NO BAÚ."
+        },
+        {
+            "perigo": "ATIVIDADES DE COMBATE A INCÊNDIOS",
+            "fonte": "",
+            "risco": "EXPOSIÇÃO A GASES TÓXICOS (MONÓXIDO DE CARBONO, CIANETO) EXPOSIÇÃO AO CALOR INTENSO (ESTRESSE TÉRMICO) QUEDAS E IMPACTOS (AMBIENTE INSTÁVEL) EXPOSIÇÃO A AGENTES QUÍMICOS (FUMAÇA E PRODUTOS DA COMBUSTÃO) ESFORÇO FÍSICO INTENSO (SOBRECARGA MUSCULAR/CARDIOVASCULAR) RUÍDO DE ALARMES E EQUIPAMENTOS",
+            "agravo": "ASFIXIA, INTOXICAÇÃO SISTÊMICA, EDEMA PULMONAR QUEIMADURAS, DESIDRATAÇÃO, EXAUSTÃO TÉRMICA FRATURAS, TRAUMATISMOS, CONTUSÕES IRRITAÇÃO OCULAR/RESPIRATÓRIA, DERMATITES, CARCINOGENICIDADE INFARTO, LESÕES MUSCULARES, DISFUNÇÕES ARTICULARES PERDA AUDITIVA INDUZIDA POR NÍVEL DE PRESSÃO SONORA",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "USO DE MÁSCARA AUTÔNOMA (SCBA), SENSORES DE GÁS ROUPAS DE PROTEÇÃO TÉRMICA (EPI), HIDRATAÇÃO, PAUSAS TREINAMENTO, USO DE BOTAS/CAPACETE, ILUMINAÇÃO EPI COMPLETO (ROUPA QUÍMICA), DESCONTAMINAÇÃO. TREINAMENTO FÍSICO, ACOMPANHAMENTO MÉDICO, PROTETORES AURICULARES DE ALTO DESEMPENHO"
+        }
     ],
     "ASSOCIACAO": [
-        { agente: "RUÍDO ASSOCIADO A AGENTES QUÍMICOS OTOTÓXICOS", risco: "Potencialização de perda auditiva neurossensorial", exame: "AUDIOMETRIA TONAL", per: "Semestral" },
-        { agente: "CALOR ASSOCIADO A ESFORÇO FÍSICO PESADO", risco: "Rabdomiólise e colapso circulatório", exame: "CLÍNICO + ECG", per: "Semestral" }
+        {
+            "perigo": "MINERAÇÃO SUBTERRÂNEA CUJAS ATIVIDADES SEJAM EXERCIDAS AFASTADAS DAS FRENTES DE PRODUÇÃO",
+            "fonte": "",
+            "risco": "RISCO DE RUÍDO E VIBRAÇÃO. REVERBERAÇÃO. RISCO DE GASES: PODE SER ELEVADO EM LOCAIS COM VENTILAÇÃO DEFICIENTE OU ONDE HÁ ACÚMULO DE GASES EM PONTOS BAIXOS (ESPAÇOS CONFINADOS DENTRO DA MINA",
+            "agravo": "SILICOSE E PAIRO, PNEUMOCONIOSES, PERDA AUDITIVA, PROBLEMAS REUMÁTICOS, UMIDADE.",
+            "exame": "AUDIOMETRIA",
+            "per": "Anual",
+            "plano": "CONTROLE DE RISCOS GEOMECÂNICOS E ACIDENTES CATASTRÓFICOSO CONTROLE DA ESTABILIDADE DA ROCHA E A PREVENÇÃO DE DESABAMENTOS SÃO PRIORITÁRIOS NAS FRENTES DE PRODUÇÃO E DESENVOLVIMENTO.PLANO DE LAVRA E SUSTENTAÇÃO:DESENVOLVER UM PLANO DE SUSTENTAÇÃO DETALHADO, BASEADO EM ESTUDOS GEOMECÂNICOS, DEFININDO O TIPO E O ESPAÇAMENTO DOS ELEMENTOS DE SUPORTE (CHUMBADORES, CAMBOTAS, TELAS).REALIZAR O SANEAMENTO DE TETO E PAREDES (ABATIMENTO DE BLOCOS INSTÁVEIS) ANTES DE INICIAR QUALQUER TRABALHO SOB O TETO NÃO SUSTENTADO. SINALIZAÇÃO E PROTEÇÃO:SINALIZAR E ISOLAR ÁREAS COM RISCO IMINENTE DE QUEDA DE MATERIAL.PROIBIR A ENTRADA DE TRABALHADORES SOB O TETO SEM SUPORTE NA FRENTE DE AVANÇO.PREVENÇÃO DE EXPLOSÕES:MONITORAR CONTINUAMENTE OS NÍVEIS DE METANO. E OUTROS GASES EXPLOSIVOS.INTERROMPER IMEDIATAMENTE OS TRABALHOS (INCLUINDO ELETRICIDADE E MÁQUINAS) E EVACUAR A ÁREA SE A CONCENTRAÇÃO DE METANO ATINGIR 1,0% (LIMITE DE ALARME E PARALISAÇÃO, CONFORME NR-22).UTILIZAR APENAS EQUIPAMENTOS ELÉTRICOS COM CERTIFICAÇÃO À PROVA DE EXPLOSÃO (EX) EM ÁREAS CLASSIFICADAS."
+        },
+        {
+            "perigo": "TRABALHOS EM ATIVIDADES PERMANENTES NO SUBSOLO DE MINERAÇÕES SUBTERRÂNEAS EM FRENTE DE PRODUÇÃO",
+            "fonte": "",
+            "risco": "CALOR, INALAÇÃO DE POEIRAS MINERAIS (PRINCIPALMENTE SÍLICA LIVRE CRISTALINA, CARVÃO E ASBESTOS\nESFORÇOS REPETITIVOS E DISTÚRBIOS OSTEOMUSCULARES RELACIONADOS AO TRABALHO,  POSTURAS FORÇADAS, TRANSPORTE MANUAL DE CARGAS, LONGAS JORNADAS, TRABALHO EM TURNOS (INVARIABILIDADE E RITMO INTENSO) E O ISOLAMENTO DO SUBSOLO",
+            "agravo": "DOENÇAS RESPIRATÓRIAS CRÔNICAS (SILICOSE E PNEUMOCONIOSES), SILICOSE: DOENÇA PULMONAR FIBROSANTE, IRREVERSÍVEL E PROGRESSIVA, INCAPACIDADE RESPIRATÓRIA, PNEUMOCONIOSES. CÂNCER DE PULMÃO: ESTRESSE TÉRMICO: DESIDRATAÇÃO, EXAUSTÃO, CHOQUE TÉRMICO, QUE PODE SER FATAL.5. ERGONÔMICOS E PSICOSSOCIAISAGENTES, LER/DORT: LESÕES POR (DORES LOMBARES, LESÕES ARTICULARES).SAÚDE MENTAL: ESTRESSE CRÔNICO, ANSIEDADE, DEPRESSÃO E PROBLEMAS DE SONO.",
+            "exame": "ESPIROMETRIA",
+            "per": "Anual",
+            "plano": "CONTROLE DE POEIRAS E VENTILAÇÃO (PREVENÇÃO DE SILICOSE E PNEUMOCONIOSES) O CONTROLE DE POEIRA E A VENTILAÇÃO SÃO AS MEDIDAS MAIS CRÍTICAS PARA PROTEGER OS TRABALHADORES CONTRA DOENÇAS PULMONARES E GASES TÓXICOS. VENTILAÇÃO PRIMÁRIA: GARANTIR A INJEÇÃO CONTÍNUA DE AR FRESCO NAS GALERIAS, DIRECIONANDO O FLUXO PARA AS FRENTES DE PRODUÇÃO (FRENTES DE LAVRA E DESENVOLVIMENTO), QUE SÃO AS ÁREAS DE MAIOR CONTAMINAÇÃO. MONITORAR O VOLUME DE AR (VAZÃO) E A VELOCIDADE DO AR PARA GARANTIR A DILUIÇÃO EFICAZ DE GASES E POEIRAS. IMPLEMENTAR CIRCUITOS DE VENTILAÇÃO SECUNDÁRIA (DUTOS E VENTILADORES AUXILIARES) PARA VENTILAR AS FRENTES ATIVAS E GARANTIR A RENOVAÇÃO DO AR NO INÍCIO DE CADA TURNO DE TRABALHO E APÓS DETONAÇÕES. CONTROLE DA POEIRA NA FONTE: UTILIZAR ÁGUA DE FORMA EFICAZ NA PERFURAÇÃO (PERFURATRIZES COM INJEÇÃO DE ÁGUA) E NO CARREGAMENTO/TRANSPORTE PARA ABATER AS PARTÍCULAS DE POEIRA ANTES QUE SE DISPERSEM. APLICAR AGENTES SUPRESSORES DE POEIRA NAS VIAS DE TRANSPORTE E PILHAS DE MINÉRIO. MONITORAMENTO AMBIENTAL: MEDIÇÃO CONTÍNUA OU PERIÓDICA DA CONCENTRAÇÃO DE SÍLICA LIVRE CRISTALINA (E OUTROS PARTICULADOS) E GASES TÓXICOS NAS ÁREAS DE TRABALHO, COM REGISTROS DOCUMENTADOS. INTERROMPER IMEDIATAMENTE AS OPERAÇÕES SE OS LIMITES DE TOLERÂNCIA FOREM EXCEDIDOS."
+        }
+    ],
+    "AUSENCIA": [
+        {
+            "perigo": "AGENTES NOCIVOS NÃO CONSTANTES NO ANEXO IV DO DECRETO 3.048/1999 E INCLUÍDOS POR FORÇA DE DECISÃO JUDICIAL OU ADMINISTRATIVA",
+            "fonte": "",
+            "risco": "05.01.001",
+            "agravo": "",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": ""
+        },
+        {
+            "perigo": "AUSÊNCIA DE AGENTE NOCIVO OU DE ATIVIDADES PREVISTAS NO ANEXO IV DO DECRETO 3.048/1999",
+            "fonte": "",
+            "risco": "09.01.001",
+            "agravo": "",
+            "exame": "CLÍNICO",
+            "per": "Anual",
+            "plano": ""
+        }
     ]
 };
+
 
 // 1. CARREGAMENTO INICIAL, SENHAS E SINCRONIZAÇÃO
 document.addEventListener('DOMContentLoaded', async () => {
@@ -122,6 +1548,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const passInput = document.getElementById('login_usuario_senha');
     if (savedEmail && emailInput) emailInput.value = savedEmail;
     if (savedPass && passInput) passInput.value = savedPass;
+
+    // Suporte para pressionar ENTER no campo de senha ou e-mail
+    if (passInput) {
+        passInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') realizarLoginSistema();
+        });
+    }
+    if (emailInput) {
+        emailInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') realizarLoginSistema();
+        });
+    }
+
 
     // Recupera dados salvos localmente
     carregarCadastrosLocalStorage();
@@ -748,8 +2187,7 @@ window.confirmarRespostaAgendamento = async function() {
     renderMonitorTable();
     renderFilaAso();
     fecharModal('modal-resposta-agendamento');
-    alert("✅ Pedido respondido com sucesso!
-O agendamento foi encaminhado, o ASO foi para a FILA DO ASO e removido das solicitações pendentes.");
+    alert("✅ Pedido respondido com sucesso!\nO agendamento foi encaminhado, o ASO foi para a FILA DO ASO e removido das solicitações pendentes.");
 };
 
 window.apagarPedidoIndividual = async function(id) {
@@ -1062,8 +2500,7 @@ window.concluirEmissaoAsoBoreal = async function() {
     renderFilaAso();
     renderHistoryTabela();
     fecharModal('modal-aso');
-    alert("✅ ASO emitido com sucesso!
-O documento foi transferido para o Banco de ASOs e removido da Fila.");
+    alert("✅ ASO emitido com sucesso!\nO documento foi transferido para o Banco de ASOs e removido da Fila.");
 };
 
 function salvarBancoAsoLocal() {
@@ -1456,33 +2893,47 @@ window.filtrarRiscosCat = function(idCatSelect, idAgenteSelect) {
     const cat = document.getElementById(idCatSelect)?.value;
     const selAgente = document.getElementById(idAgenteSelect);
     if (!selAgente) return;
-    selAgente.innerHTML = '<option value="">-- Selecione o Agente do Inventário PGR --</option>';
+    selAgente.innerHTML = '<option value="">-- Selecione o Perigo do Inventário PGR --</option>';
 
     if (CATALOGO_RISCOS[cat]) {
         CATALOGO_RISCOS[cat].forEach(item => {
             const opt = document.createElement('option');
-            opt.value = item.agente;
+            opt.value = item.perigo;
             opt.dataset.risco = item.risco;
-            opt.dataset.exame = item.exame;
-            opt.dataset.per = item.per;
-            opt.innerText = `${item.agente} ➔ ${item.risco}`;
+            opt.dataset.agravo = item.agravo || item.risco;
+            opt.dataset.exame = item.exame || 'CLÍNICO';
+            opt.dataset.per = item.per || 'Anual';
+            opt.dataset.plano = item.plano || '';
+            opt.innerText = item.perigo;
             selAgente.appendChild(opt);
         });
     }
 };
 
-window.autoPreencherExamePcmso = function() {
+window.autoPreencherPerigoRiscoPlano = function() {
     const selAgente = document.getElementById('pcmso_add_agente');
     const opt = selAgente?.options[selAgente.selectedIndex];
-    if (opt && opt.dataset.exame) {
-        const selExame = document.getElementById('pcmso_add_exame');
-        const selPer = document.getElementById('pcmso_add_periodicidade');
-        if (selExame) selExame.value = opt.dataset.exame;
-        if (selPer) selPer.value = opt.dataset.per;
-    }
+    if (!opt || !opt.value) return;
+
+    const inpPerigo = document.getElementById('pcmso_add_perigo_custom');
+    if (inpPerigo) inpPerigo.value = opt.value;
+
+    const inpRisco = document.getElementById('pcmso_add_risco');
+    if (inpRisco) inpRisco.value = `${opt.dataset.risco} — ${opt.dataset.agravo}`;
+
+    const selExame = document.getElementById('pcmso_add_exame');
+    if (selExame && opt.dataset.exame) selExame.value = opt.dataset.exame;
+
+    const selPer = document.getElementById('pcmso_add_periodicidade');
+    if (selPer && opt.dataset.per) selPer.value = opt.dataset.per;
+
+    const txtPlano = document.getElementById('pcmso_add_plano_gestor');
+    if (txtPlano && opt.dataset.plano) txtPlano.value = opt.dataset.plano;
 };
 
-// ITEM 8: CARREGAMENTO DA MATRIZ DO PCMSO REATIVADO
+// Aliases para compatibilidade
+window.autoPreencherExamePcmso = window.autoPreencherPerigoRiscoPlano;
+
 window.adicionarLinhaPCMSO = async function() {
     const activeCli = document.getElementById('active-cliente-select')?.value || 'CLIENTE';
     const clienteNome = activeCli === 'ALL' ? (clientesCadastrados[0]?.nome || 'CLIENTE PADRÃO') : activeCli;
@@ -1492,20 +2943,27 @@ window.adicionarLinhaPCMSO = async function() {
     const cargo = document.getElementById('pcmso_add_cargo')?.value.trim() || 'OPERADOR';
     const qtd = parseInt(document.getElementById('pcmso_add_qtd')?.value) || 1;
 
+    // Perigo: pega do campo novo se preenchido, senão do select
+    const perigoCustom = document.getElementById('pcmso_add_perigo_custom')?.value.trim();
     const selAgente = document.getElementById('pcmso_add_agente');
-    const agente = selAgente?.value || 'AUSÊNCIA DE RISCOS ESPECÍFICOS';
-    const risco = selAgente?.options[selAgente.selectedIndex]?.dataset.risco || 'MONITORAMENTO CLÍNICO OCUPACIONAL';
+    const perigo = perigoCustom || selAgente?.value || 'AUSÊNCIA DE RISCOS ESPECÍFICOS';
 
+    // Risco: pega do campo novo de risco
+    const risco = document.getElementById('pcmso_add_risco')?.value.trim() || selAgente?.options[selAgente.selectedIndex]?.dataset.risco || 'MONITORAMENTO CLÍNICO OCUPACIONAL';
+
+    // Exame: pega do customizado ou select
     const selExame = document.getElementById('pcmso_add_exame')?.value;
     const customExame = document.getElementById('pcmso_add_exame_custom')?.value.trim();
     const exame = customExame || selExame || 'CLÍNICO';
 
+    // Periodicidade
     const selPer = document.getElementById('pcmso_add_periodicidade')?.value;
     const customPer = document.getElementById('pcmso_add_per_custom')?.value.trim();
     const periodicidade = customPer || selPer || 'Anual';
 
-    const planoGestor = document.getElementById('pcmso_add_plano_gestor')?.value.trim() || 'Monitoramento ambiental e medidas coletivas.';
-    const planoMedico = document.getElementById('pcmso_add_plano_medico')?.value.trim() || 'Exames periódicos e controle ambulatorial.';
+    // Planos de Ação
+    const planoGestor = document.getElementById('pcmso_add_plano_gestor')?.value.trim() || 'Medidas preventivas conforme PGR.';
+    const planoMedico = document.getElementById('pcmso_add_plano_medico')?.value.trim() || 'Acompanhamento ocupacional e exames periódicos conforme NR-07.';
 
     const novaLinha = {
         id: Date.now(),
@@ -1514,7 +2972,8 @@ window.adicionarLinhaPCMSO = async function() {
         processo,
         cargo,
         qtd,
-        agente,
+        perigo,
+        agente: perigo,
         risco,
         exame,
         periodicidade,
@@ -1535,7 +2994,7 @@ window.adicionarLinhaPCMSO = async function() {
                 processo: novaLinha.processo,
                 cargo: novaLinha.cargo,
                 qtd: novaLinha.qtd,
-                agente: novaLinha.agente,
+                agente: novaLinha.perigo,
                 risco: novaLinha.risco,
                 exame: novaLinha.exame,
                 periodicidade: novaLinha.periodicidade,
@@ -1576,7 +3035,6 @@ window.renderPcmsoMatriz = function() {
 
     const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
     const isPcmsoMed = currentRole === 'MEDICO_PCMSO';
-    const isReadOnly = currentRole === 'MEDICO' || currentRole === 'CLIENTE';
 
     pcmsoMatrizData
         .filter(m => activeCli === 'ALL' || m.cliente === activeCli)
@@ -1589,8 +3047,8 @@ window.renderPcmsoMatriz = function() {
                 <td class="p-2">${m.processo}</td>
                 <td class="p-2 font-black text-blue-950">${m.cargo}</td>
                 <td class="p-2 text-center font-bold">${m.qtd}</td>
-                <td class="p-2 font-semibold text-rose-900">${m.agente}</td>
-                <td class="p-2 text-slate-700">${m.risco}</td>
+                <td class="p-2 font-semibold text-slate-800">${m.perigo || m.agente}</td>
+                <td class="p-2 text-rose-900 font-semibold">${m.risco}</td>
                 <td class="p-2 font-bold text-blue-900">
                     ${isPcmsoMed || currentRole === 'GESTOR' || currentRole === 'AGENTE' ? `
                         <input type="text" value="${m.exame}" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'exame', this.value)" class="w-full border rounded p-1 text-xs font-bold bg-white text-blue-900">
@@ -1607,20 +3065,39 @@ window.renderPcmsoMatriz = function() {
             `;
 
             const trPlanos = document.createElement('tr');
-            trPlanos.className = "bg-slate-50/80 border-b";
+            trPlanos.className = "bg-slate-50/90 border-b";
             trPlanos.innerHTML = `
-                <td colspan="10" class="p-2 space-y-1 text-[11px]">
-                    <div class="flex items-center gap-2">
-                        <span class="font-extrabold text-amber-900 min-w-[140px]">📋 PLANO GESTOR/PGR:</span>
+                <td colspan="10" class="p-2.5 space-y-2 text-xs">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-amber-950 bg-amber-100 px-2 py-0.5 rounded text-[11px] uppercase">
+                                📋 Plano de Ação do Gestor / PGR:
+                            </span>
+                            ${currentRole === 'GESTOR' || currentRole === 'AGENTE' ? `
+                                <span class="text-[10px] text-slate-500 font-semibold">(Editável por Gestor / Agente)</span>
+                            ` : ''}
+                        </div>
                         ${currentRole === 'GESTOR' || currentRole === 'AGENTE' ? `
-                            <input type="text" value="${m.planoGestor || ''}" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'planoGestor', this.value)" class="w-full border rounded p-1 text-xs bg-white font-semibold">
-                        ` : `<span class="font-semibold text-slate-700">${m.planoGestor || '-'}</span>`}
+                            <textarea rows="2" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'planoGestor', this.value)" class="w-full border rounded p-1.5 text-xs bg-white font-semibold text-slate-800 shadow-sm">${m.planoGestor || ''}</textarea>
+                        ` : `
+                            <div class="p-2 bg-white rounded border border-slate-200 font-semibold text-slate-800">${m.planoGestor || 'Nenhuma medida preventiva cadastrada.'}</div>
+                        `}
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-extrabold text-blue-900 min-w-[140px]">🩺 PLANO MÉDICO PCMSO:</span>
+
+                    <div class="space-y-1 pt-1 border-t border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-blue-950 bg-blue-100 px-2 py-0.5 rounded text-[11px] uppercase">
+                                🩺 Plano de Ação Médico (NR-07):
+                            </span>
+                            ${isPcmsoMed || currentRole === 'GESTOR' ? `
+                                <span class="text-[10px] text-blue-700 font-semibold">(Editável pelo Médico do PCMSO)</span>
+                            ` : ''}
+                        </div>
                         ${isPcmsoMed || currentRole === 'GESTOR' ? `
-                            <input type="text" value="${m.planoMedico || ''}" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'planoMedico', this.value)" class="w-full border border-blue-400 rounded p-1 text-xs bg-blue-50 font-bold text-blue-950">
-                        ` : `<span class="font-bold text-blue-950">${m.planoMedico || '-'}</span>`}
+                            <textarea rows="2" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'planoMedico', this.value)" class="w-full border border-blue-400 rounded p-1.5 text-xs bg-blue-50/60 font-bold text-blue-950 shadow-sm">${m.planoMedico || ''}</textarea>
+                        ` : `
+                            <div class="p-2 bg-blue-50/50 rounded border border-blue-200 font-bold text-blue-950">${m.planoMedico || 'Nenhuma conduta médica específica registrada.'}</div>
+                        `}
                     </div>
                 </td>
             `;
