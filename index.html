@@ -89,1160 +89,849 @@
     </div>
 </div>
 
-    <!-- BARRA NAVEGAÇÃO PRINCIPAL -->
-    <header class="boreal-header text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="bg-amber-500 text-slate-950 font-black text-xl px-2.5 py-0.5 rounded shadow">B</div>
-                <div>
-                    <h1 class="font-extrabold text-base md:text-lg tracking-wide leading-none flex items-center gap-2">
-                        BOREAL ENGMED <span class="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-black uppercase">Gestão ASO / PCMSO / eSocial S-2220</span>
-                    </h1>
-                    <p class="text-[10px] text-blue-200 mt-0.5">SISTEMA INTEGRADO DE SAÚDE OCUPACIONAL & ATENDIMENTO CLÍNICO</p>
-                </div>
+<!-- BARRA NAVEGAÇÃO PRINCIPAL -->
+<header class="boreal-header text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-500 text-slate-950 font-black text-xl px-2.5 py-0.5 rounded shadow">B</div>
+            <div>
+                <h1 class="font-extrabold text-base md:text-lg tracking-wide leading-none flex items-center gap-2">
+                    BOREAL ENGMED <span class="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-black uppercase">Gestão ASO / PCMSO / eSocial S-2220</span>
+                </h1>
+                <p class="text-[10px] text-blue-200 mt-0.5">SISTEMA INTEGRADO DE SAÚDE OCUPACIONAL & ATENDIMENTO CLÍNICO</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+            <div class="bg-slate-900/90 border border-blue-400/30 px-3 py-1 rounded-lg flex items-center gap-2">
+                <span class="text-amber-400 font-bold">PERFIL:</span>
+                <select id="user-role-select" onchange="validarTrocaPerfil(this.value)" class="border border-slate-300 bg-white font-bold text-xs p-1 rounded shadow-sm text-slate-800">
+                    <option value="GESTOR">GESTOR CENTRAL</option>
+                    <option value="AGENTE">AGENTE (EQUIPE DO GESTOR)</option>
+                    <option value="CLINICA">CLÍNICA CREDENCIADA</option>
+                    <option value="CLIENTE">CLIENTE (EMPRESA)</option>
+                    <option value="MEDICO">MÉDICO EXAMINADOR (CLÍNICA)</option>
+                    <option value="MEDICO_EXAMINADOR_IND">MÉDICO EXAMINADOR INDEPENDENTE</option>
+                    <option value="MEDICO_HOMOLOGADOR">MÉDICO HOMOLOGADOR INDEPENDENTE</option>
+                    <option value="MEDICO_PCMSO">MÉDICO RESPONSÁVEL PCMSO</option>
+                </select>
             </div>
 
-            <div class="flex items-center space-x-2 text-xs">
-                <div class="bg-slate-900/90 border border-blue-400/30 px-3 py-1 rounded-lg flex items-center gap-2">
-                    <span class="text-amber-400 font-bold">PERFIL:</span>
-                    <select id="user-role-select" onchange="validarTrocaPerfil(this.value)" class="border border-slate-300 bg-white font-bold text-xs p-1 rounded shadow-sm text-slate-800">
-                        <option value="GESTOR">GESTOR CENTRAL</option>
-                        <option value="AGENTE">AGENTE (EQUIPE DO GESTOR)</option>
-                        <option value="CLINICA">CLÍNICA CREDENCIADA</option>
-                        <option value="CLIENTE">CLIENTE (EMPRESA)</option>
-                        <option value="MEDICO">MÉDICO EXAMINADOR (CLÍNICA)</option>
-                        <option value="MEDICO_EXAMINADOR_IND">MÉDICO EXAMINADOR INDEPENDENTE</option>
-                        <option value="MEDICO_HOMOLOGADOR">MÉDICO HOMOLOGADOR INDEPENDENTE</option>
-                        <option value="MEDICO_PCMSO">MÉDICO RESPONSÁVEL PCMSO</option>
-                    </select>
+            <button type="button" onclick="alterarSenhaMaster()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 font-bold text-[11px]">
+                🔑 Senha Master
+            </button>
+            <button type="button" onclick="alterarChaveGemini()" title="Configurar Chave Google Gemini API" class="bg-indigo-950 hover:bg-indigo-900 text-amber-300 px-2.5 py-1 rounded border border-indigo-700 font-bold text-[11px] flex items-center gap-1 shadow-sm">
+                🤖 Chave IA (Gemini)
+            </button>
+
+            <div id="cliente-filter-container" class="bg-slate-900/90 border border-blue-400/30 px-2 py-1 rounded-lg flex items-center gap-1">
+                <span class="text-blue-300 font-bold">CLIENTE:</span>
+                <select id="active-cliente-select" onchange="aoTrocarClienteFiltro()" class="bg-slate-800 text-white font-bold rounded px-2 py-0.5 border border-slate-700">
+                    <option value="ALL">TODOS OS CLIENTES</option>
+                </select>
+            </div>
+            
+            <button type="button" onclick="realizarLogout()" class="bg-rose-900 hover:bg-rose-800 text-white px-2.5 py-1 rounded border border-rose-700 font-bold text-[11px]">
+                Sair
+            </button>
+        </div>
+    </div>
+
+    <nav class="bg-slate-950/80 border-t border-blue-900/60 px-4 py-1.5 overflow-x-auto">
+        <div class="max-w-7xl mx-auto flex items-center space-x-2 text-xs font-bold whitespace-nowrap" id="main-nav-buttons">
+            <button type="button" onclick="switchTab('pedidos')" id="nav-btn-pedidos" class="nav-tab-btn text-white bg-blue-800 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> 1. Solicitador de Pedidos & Agendamento
+            </button>
+            <button type="button" onclick="switchTab('atendimento')" id="nav-btn-atendimento" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="user-check" class="w-3.5 h-3.5"></i> 2. Fila de Atendimento ASO
+            </button>
+            <button type="button" onclick="switchTab('historico')" id="nav-btn-historico" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="archive" class="w-3.5 h-3.5"></i> 3. Banco de ASOs & Anamnese
+            </button>
+            <button type="button" onclick="switchTab('esocial')" id="nav-btn-esocial" class="nav-tab-btn text-emerald-400 hover:text-emerald-200 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i> 4. eSocial (S-2220)
+            </button>
+            <button type="button" onclick="switchTab('homologacao')" id="nav-btn-homologacao" class="nav-tab-btn text-purple-300 hover:text-purple-100 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="file-check" class="w-3.5 h-3.5"></i> 5. Homologação de Atestados
+            </button>
+            <button type="button" onclick="switchTab('pcmso-matriz')" id="nav-btn-pcmso-matriz" class="nav-tab-btn text-sky-300 hover:text-sky-100 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> 6. Matriz PCMSO (NR-07)
+            </button>
+            <button type="button" onclick="switchTab('relatorio-pcmso')" id="nav-btn-relatorio-pcmso" class="nav-tab-btn text-amber-300 hover:text-amber-100 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> 7. Relatório Analítico PCMSO
+            </button>
+            <button type="button" onclick="switchTab('producao')" id="nav-btn-producao" class="nav-tab-btn text-emerald-300 hover:text-emerald-100 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="line-chart" class="w-3.5 h-3.5"></i> 8. Posição Financeira / Produção
+            </button>
+            <button type="button" onclick="switchTab('chat')" id="nav-btn-chat" class="nav-tab-btn text-teal-300 hover:text-teal-100 px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="messages-square" class="w-3.5 h-3.5"></i> 9. Chat Direto Privado
+            </button>
+            <button type="button" onclick="switchTab('cadastros')" id="nav-btn-cadastros" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i> 10. Clientes, Médicos PCMSO & Clínicas
+            </button>
+        </div>
+    </nav>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
+
+    <!-- ABA 1: SOLICITADOR DE PEDIDOS -->
+    <section id="tab-pedidos" class="tab-content space-y-4">
+        <div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-xl shadow-md p-4 space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+                <div>
+                    <h2 class="font-extrabold text-sm md:text-base uppercase flex items-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-5 h-5 text-amber-400"></i> Pedido em Massa via Planilha (.XLSX)
+                    </h2>
+                    <p class="text-xs text-blue-200 mt-0.5">
+                        O pedido em massa para <strong>Médico Independente vai DIRETO para a Fila do ASO</strong> preenchido. O pedido para <strong>Clínica vai para o Agendamento</strong>.
+                    </p>
                 </div>
-
-                <button type="button" onclick="alterarSenhaMaster()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 px-2.5 py-1 rounded border border-slate-700 font-bold text-[11px]">
-                    🔑 Senha Master
-                </button>
-                <button type="button" onclick="alterarChaveGemini()" title="Configurar Chave Google Gemini API" class="bg-indigo-950 hover:bg-indigo-900 text-amber-300 px-2.5 py-1 rounded border border-indigo-700 font-bold text-[11px] flex items-center gap-1 shadow-sm">
-                    🤖 Chave IA (Gemini)
-                </button>
-
-                <div id="cliente-filter-container" class="bg-slate-900/90 border border-blue-400/30 px-2 py-1 rounded-lg flex items-center gap-1">
-                    <span class="text-blue-300 font-bold">CLIENTE:</span>
-                    <select id="active-cliente-select" onchange="aoTrocarClienteFiltro()" class="bg-slate-800 text-white font-bold rounded px-2 py-0.5 border border-slate-700">
-                        <option value="ALL">TODOS OS CLIENTES</option>
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="carga_destino_tipo" onchange="atualizarSeletorDestinoCargaMassa()" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white">
+                        <option value="MEDICO_INDEPENDENTE">➔ ENVIAR P/ MÉDICO INDEPENDENTE (DIRETO FILA ASO)</option>
+                        <option value="CLINICA">➔ ENVIAR P/ CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
                     </select>
+                    <select id="carga_destino_parceiro" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white"></select>
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded cursor-pointer flex items-center gap-1.5 shadow">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Carregar Planilha (.XLSX)
+                        <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaDirecionada(event)">
+                    </label>
                 </div>
             </div>
         </div>
 
-        <nav class="bg-slate-950/80 border-t border-blue-900/60 px-4 py-1.5 overflow-x-auto">
-            <div class="max-w-7xl mx-auto flex items-center space-x-2 text-xs font-bold whitespace-nowrap" id="main-nav-buttons">
-                <button type="button" onclick="switchTab('pedidos')" id="nav-btn-pedidos" class="nav-tab-btn text-white bg-blue-800 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> 1. Solicitador de Pedidos & Agendamento
-                </button>
-                <button type="button" onclick="switchTab('atendimento')" id="nav-btn-atendimento" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="user-check" class="w-3.5 h-3.5"></i> 2. Fila de Atendimento ASO
-                </button>
-                <button type="button" onclick="switchTab('historico')" id="nav-btn-historico" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="archive" class="w-3.5 h-3.5"></i> 3. Banco de ASOs & Anamnese
-                </button>
-                <button type="button" onclick="switchTab('esocial')" id="nav-btn-esocial" class="nav-tab-btn text-emerald-400 hover:text-emerald-200 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="send" class="w-3.5 h-3.5"></i> 4. eSocial (S-2220)
-                </button>
-                <button type="button" onclick="switchTab('homologacao')" id="nav-btn-homologacao" class="nav-tab-btn text-purple-300 hover:text-purple-100 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="file-check" class="w-3.5 h-3.5"></i> 5. Homologação de Atestados
-                </button>
-                <button type="button" onclick="switchTab('pcmso-matriz')" id="nav-btn-pcmso-matriz" class="nav-tab-btn text-sky-300 hover:text-sky-100 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> 6. Matriz PCMSO (NR-07)
-                </button>
-                <button type="button" onclick="switchTab('relatorio-pcmso')" id="nav-btn-relatorio-pcmso" class="nav-tab-btn text-amber-300 hover:text-amber-100 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> 7. Relatório Analítico PCMSO
-                </button>
-                <button type="button" onclick="switchTab('producao')" id="nav-btn-producao" class="nav-tab-btn text-emerald-300 hover:text-emerald-100 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="line-chart" class="w-3.5 h-3.5"></i> 8. Posição Financeira / Produção
-                </button>
-                <button type="button" onclick="switchTab('chat')" id="nav-btn-chat" class="nav-tab-btn text-teal-300 hover:text-teal-100 px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="messages-square" class="w-3.5 h-3.5"></i> 9. Chat Direto Privado
-                </button>
-                <button type="button" onclick="switchTab('cadastros')" id="nav-btn-cadastros" class="nav-tab-btn text-slate-300 hover:text-white px-3 py-1 rounded flex items-center gap-1">
-                    <i data-lucide="settings" class="w-3.5 h-3.5"></i> 10. Clientes, Médicos PCMSO & Clínicas
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-4 space-y-6">
-
-        <!-- ABA 1: SOLICITADOR DE PEDIDOS (ROTEAMENTO DINÂMICO PARA CLÍNICA OU MÉDICO) -->
-        <section id="tab-pedidos" class="tab-content space-y-4">
-            
-            <!-- ÁREA DE CARGA EM MASSA DO CLIENTE / GESTOR DIRECIONADA -->
-            <div class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white rounded-xl shadow-md p-4 space-y-3">
-                <div class="flex flex-wrap justify-between items-center gap-2">
-                    <div>
-                        <h2 class="font-extrabold text-sm md:text-base uppercase flex items-center gap-2">
-                            <i data-lucide="upload-cloud" class="w-5 h-5 text-amber-400"></i> Pedido em Massa via Planilha (.XLSX)
-                        </h2>
-                        <p class="text-xs text-blue-200 mt-0.5">
-                            O pedido em massa para <strong>Médico Independente vai DIRETO para a Fila do ASO</strong> preenchido. O pedido para <strong>Clínica vai para o Agendamento</strong>.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <select id="carga_destino_tipo" onchange="atualizarSeletorDestinoCargaMassa()" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white">
-                            <option value="MEDICO_INDEPENDENTE">➔ ENVIAR P/ MÉDICO INDEPENDENTE (DIRETO FILA ASO)</option>
-                            <option value="CLINICA">➔ ENVIAR P/ CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
-                        </select>
-                        <select id="carga_destino_parceiro" class="border border-blue-300 rounded p-1.5 text-xs font-bold text-slate-900 bg-white"></select>
-                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded cursor-pointer flex items-center gap-1.5 shadow">
-                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Carregar Planilha (.XLSX)
-                            <input type="file" accept=".xlsx, .xls" class="hidden" onchange="processarCargaMassaDirecionada(event)">
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FORMULÁRIO DE PEDIDO AVULSO ITEM A ITEM -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                <div class="flex flex-wrap justify-between items-center gap-2 border-b pb-2">
-                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                        <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-800"></i> Inclusão de Pedido Avulso & Agendamento
-                    </h2>
-                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border">CLIENTE & GESTOR BOREAL</span>
-                </div>
-
-                <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg space-y-2">
-                    <span class="text-xs font-bold text-blue-950 uppercase block">Adicionar Objeto / Exame ao Pedido:</span>
-                    <div class="grid grid-cols-1 md:grid-cols-6 gap-2 text-xs">
-                        <div class="md:col-span-2">
-                            <label class="font-bold block text-slate-700 mb-0.5">Trabalhador & CPF *</label>
-                            <input type="text" id="ped_trab_cpf" placeholder="EX: JOÃO DA SILVA - 123.456.789-00" class="w-full border border-slate-300 rounded p-1.5 bg-white font-semibold">
-                        </div>
-                        <div>
-                            <label class="font-bold block text-slate-700 mb-0.5">Objeto / Exame Padrão *</label>
-                            <select id="ped_objeto" onchange="verificarExameOutro()" class="w-full border border-slate-300 rounded p-1.5 bg-white font-semibold">
-                                <option value="ASO ADMISSONAL">ASO ADMISSONAL</option>
-                                <option value="ASO PERIÓDICO">ASO PERIÓDICO</option>
-                                <option value="ASO DEMISSONAL">ASO DEMISSONAL</option>
-                                <option value="ASO MUDANÇA DE RISCO">ASO MUDANÇA DE RISCO</option>
-                                <option value="ASO RETORNO AO TRABALHO">ASO RETORNO AO TRABALHO</option>
-                                <option value="AUDIOMETRIA TONAL">AUDIOMETRIA TONAL</option>
-                                <option value="EXAME CLINICO + HEMOGRAMA">EXAME CLINICO + HEMOGRAMA</option>
-                                <option value="OUTRO">OUTRO (DIGITAR MANUALMENTE)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-bold block text-slate-700 mb-0.5">Outro Objeto (Avulso)</label>
-                            <input type="text" id="ped_objeto_custom" placeholder="DIGITE O EXAME..." disabled class="w-full border border-slate-300 rounded p-1.5 bg-slate-100 font-semibold">
-                        </div>
-                        <div>
-                            <label id="lbl_ped_qtd_valor" class="font-bold block text-slate-700 mb-0.5">Qtd / Valor Unit. (R$)</label>
-                            <div class="flex gap-1">
-                                <input type="number" id="ped_qtd" value="1" min="1" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold">
-                                <input type="text" id="ped_valor" value="85,00" class="w-full border border-slate-300 rounded p-1.5 text-center font-bold col-valor-sigilo">
-                            </div>
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" onclick="addOrderItem()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-1.5 px-3 rounded shadow text-xs uppercase flex items-center justify-center">
-                                ➕ Incluir Item
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2">Trabalhador & CPF</th>
-                                <th class="p-2">Objeto Solicitado</th>
-                                <th class="p-2 text-center">Qtd</th>
-                                <th class="p-2 text-center col-valor-sigilo">Valor Unit.</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pedidos-current-tbody" class="divide-y divide-slate-200">
-                            <tr><td colspan="5" class="p-3 text-center text-slate-400 uppercase italic">Nenhum item adicionado ao pedido atual.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="flex flex-wrap justify-between items-center bg-emerald-50 border border-emerald-200 p-3 rounded-lg gap-2">
-                    <div class="text-xs text-emerald-950 font-bold uppercase">
-                        Selecione para qual parceiro vinculado direcionar o pedido:
-                    </div>
-                    <div class="flex flex-wrap gap-2 items-center">
-                        <select id="ped_destino_tipo" onchange="atualizarSeletorDestinoPedidoManual()" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white">
-                            <option value="CLINICA">CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
-                            <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR (FILA DE ASO)</option>
-                        </select>
-                        <select id="ped_destino_parceiro" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white"></select>
-                        <button type="button" onclick="dispatchOrder()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs px-4 py-2 rounded flex items-center shadow">
-                            📲 Despachar Pedido
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABELA DE MONITORAMENTO COM TECLA RESPONDER E APAGAR (ITEM 1) -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1.5">
-                        <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> 📋 Tabela de Monitoramento de Agendamentos & Pedidos da Clínica
-                    </h3>
-                    <button type="button" onclick="limparPedidosAgendamentoSelecionados()" class="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-3 py-1 rounded shadow flex items-center gap-1">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Apagar Todos os Pedidos
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2">Data Solicit.</th>
-                                <th class="p-2">Cliente</th>
-                                <th class="p-2">Trabalhador & CPF</th>
-                                <th class="p-2">Objeto</th>
-                                <th class="p-2 text-center">Qtd</th>
-                                <th class="p-2 text-center col-valor-sigilo">Valor (R$)</th>
-                                <th class="p-2">Destinatário</th>
-                                <th class="p-2">Resposta / Status</th>
-                                <th class="p-2 text-center">Ações / Responder</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monitor-requests-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 2: FILA DE ATENDIMENTO ASO -->
-        <section id="tab-atendimento" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-3">
-                <div>
-                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                        <i data-lucide="user-check" class="w-5 h-5 text-blue-700"></i> Fila de Atendimento Ocupacional & Emissão de ASO
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Carga em massa cai preenchida aqui. O Médico Examinador Independente pode corrigir qualquer dado.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="abrirModalNovoAso()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center shadow">
-                        <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Novo ASO Avulso
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2.5">Empregado / CPF</th>
-                                <th class="p-2.5">Cliente / Razão Social</th>
-                                <th class="p-2.5">Cargo / Função / Lotação</th>
-                                <th class="p-2.5">Tipo de Exame ASO</th>
-                                <th class="p-2.5 text-center">Ficha Anamnese Digital</th>
-                                <th class="p-2.5 text-center">Abrir & Editar ASO Boreal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="aso-queue-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 3: BANCO DE ASOs CONCLUÍDOS E ARQUIVADOS (ITEM 2 E 3) -->
-        <section id="tab-historico" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 border-b pb-2">
                 <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                    <i data-lucide="archive" class="w-5 h-5 text-indigo-700"></i> Banco de ASOs Concluídos & Fichas Digitais
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-800"></i> Inclusão de Pedido Avulso & Agendamento
                 </h2>
-                <p class="text-xs text-slate-500 mt-1">Acervo permanente salvo em nuvem e persistido no navegador com layout fiel e completo.</p>
+                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border">CLIENTE & GESTOR BOREAL</span>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2.5">Data Emissão</th>
-                                <th class="p-2.5">Empregado / CPF</th>
-                                <th class="p-2.5">Cliente / Razão Social</th>
-                                <th class="p-2.5">Parecer Final</th>
-                                <th class="p-2.5">Médico Examinador</th>
-                                <th class="p-2.5 text-center">Ficha Anamnese Anexada</th>
-                                <th class="p-2.5 text-center">ASO Boreal Individual Anexado</th>
-                                <th class="p-2.5 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="aso-history-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 4: eSOCIAL S-2220 -->
-        <section id="tab-esocial" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-between items-center">
-                <div>
-                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                        <i data-lucide="send" class="w-5 h-5 text-emerald-700"></i> Módulo eSocial — Evento S-2220
-                    </h2>
-                    <p class="text-xs text-slate-500">Exportação oficial do lote XML dos ASOs para o eSocial.</p>
-                </div>
-                <button type="button" onclick="gerarLoteESocial()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2 rounded flex items-center shadow">
-                    <i data-lucide="download" class="w-4 h-4 mr-1.5"></i> Exportar Lote XML S-2220
-                </button>
-            </div>
-            <pre id="esocial-preview-container" class="bg-slate-900 text-emerald-400 font-mono p-4 rounded-xl text-xs overflow-x-auto max-h-96">// Clique no botão acima para compilar o lote de XMLs...</pre>
-        </section>
-
-        <!-- ABA 5: MÓDULO HOMOLOGAÇÃO DE ATESTADOS OCUPACIONAIS (ITEM 4) -->
-        <section id="tab-homologacao" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg space-y-2">
+                <span class="text-xs font-bold text-blue-950 uppercase block">Adicionar Objeto / Exame ao Pedido:</span>
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-2 text-xs">
+                    <div class="md:col-span-2">
+                        <label class="font-bold block text-slate-700 mb-0.5">Trabalhador & CPF *</label>
+                        <input type="text" id="ped_trab_cpf" placeholder="EX: JOÃO DA SILVA - 123.456.789-00" class="w-full border border-slate-300 rounded p-1.5 bg-white font-semibold">
+                    </div>
                     <div>
-                        <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                            <i data-lucide="file-check" class="w-5 h-5 text-purple-700"></i> Homologação de Atestados Médicos Externos
-                        </h2>
-                        <p class="text-xs text-slate-500">Cadastre o empregado e anexe o atestado para homologação médica ocupacional.</p>
+                        <label class="font-bold block text-slate-700 mb-0.5">Objeto / Exame Padrão *</label>
+                        <select id="ped_objeto" onchange="verificarExameOutro()" class="w-full border border-slate-300 rounded p-1.5 bg-white font-semibold">
+                            <option value="ASO ADMISSONAL">ASO ADMISSONAL</option>
+                            <option value="ASO PERIÓDICO">ASO PERIÓDICO</option>
+                            <option value="ASO DEMISSONAL">ASO DEMISSONAL</option>
+                            <option value="ASO MUDANÇA DE RISCO">ASO MUDANÇA DE RISCO</option>
+                            <option value="ASO RETORNO AO TRABALHO">ASO RETORNO AO TRABALHO</option>
+                            <option value="AUDIOMETRIA TONAL">AUDIOMETRIA TONAL</option>
+                            <option value="EXAME CLINICO + HEMOGRAMA">EXAME CLINICO + HEMOGRAMA</option>
+                            <option value="OUTRO">OUTRO (DIGITAR MANUALMENTE)</option>
+                        </select>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="gerarRelatorioPdfHomologacao()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📄 Relatório de Absenteísmo (PDF / Visualizar)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- PAINEL DE INCLUSÃO DIRETA NA TELA -->
-                <div id="painel-inclusao-homologacao" class="bg-purple-50 border border-purple-200 p-3 rounded-lg space-y-2 text-xs">
-                    <span class="font-bold text-purple-950 block uppercase">➕ Relacionar Novo Empregado para Homologação:</span>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Trabalhador & CPF/Matr. *</label>
-                            <input type="text" id="hom_top_trab" placeholder="EX: CARLOS SILVA - 11122" class="w-full border p-1.5 rounded font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Lotação / Setor</label>
-                            <input type="text" id="hom_top_setor" placeholder="LOTAÇÃO / SETOR" class="w-full border p-1.5 rounded font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Função / Cargo</label>
-                            <input type="text" id="hom_top_cargo" placeholder="CARGO / FUNÇÃO" class="w-full border p-1.5 rounded font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-purple-950 block mb-0.5">Tempo de Afastamento *</label>
-                            <input type="number" id="hom_top_dias" value="1" placeholder="DIAS" class="w-full border p-1.5 rounded text-center font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Diagnóstico (CID-10) *</label>
-                            <input list="lista-cid10-homologacao" type="text" id="hom_top_cid" placeholder="CID OU DOENÇA..." class="w-full border p-1.5 rounded text-center font-bold bg-white" onchange="formatarCidSelecionado(this)">
-                            <datalist id="lista-cid10-homologacao"></datalist>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <input type="text" id="hom_top_empresa" placeholder="EMPRESA CLIENTE" class="border p-1.5 rounded font-bold bg-white">
-                        <input type="text" id="hom_top_medico" placeholder="MÉDICO EMISSOR DO ATESTADO" class="border p-1.5 rounded font-semibold bg-white">
-                        <input type="file" id="hom_top_arquivo" class="border p-1 rounded bg-white font-semibold cursor-pointer" onchange="processarArquivoAtestadoTop(event)">
-                        <button type="button" onclick="adicionarHomologacaoDireta()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold p-1.5 rounded uppercase shadow">
-                            💾 Relacionar Empregado
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-800 text-white font-bold uppercase">
-                                <th class="p-2">Empresa Cliente</th>
-                                <th class="p-2">Trabalhador & CPF</th>
-                                <th class="p-2">Lotação / Setor</th>
-                                <th class="p-2">Função / Cargo</th>
-                                <th class="p-2">Data Atestado</th>
-                                <th class="p-2 text-center">Tempo Afast.</th>
-                                <th class="p-2 text-center">CID-10</th>
-                                <th class="p-2">Médico Emissor</th>
-                                <th class="p-2 text-center">Original Escaneado</th>
-                                <th class="p-2 text-center">Status Homologação</th>
-                                <th class="p-2 text-center">Parecer & Documento</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="atestados-homologacao-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 6: MATRIZ PCMSO SEQUENCIAL (NR-07) (ITENS 5, 7, 8, 9) -->
-        <section id="tab-pcmso-matriz" class="tab-content hidden space-y-4">
-            <div id="pcmso-medico-header-info" class="bg-sky-900 text-white p-3.5 rounded-xl flex flex-wrap justify-between items-center gap-2 shadow border border-sky-700">
-                <div class="text-xs">
-                    <span class="text-sky-300 font-extrabold uppercase block">MATRIZ DO PCMSO EM EDIÇÃO / REVISÃO MÉDICA:</span>
-                    <strong id="pcmso_lbl_cliente_nome" class="text-base font-black text-amber-400">TODOS OS CLIENTES</strong>
-                </div>
-                <div class="text-xs text-right">
-                    <span class="text-sky-200 font-bold block">Médico Responsável do PCMSO:</span>
-                    <strong id="pcmso_lbl_medico_nome" class="text-white font-black">A DEFINIR NO CADASTRO</strong>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
                     <div>
-                        <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                            <i data-lucide="file-spreadsheet" class="w-5 h-5 text-sky-700"></i> Matriz do PCMSO Sequencial (NR-07)
-                        </h2>
-                        <p class="text-xs text-slate-500">Gestão das exposições a riscos, exames exigidos e planos de ação em saúde.</p>
+                        <label class="font-bold block text-slate-700 mb-0.5">Outro Objeto (Avulso)</label>
+                        <input type="text" id="ped_objeto_custom" placeholder="DIGITE O EXAME..." disabled class="w-full border border-slate-300 rounded p-1.5 bg-slate-100 font-semibold">
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="gerarRelatorioPdfMatrizPcmso()" class="bg-sky-800 hover:bg-sky-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📄 Relatório Matriz (PDF / Imprimir)
-                        </button>
-                        <button type="button" onclick="exportarMatrizPcmsoWord()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            📝 Baixar Matriz em Word (.doc)
-                        </button>
-                    </div>
-                </div>
-
-                <div id="pcmso-form-container" class="bg-slate-50 border p-3 rounded-lg space-y-3 text-xs">
-                    <span class="font-extrabold text-slate-800 block uppercase">➕ Incluir Novo Cargo / Perigo / Risco na Matriz do PCMSO:</span>
-                    
-                    <!-- 1. Dados Organizacionais do Cargo -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Lotação / Setor *</label>
-                            <input type="text" id="pcmso_add_lotacao" placeholder="LOTAÇÃO / SETOR" class="w-full border p-1.5 rounded font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Processo Operacional</label>
-                            <input type="text" id="pcmso_add_processo" placeholder="PROCESSO OPERACIONAL" class="w-full border p-1.5 rounded bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Cargo / Função *</label>
-                            <input type="text" id="pcmso_add_cargo" placeholder="CARGO / FUNÇÃO" class="w-full border p-1.5 rounded font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Qtd Expostos *</label>
-                            <input type="number" id="pcmso_add_qtd" value="1" placeholder="QUANT." class="w-full border p-1.5 rounded text-center font-bold bg-white">
+                    <div>
+                        <label id="lbl_ped_qtd_valor" class="font-bold block text-slate-700 mb-0.5">Qtd / Valor Unit. (R$)</label>
+                        <div class="flex gap-1">
+                            <input type="number" id="ped_qtd" value="1" min="1" class="w-16 border border-slate-300 rounded p-1.5 text-center font-bold">
+                            <input type="text" id="ped_valor" value="85,00" class="w-full border border-slate-300 rounded p-1.5 text-center font-bold col-valor-sigilo">
                         </div>
                     </div>
-
-                    <!-- 2. Seleção de Grupo e Perigo do Inventário PGR -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Grupo / Categoria do Inventário *</label>
-                            <select id="pcmso_add_cat" onchange="filtrarRiscosCat('pcmso_add_cat', 'pcmso_add_agente')" class="w-full border p-1.5 rounded font-bold text-sky-900 bg-white">
-                                <option value="">-- Selecione o Grupo do Inventário --</option>
-                                <option value="ACIDENTES">Riscos de Acidentes</option>
-                                <option value="ACIDENTES_AMPLIADOS">Riscos de Acidentes Ampliados</option>
-                                <option value="FISICOS">Riscos Físicos</option>
-                                <option value="QUIMICOS">Riscos Químicos</option>
-                                <option value="BIOLOGICOS">Riscos Biológicos</option>
-                                <option value="BIOLOGICOS_AMPLIADOS">Riscos Biológicos Ampliados</option>
-                                <option value="ERGONOMICOS_BIOMECANICOS">Ergonômicos Biomecânicos e Organizacionais</option>
-                                <option value="ERGONOMICOS_COGNITIVOS">Ergonômicos Cognitivos</option>
-                                <option value="PSICOSSOCIAIS">Riscos Psicossociais (COPSOQ)</option>
-                                <option value="PERICULOSOS">Riscos Periculosos</option>
-                                <option value="ASSOCIACAO">Associação de Agentes Nocivos</option>
-                                <option value="AUSENCIA">Ausência de Riscos (Decreto 3.048/99)</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="font-bold text-slate-700 block mb-0.5">Perigo Selecionado do Inventário PGR (Preenchimento Automático) *</label>
-                            <select id="pcmso_add_agente" onchange="autoPreencherPerigoRiscoPlano()" class="w-full border p-1.5 rounded bg-white font-semibold">
-                                <option value="">-- Selecione o Grupo Acima Primeiro --</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- 3. Campos Novos Editáveis: Novo Perigo e Novo Risco -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Novo Perigo (Digitar caso não esteja na lista):</label>
-                            <input type="text" id="pcmso_add_perigo_custom" placeholder="DIGITE UM NOVO PERIGO CASO NECESSÁRIO..." class="w-full border p-1.5 rounded font-bold bg-white text-blue-950">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Risco / Agravo à Saúde (Editável):</label>
-                            <input type="text" id="pcmso_add_risco" placeholder="RISCO / DANOS / AGRAVOS À SAÚDE..." class="w-full border p-1.5 rounded font-semibold bg-white text-rose-900">
-                        </div>
-                    </div>
-
-                    <!-- 4. Exames Complementares e Periodicidades -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Exame Obrigatório</label>
-                            <select id="pcmso_add_exame" class="w-full border p-1.5 rounded font-semibold bg-white">
-                                <option value="CLÍNICO">CLÍNICO</option>
-                                <option value="AUDIOMETRIA">AUDIOMETRIA</option>
-                                <option value="ESPIROMETRIA">ESPIROMETRIA</option>
-                                <option value="ACUIDADE VISUAL">ACUIDADE VISUAL</option>
-                                <option value="ECG">ECG</option>
-                                <option value="EEG">EEG</option>
-                                <option value="HEMOGRAMA COMPLETO">HEMOGRAMA COMPLETO</option>
-                                <option value="GLICEMIA DE JEJUM">GLICEMIA DE JEJUM</option>
-                                <option value="RAIO-X DE TÓRAX">RAIO-X DE TÓRAX</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Novo Exame (Digitar Manual):</label>
-                            <input type="text" id="pcmso_add_exame_custom" placeholder="NOVO EXAME..." class="w-full border p-1.5 rounded font-semibold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Periodicidade</label>
-                            <select id="pcmso_add_periodicidade" class="w-full border p-1.5 rounded font-bold bg-white">
-                                <option value="Anual">Anual</option>
-                                <option value="Bienal (24 meses)">Bienal (24 meses)</option>
-                                <option value="Semestral">Semestral</option>
-                                <option value="Admissional / Demissional">Admissional / Demissional</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-bold text-slate-700 block mb-0.5">Nova Periodicidade (Digitar):</label>
-                            <input type="text" id="pcmso_add_per_custom" placeholder="NOVA PERIODICIDADE..." class="w-full border p-1.5 rounded font-semibold bg-white">
-                        </div>
-                    </div>
-
-                    <!-- 5. Planos de Ação em Linhas Grandes e Separadas -->
-                    <div class="space-y-2 pt-1">
-                        <div>
-                            <label class="font-bold text-amber-950 block mb-0.5">📋 Novo Plano de Ação do Gestor / PGR (Medidas de Engenharia, EPI/EPC e Prevenção):</label>
-                            <textarea id="pcmso_add_plano_gestor" rows="2" placeholder="DESCREVA AS MEDIDAS PREVENTIVAS, TREINAMENTOS, EPC/EPI E ORDENS DE SERVIÇO DO PGR..." class="w-full border p-2 rounded bg-amber-50 font-semibold text-slate-800 text-xs shadow-sm"></textarea>
-                        </div>
-                        <div id="pcmso_box_plano_medico">
-                            <label class="font-bold text-blue-950 block mb-0.5">🩺 Novo Plano de Ação Médico (Exclusivo Médico do PCMSO - Vigilância e Acompanhamento Clínico):</label>
-                            <textarea id="pcmso_add_plano_medico" rows="2" placeholder="DESCREVA AS DIRETRIZES CLÍNICAS, CONDUTAS EM CASO DE AGRAVOS, VIGILÂNCIA EPIDEMIOLÓGICA E CONTROLES AMBULATORIAIS..." class="w-full border border-blue-400 p-2 rounded bg-blue-50 font-bold text-blue-950 text-xs shadow-sm"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end pt-1">
-                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-2 rounded uppercase shadow flex items-center gap-2">
-                            ➕ Carregar Linha no PCMSO
+                    <div class="flex items-end">
+                        <button type="button" onclick="addOrderItem()" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-1.5 px-3 rounded shadow text-xs uppercase flex items-center justify-center">
+                            ➕ Incluir Item
                         </button>
                     </div>
-                </div>
-
-                <div class="overflow-x-auto border rounded-lg">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-800 text-white font-bold uppercase">
-                                <th class="p-2">Empresa Cliente</th>
-                                <th class="p-2">Lotação</th>
-                                <th class="p-2">Processo Operacional</th>
-                                <th class="p-2">Cargo / Função</th>
-                                <th class="p-2 text-center">Qtd</th>
-                                <th class="p-2">Agente (Fonte)</th>
-                                <th class="p-2">Risco (Agravo)</th>
-                                <th class="p-2">Descrição dos Exames</th>
-                                <th class="p-2 text-center">Periodicidade</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pcmso-matriz-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
                 </div>
             </div>
-        </section>
 
-        <!-- ABA 7: RELATÓRIO ANALÍTICO PCMSO -->
-        <section id="tab-relatorio-pcmso" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
-                    <div>
-                        <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-600"></i> Relatório Analítico Anual do PCMSO (NR-07 Item 7.6.2)
-                        </h2>
-                        <p class="text-xs text-slate-500">Síntese dos resultados dos exames ocupacionais para acompanhamento epidemiológico.</p>
-                    </div>
-                    <button type="button" onclick="gerarRelatorioPdfAnaliticoPcmso()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                        📄 Imprimir Relatório Analítico (PDF)
+            <div class="border rounded-lg overflow-hidden">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
+                            <th class="p-2">Trabalhador & CPF</th>
+                            <th class="p-2">Objeto Solicitado</th>
+                            <th class="p-2 text-center">Qtd</th>
+                            <th class="p-2 text-center col-valor-sigilo">Valor Unit.</th>
+                            <th class="p-2 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pedidos-current-tbody" class="divide-y divide-slate-200">
+                        <tr><td colspan="5" class="p-3 text-center text-slate-400 uppercase italic">Nenhum item adicionado ao pedido atual.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-center bg-emerald-50 border border-emerald-200 p-3 rounded-lg gap-2">
+                <div class="text-xs text-emerald-950 font-bold uppercase">
+                    Selecione para qual parceiro vinculado direcionar o pedido:
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <select id="ped_destino_tipo" onchange="atualizarSeletorDestinoPedidoManual()" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white">
+                        <option value="CLINICA">CLÍNICA CREDENCIADA (AGENDAMENTO)</option>
+                        <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR (FILA DE ASO)</option>
+                    </select>
+                    <select id="ped_destino_parceiro" class="border border-emerald-400 rounded px-2 py-1.5 text-xs font-bold bg-white"></select>
+                    <button type="button" onclick="dispatchOrder()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs px-4 py-2 rounded flex items-center shadow">
+                        📲 Despachar Pedido
                     </button>
                 </div>
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-center">
-                        <span class="text-xs text-blue-800 font-bold block uppercase">Total Exames</span>
-                        <strong id="stat-total-exames" class="text-2xl font-black text-blue-950">0</strong>
-                    </div>
-                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-center">
-                        <span class="text-xs text-emerald-800 font-bold block uppercase">Aptos</span>
-                        <strong id="stat-total-aptos" class="text-2xl font-black text-emerald-950">0</strong>
-                    </div>
-                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-center">
-                        <span class="text-xs text-amber-800 font-bold block uppercase">Aptos c/ Restrição</span>
-                        <strong id="stat-total-restricao" class="text-2xl font-black text-amber-950">0</strong>
-                    </div>
-                    <div class="bg-red-50 border border-red-200 p-3 rounded-lg text-center">
-                        <span class="text-xs text-red-800 font-bold block uppercase">Inaptos</span>
-                        <strong id="stat-total-inaptos" class="text-2xl font-black text-red-950">0</strong>
-                    </div>
-                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- ABA 8: MÓDULO FINANCEIRO (POSIÇÃO CONSOLIDADA) (ITENS 3, 6, 7, 8, 10) -->
-        <section id="tab-producao" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
-                    <div>
-                        <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
-                            <i data-lucide="line-chart" class="w-5 h-5 text-emerald-700"></i> Posição Financeira — Produção Real Executada
-                        </h2>
-                        <p class="text-xs text-slate-500">Módulo exclusivo do Gestor e Fornecedores vinculados. Apuração de quantidades executadas.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="salvarFechamentoPeriodo()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            💾 Gravar Fechamento
-                        </button>
-                        <button type="button" onclick="enviarRelatorioEmailFinanceiro()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            ✉️ Enviar para financeiro@boreal.eng.br
-                        </button>
-                        <button type="button" onclick="window.print()" class="bg-slate-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
-                            🖨️ Imprimir / PDF
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Período e Observações -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border text-xs">
-                    <div>
-                        <label class="font-bold block mb-0.5">Período de Execução (Início - Fim):</label>
-                        <input type="text" id="fin_periodo_execucao" placeholder="EX: 01/10/2026 A 31/10/2026" class="w-full border p-1.5 rounded font-bold bg-white">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="font-bold block mb-0.5">Observações Gerais do Fornecedor / Gestor:</label>
-                        <input type="text" id="fin_observacoes_gerais" placeholder="OBSERVAÇÕES SOBRE GLOSAS, REAJUSTES OU DETALHES DE FATURAMENTO..." class="w-full border p-1.5 rounded font-semibold bg-white">
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-800 text-white font-bold uppercase">
-                                <th class="p-2.5">Data</th>
-                                <th class="p-2.5">Fornecedor</th>
-                                <th class="p-2.5">Cliente</th>
-                                <th class="p-2.5">Objeto / Procedimento</th>
-                                <th class="p-2.5 text-center bg-amber-900 text-amber-200">Qtd Real Executada</th>
-                                <th class="p-2.5 text-right">Valor Unit. (R$)</th>
-                                <th class="p-2.5 text-right font-extrabold text-emerald-400 bg-slate-950">Subtotal Real</th>
-                                <th class="p-2.5 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="relatorio-producao-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center font-bold text-sm text-emerald-950">
-                    <span>VALOR GLOBAL DO PERÍODO EXECUTADO:</span>
-                    <span id="valor-soma-total-producao" class="text-xl font-black text-emerald-700">R$ 0,00</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 9: CHAT PRIVADO -->
-        <section id="tab-chat" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
-                <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2 border-b pb-2">
-                    <i data-lucide="messages-square" class="w-5 h-5 text-teal-700"></i> 💬 Chat de Comunicação Direta Privada
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <div class="bg-slate-50 border rounded-lg p-2 space-y-2 text-xs">
-                        <span class="font-bold text-slate-700 uppercase block mb-1">Endereçamento da Mensagem:</span>
-                        <div>
-                            <label class="block font-bold mb-0.5">Emissor (Remetente):</label>
-                            <select id="chat_remetente_select" class="w-full border p-1 rounded font-bold bg-white text-slate-800">
-                                <option value="GESTOR BOREAL">GESTOR BOREAL</option>
-                                <option value="CLIENTE">CLIENTE / RH</option>
-                                <option value="CLÍNICA">CLÍNICA CREDENCIADA</option>
-                                <option value="MÉDICO EXAMINADOR">MÉDICO EXAMINADOR</option>
-                                <option value="MÉDICO PCMSO">MÉDICO PCMSO</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold mb-0.5">Destinatário:</label>
-                            <select id="chat_destinatario_select" class="w-full border p-1 rounded font-bold bg-white text-slate-800">
-                                <option value="CLÍNICA">CLÍNICA CREDENCIADA</option>
-                                <option value="CLIENTE">CLIENTE / RH</option>
-                                <option value="GESTOR BOREAL">GESTOR BOREAL</option>
-                                <option value="MÉDICO EXAMINADOR">MÉDICO EXAMINADOR</option>
-                                <option value="MÉDICO PCMSO">MÉDICO PCMSO</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-3 border rounded-lg flex flex-col h-80 bg-slate-50 overflow-hidden">
-                        <div id="chat-messages-box" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
-                            <div class="bg-white p-2 rounded border max-w-md shadow-sm">
-                                <strong class="text-teal-800 block">SISTEMA:</strong> Canal de comunicação privada pronto para uso.
-                            </div>
-                        </div>
-                        <div class="p-2 bg-white border-t flex gap-2">
-                            <input type="text" id="chat-msg-input" placeholder="DIGITE SUA MENSAGEM PRIVADA..." class="flex-1 border rounded px-2 py-1 text-xs uppercase">
-                            <button type="button" onclick="enviarMensagemChat()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-1 rounded text-xs uppercase">
-                                Enviar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA 10: CADASTROS & MATRIZ DE VÍNCULOS COMERCIAIS (BLOQUEADA PARA CLIENTE) -->
-        <section id="tab-cadastros" class="tab-content hidden space-y-6">
-            
-            <div class="bg-slate-900 text-white p-4 rounded-xl space-y-2 shadow">
-                <h3 class="font-extrabold text-amber-400 text-xs uppercase flex items-center gap-1.5">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i> Dados do Gestor Master Boreal Engmed
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300">
-                    <div><strong>Contato:</strong> BOREAL ENGMED GESTÃO CENTRAL</div>
-                    <div><strong>WhatsApp:</strong> (19) 99156-7153</div>
-                    <div><strong>E-mail:</strong> contato@borealengmed.com.br</div>
-                </div>
-            </div>
-
-            <!-- MATRIZ DE VÍNCULOS COMERCIAIS E PRECIFICAÇÃO DINÂMICA (ITENS 1 e 2) -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
-                        <i data-lucide="tag" class="w-4 h-4 text-emerald-700"></i> Tabela de Preços e Serviços Contratados (Por Cliente / Fornecedor)
-                    </h2>
-                    <span class="text-xs bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">Acesso Clínicas Credenciadas & Gestão</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs bg-slate-50 p-3 rounded border">
-                    <div>
-                        <label class="font-bold block mb-1">Cliente Vinculado *</label>
-                        <select id="vinc_cli_select" class="w-full border rounded p-1.5 bg-white font-bold"></select>
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Tipo de Parceiro *</label>
-                        <select id="vinc_tipo_select" class="w-full border rounded p-1.5 bg-white font-bold" onchange="atualizarListaParceirosVinculo()">
-                            <option value="CLINICA">CLÍNICA CREDENCIADA</option>
-                            <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR INDEPENDENTE</option>
-                            <option value="MEDICO_HOMOLOGADOR">MÉDICO HOMOLOGADOR</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Nome do Parceiro *</label>
-                        <select id="vinc_parceiro_select" class="w-full border rounded p-1.5 bg-white font-bold"></select>
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Tipo de Contrato *</label>
-                        <select id="vinc_modalidade_contrato" class="w-full border rounded p-1.5 bg-white font-bold text-blue-900">
-                            <option value="RECORRENTE_FIXO">FIXO (RECORRENTE MENSAL)</option>
-                            <option value="AVULSO">AVULSO (DEMANDA SOB CONSULTA)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Valor Unitário Contratado (R$) *</label>
-                        <input type="number" step="0.01" id="vinc_unit" value="0.00" class="w-full border rounded p-1.5 bg-white font-bold text-emerald-800">
-                    </div>
-                    <div class="md:col-span-4">
-                        <label class="font-bold block mb-1">Descrição do Objeto / Procedimento Realizado *</label>
-                        <input type="text" id="vinc_objeto" placeholder="EX: ASO CLÍNICO OCUPACIONAL, AUDIOMETRIA TONAL, RAIO-X DE TÓRAX..." class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="button" onclick="adicionarItemTabelaPreco()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs p-2 rounded shadow flex items-center justify-center gap-1">
-                            ➕ Adicionar Item
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border">
-                        <thead class="bg-slate-100 text-slate-700 font-bold border-b">
-                            <tr>
-                                <th class="p-2">Cliente</th>
-                                <th class="p-2">Tipo</th>
-                                <th class="p-2">Fornecedor / Parceiro</th>
-                                <th class="p-2">Contrato</th>
-                                <th class="p-2">Objeto / Serviço Cadastrado</th>
-                                <th class="p-2 text-right bg-amber-50">Valor Unitário (Editável pela Clínica)</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-vinculos-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- CADASTRO DE CLIENTES & MÉDICO RESPONSÁVEL DO PCMSO -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
-                        <i data-lucide="building" class="w-4 h-4 text-blue-700"></i> Cadastro de Clientes & Médico Responsável pelo PCMSO
-                    </h2>
-                </div>
-                
-                <div id="box-form-cliente" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
-                    <div class="md:col-span-2">
-                        <label class="font-bold block mb-1">Razão Social do Cliente *</label>
-                        <input type="text" id="cad_cli_nome" placeholder="NOME DA EMPRESA CLIENTE" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">CNPJ *</label>
-                        <input type="text" id="cad_cli_cnpj" placeholder="00.000.000/0001-00" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Telefone / WhatsApp *</label>
-                        <input type="text" id="cad_cli_tel" placeholder="(19) 0000-0000" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="font-bold block mb-1">Endereço Completo *</label>
-                        <input type="text" id="cad_cli_end" placeholder="RUA, Nº, BAIRRO, CIDADE - UF" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="font-bold block mb-1">E-mail de Contato *</label>
-                        <input type="text" id="cad_cli_email" placeholder="CONTATO@CLIENTE.COM.BR" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-
-                    <div class="md:col-span-4 bg-amber-50 border border-amber-300 p-3 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div>
-                            <label class="font-bold text-amber-950 block mb-0.5">Nome do Médico Responsável do PCMSO *</label>
-                            <input type="text" id="cad_cli_med_pcmso" placeholder="DR(A). NOME DO MÉDICO" class="w-full border rounded p-1.5 bg-white font-bold text-blue-900">
-                        </div>
-                        <div>
-                            <label class="font-bold text-amber-950 block mb-0.5">CRM / UF *</label>
-                            <input type="text" id="cad_cli_med_crm" placeholder="CRM SP 000000" class="w-full border rounded p-1.5 bg-white font-bold">
-                        </div>
-                        <div>
-                            <label class="font-bold text-amber-950 block mb-0.5">RQE (Especialidade)</label>
-                            <input type="text" id="cad_cli_med_rqe" placeholder="RQE 00000" class="w-full border rounded p-1.5 bg-white font-bold">
-                        </div>
-                        <div>
-                            <label class="font-bold text-amber-950 block mb-0.5">WhatsApp Médico *</label>
-                            <input type="text" id="cad_cli_med_whats" placeholder="(19) 90000-0000" class="w-full border rounded p-1.5 bg-white font-bold text-emerald-800">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="font-bold text-amber-950 block mb-0.5">E-mail Médico *</label>
-                            <input type="text" id="cad_cli_med_email" placeholder="medico.pcmso@email.com" class="w-full border rounded p-1.5 bg-white font-bold text-blue-800">
-                        </div>
-                    </div>
-
-                    <div class="md:col-span-4 flex justify-end">
-                        <button type="button" onclick="salvarNovoCliente()" class="btn-only-gestor bg-blue-800 hover:bg-blue-900 text-white font-extrabold px-5 py-2 rounded text-xs uppercase shadow">
-                            💾 Salvar Cadastro do Cliente & PCMSO
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2">Razão Social</th>
-                                <th class="p-2">CNPJ</th>
-                                <th class="p-2">Telefone</th>
-                                <th class="p-2">E-mail</th>
-                                <th class="p-2">Médico Responsável PCMSO & Contatos</th>
-                                <th class="p-2 text-center">Notificação</th>
-                                <th class="p-2 text-center">Status</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientes-cadastrados-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- CADASTRO DE CLÍNICAS CREDENCIADAS COM ENDEREÇO -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
-                        <i data-lucide="hospital" class="w-4 h-4 text-emerald-700"></i> Cadastro de Clínicas Credenciadas (com Endereço Atendimento)
-                    </h2>
-                </div>
-
-                <div id="box-form-clinica" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
-                    <div>
-                        <label class="font-bold block mb-1">Nome da Clínica *</label>
-                        <input type="text" id="cad_clin_nome" placeholder="NOME DA CLÍNICA" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">CNPJ / Cidade *</label>
-                        <input type="text" id="cad_clin_cnpj" placeholder="CNPJ / CIDADE" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Telefone / WhatsApp *</label>
-                        <input type="text" id="cad_clin_whats" placeholder="(19) 99999-9999" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">E-mail da Clínica *</label>
-                        <input type="text" id="cad_clin_email" placeholder="CLINICA@EMAIL.COM" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="md:col-span-4">
-                        <label class="font-bold block mb-1">Endereço de Atendimento Completo *</label>
-                        <input type="text" id="cad_clin_endereco" placeholder="RUA / AV, Nº, BAIRRO, CIDADE - UF" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="md:col-span-4 flex justify-end">
-                        <button type="button" onclick="salvarNovaClinica()" class="btn-only-gestor bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold px-5 py-2 rounded text-xs uppercase shadow">
-                            💾 Salvar Clínica Credenciada
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2">Nome da Clínica</th>
-                                <th class="p-2">CNPJ / Cidade</th>
-                                <th class="p-2">Endereço Atendimento</th>
-                                <th class="p-2">WhatsApp / Telefone</th>
-                                <th class="p-2">E-mail</th>
-                                <th class="p-2 text-center">Status</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clinicas-cadastradas-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- CADASTRO DE MÉDICOS EXAMINADORES E HOMOLOGADORES -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2">
-                        <i data-lucide="user-plus" class="w-4 h-4 text-indigo-700"></i> Cadastro de Médicos (Examinadores & Homologadores)
-                    </h2>
-                </div>
-
-                <div id="box-form-medico" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-50 p-3 rounded border">
-                    <div>
-                        <label class="font-bold block mb-1">Nome Completo do Médico *</label>
-                        <input type="text" id="cad_med_nome" placeholder="DR. NOME DO MÉDICO" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">CRM / UF *</label>
-                        <input type="text" id="cad_med_crm" placeholder="CRM SP 000000" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">RQE / Especialidade</label>
-                        <input type="text" id="cad_med_rqe" placeholder="RQE 00000" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Tipo de Atuação *</label>
-                        <select id="cad_med_tipo" class="w-full border rounded p-1.5 bg-white font-bold">
-                            <option value="MÉDICO EXAMINADOR INDEPENDENTE">MÉDICO EXAMINADOR INDEPENDENTE</option>
-                            <option value="MÉDICO EXAMINADOR (CLÍNICA)">MÉDICO EXAMINADOR (CLÍNICA)</option>
-                            <option value="MÉDICO HOMOLOGADOR INDEPENDENTE">MÉDICO HOMOLOGADOR INDEPENDENTE</option>
-                            <option value="MÉDICO RESPONSÁVEL PCMSO">MÉDICO RESPONSÁVEL PCMSO</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="font-bold block mb-1">Telefone / WhatsApp *</label>
-                        <input type="text" id="cad_med_tel" placeholder="(19) 90000-0000" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="font-bold block mb-1">E-mail para Acesso e Notificações *</label>
-                        <input type="text" id="cad_med_email" placeholder="medico@email.com" class="w-full border rounded p-1.5 bg-white font-bold">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="button" onclick="salvarNovoMedico()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold p-2 rounded text-xs uppercase shadow">
-                            💾 Salvar Médico
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
-                                <th class="p-2">Nome do Médico</th>
-                                <th class="p-2">CRM / UF (RQE)</th>
-                                <th class="p-2">Tipo de Atuação</th>
-                                <th class="p-2">Telefone / WhatsApp</th>
-                                <th class="p-2">E-mail</th>
-                                <th class="p-2 text-center">Status</th>
-                                <th class="p-2 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="medicos-cadastrados-tbody" class="divide-y divide-slate-200">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-    <!-- MODAL DE RESPOSTA DE AGENDAMENTO COM BOTÃO "IGUAL" (ITEM 1 e 5) -->
-    <div id="modal-resposta-agendamento" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl border p-5 space-y-3 text-xs">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-extrabold text-sm text-slate-900 uppercase">📅 Confirmar Horário de Agendamento</h3>
-                <button type="button" onclick="fecharModal('modal-resposta-agendamento')" class="text-slate-500 font-bold">✕</button>
+                <h3 class="font-bold text-slate-900 text-xs uppercase flex items-center gap-1.5">
+                    <i data-lucide="list-checks" class="w-4 h-4 text-blue-700"></i> 📋 Tabela de Monitoramento de Agendamentos & Pedidos da Clínica
+                </h3>
+                <button type="button" onclick="limparPedidosAgendamentoSelecionados()" class="bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold px-3 py-1 rounded shadow flex items-center gap-1">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Apagar Todos os Pedidos
+                </button>
             </div>
-            <div class="space-y-2">
-                <div>
-                    <label class="font-bold block mb-0.5">Trabalhador / Pedido:</label>
-                    <input type="text" id="resp_trab_lbl" disabled class="w-full border p-1.5 rounded font-bold bg-slate-100">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-0.5">
-                        <label class="font-bold">Opções de Data e Horário *</label>
-                        <button type="button" onclick="aplicarHorarioAnteriorIgual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded font-extrabold text-[10px] border border-indigo-300">
-                            ⚡ Repetir Horário Anterior ("IGUAL")
-                        </button>
-                    </div>
-                    <textarea id="resp_horarios" rows="3" placeholder="EX: 10/11/2026 às 08:30h" class="w-full border p-1.5 rounded font-bold bg-white"></textarea>
-                </div>
-                <div>
-                    <label class="font-bold block mb-0.5">Endereço de Comparecimento:</label>
-                    <input type="text" id="resp_endereco" class="w-full border p-1.5 rounded font-bold bg-amber-50">
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
+                            <th class="p-2">Data Solicit.</th>
+                            <th class="p-2">Cliente</th>
+                            <th class="p-2">Trabalhador & CPF</th>
+                            <th class="p-2">Objeto</th>
+                            <th class="p-2 text-center">Qtd</th>
+                            <th class="p-2 text-center col-valor-sigilo">Valor (R$)</th>
+                            <th class="p-2">Destinatário</th>
+                            <th class="p-2">Resposta / Status</th>
+                            <th class="p-2 text-center">Ações / Responder</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monitor-requests-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
             </div>
-            <div class="flex justify-end gap-2 border-t pt-3">
-                <button type="button" onclick="fecharModal('modal-resposta-agendamento')" class="bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded uppercase">Cancelar</button>
-                <button type="button" onclick="confirmarRespostaAgendamento()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-1.5 rounded uppercase shadow">
-                    📲 Enviar Resposta (Transferir p/ Fila ASO)
+        </div>
+    </section>
+
+    <!-- ABA 2: FILA DE ATENDIMENTO ASO -->
+    <section id="tab-atendimento" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-wrap justify-between items-center gap-3">
+            <div>
+                <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-5 h-5 text-blue-700"></i> Fila de Atendimento Ocupacional & Emissão de ASO
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Carga em massa cai preenchida aqui. O Médico Examinador Independente pode corrigir qualquer dado.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="abrirModalNovoAso()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center shadow">
+                    <i data-lucide="user-plus" class="w-4 h-4 mr-1"></i> Novo ASO Avulso
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- MODAL: FICHA DE ANAMNESE OCUPACIONAL (ITEM 26, 27) -->
-    <div id="modal-anamnese" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-5 space-y-4 max-h-[90vh] overflow-y-auto text-xs">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-extrabold text-sm text-slate-900 uppercase flex items-center gap-2">
-                    📋 FICHA DE ANAMNESE OCUPACIONAL COMPLETA — BOREAL ENGMED
-                </h3>
-                <button type="button" onclick="fecharModal('modal-anamnese')" class="text-slate-500 font-bold text-base">✕</button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 bg-slate-100 p-3 rounded font-bold text-[11px]">
-                <div><strong>Empregado:</strong> <span id="anam_nome_lbl" class="text-blue-900">-</span></div>
-                <div><strong>CPF:</strong> <span id="anam_cpf_lbl" class="text-blue-900">-</span></div>
-                <div><strong>Função / Cargo:</strong> <span id="anam_cargo_lbl" class="text-blue-900">-</span></div>
-                <div><strong>Tipo Sanguíneo:</strong> <input type="text" id="anam_sangue" value="O+" class="w-12 border rounded text-center bg-white"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] bg-slate-50 p-2 rounded border">
-                <div><strong>Unidade / Empresa:</strong> <input type="text" id="anam_unidade" placeholder="UNIDADE" class="w-full border rounded p-1 bg-white"></div>
-                <div><strong>Setor de Trabalho:</strong> <input type="text" id="anam_setor" placeholder="SETOR" class="w-full border rounded p-1 bg-white"></div>
-                <div><strong>E-mail / Telefone:</strong> <input type="text" id="anam_contato" placeholder="CONTATO" class="w-full border rounded p-1 bg-white"></div>
-            </div>
-
-            <div class="space-y-3">
-                <div class="border rounded-lg p-3 bg-slate-50 space-y-2">
-                    <h4 class="font-extrabold text-blue-900 uppercase border-b pb-1">1. ANTECEDENTES OCUPACIONAIS</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
-                        <div>
-                            <label class="block font-bold">Já sofreu Acidente de Trabalho?</label>
-                            <select id="anam_acid_outro" class="w-full border rounded p-1 bg-white font-bold"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select>
-                            <input type="text" id="anam_acid_outro_desc" placeholder="Descreva sequelas, se houver..." class="w-full border rounded p-1 mt-1 bg-white">
-                        </div>
-                        <div>
-                            <label class="block font-bold">Possui limitações para realizar atribuições?</label>
-                            <select id="anam_limitacao" class="w-full border rounded p-1 bg-white font-bold"><option value="NÃO">NÃO</option><option value="SIM">SIM</option></select>
-                            <input type="text" id="anam_limitacao_desc" placeholder="Descreva limitações..." class="w-full border rounded p-1 mt-1 bg-white">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border rounded-lg p-3 bg-slate-50 space-y-2">
-                    <h4 class="font-extrabold text-blue-900 uppercase border-b pb-1">2. ANTECEDENTES FAMILIARES</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_tb"> Tuberculose</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_diab"> Diabetes</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_cancer"> Câncer</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_asma"> Asma</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_surdez"> Surdez</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_mental"> Doença Mental</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="fam_coracao"> Doença do Coração</label>
-                    </div>
-                    <input type="text" id="fam_desc_geral" placeholder="Detalhes dos antecedentes familiares..." class="w-full border rounded p-1 bg-white font-semibold">
-                </div>
-
-                <div class="border rounded-lg p-3 bg-slate-50 space-y-2">
-                    <h4 class="font-extrabold text-blue-900 uppercase border-b pb-1">3. ANTECEDENTES PESSOAIS & CONDIÇÕES CLÍNICAS</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px]">
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_has"> Cardíaco / Hipertensão</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_pne"> Portador Neces. Especiais</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_dor_peito"> Dor no Peito / Palpitações</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_fratura"> Fratura c/ Sequela</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_renal"> Doenças Renais</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_onco"> Histórico Oncológico</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_diab"> Diabetes</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_convulsao"> Já teve Convulsão</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_estomago"> Gastrite / Úlcera</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_med_controlado"> Remédio Controlado</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_respiratorio"> Doenças Respiratórias</label>
-                        <label class="flex items-center gap-1 font-bold"><input type="checkbox" id="pess_alergia_med"> Alergia a Medicamentos</label>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="font-bold block mb-1">Observações Médicas Complementares (Evolução Clínica):</label>
-                    <textarea id="anam_obs" rows="2" placeholder="OBSERVAÇÕES DO MÉDICO..." class="w-full border rounded p-2 bg-slate-50 font-semibold"></textarea>
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 border-t pt-3">
-                <button type="button" onclick="fecharModal('modal-anamnese')" class="bg-slate-300 font-bold px-4 py-1.5 rounded uppercase">Cancelar</button>
-                <button type="button" onclick="salvarAnamnese()" class="bg-blue-800 text-white font-bold px-4 py-1.5 rounded uppercase shadow">💾 Salvar Anamnese</button>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
+                            <th class="p-2.5">Empregado / CPF</th>
+                            <th class="p-2.5">Cliente / Razão Social</th>
+                            <th class="p-2.5">Cargo / Função / Lotação</th>
+                            <th class="p-2.5">Tipo de Exame ASO</th>
+                            <th class="p-2.5 text-center">Ficha Anamnese Digital</th>
+                            <th class="p-2.5 text-center">Abrir & Editar ASO Boreal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aso-queue-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- MODAL: FORMULÁRIO DO ASO BOREAL COM TODOS OS CAMPOS TOTALMENTE EDITÁVEIS (ITEM 12 a 16) -->
-    <div id="modal-aso" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-2 overflow-y-auto">
-        <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-4 space-y-3 max-h-[95vh] overflow-y-auto text-xs">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-extrabold text-sm text-slate-900 uppercase">
-                    🩺 FORMULÁRIO OFICIAL DO ASO BOREAL ENGMED (CAMPOS TOTALMENTE EDITÁVEIS)
-                </h3>
-                <button type="button" onclick="fecharModal('modal-aso')" class="text-slate-500 font-bold text-lg">✕</button>
+    <!-- ABA 3: BANCO DE ASOs -->
+    <section id="tab-historico" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                <i data-lucide="archive" class="w-5 h-5 text-indigo-700"></i> Banco de ASOs Concluídos & Fichas Digitais
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Acervo permanente salvo em nuvem e persistido no navegador com layout fiel e completo.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800 font-bold uppercase">
+                            <th class="p-2.5">Data Emissão</th>
+                            <th class="p-2.5">Empregado / CPF</th>
+                            <th class="p-2.5">Cliente / Razão Social</th>
+                            <th class="p-2.5">Parecer Final</th>
+                            <th class="p-2.5">Médico Examinador</th>
+                            <th class="p-2.5 text-center">Ficha Anamnese Anexada</th>
+                            <th class="p-2.5 text-center">ASO Boreal Individual Anexado</th>
+                            <th class="p-2.5 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aso-history-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 4: eSOCIAL -->
+    <section id="tab-esocial" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-between items-center">
+            <div>
+                <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5 text-emerald-700"></i> Módulo eSocial — Evento S-2220
+                </h2>
+                <p class="text-xs text-slate-500">Exportação oficial do lote XML dos ASOs para o eSocial.</p>
+            </div>
+            <button type="button" onclick="gerarLoteESocial()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2 rounded flex items-center shadow">
+                <i data-lucide="download" class="w-4 h-4 mr-1.5"></i> Exportar Lote XML S-2220
+            </button>
+        </div>
+        <pre id="esocial-preview-container" class="bg-slate-900 text-emerald-400 font-mono p-4 rounded-xl text-xs overflow-x-auto max-h-96">// Clique no botão acima para compilar o lote de XMLs...</pre>
+    </section>
+
+    <!-- ABA 5: HOMOLOGAÇÃO DE ATESTADOS -->
+    <section id="tab-homologacao" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+            <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                <div>
+                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                        <i data-lucide="file-check" class="w-5 h-5 text-purple-700"></i> Homologação de Atestados Médicos Externos
+                    </h2>
+                    <p class="text-xs text-slate-500">Cadastre o empregado e anexe o atestado para homologação médica ocupacional.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="gerarRelatorioPdfHomologacao()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
+                        📄 Relatório de Absenteísmo (PDF / Visualizar)
+                    </button>
+                </div>
             </div>
 
-            <div id="aso-boreal-documento-oficial" class="aso-boreal-paper space-y-3 text-[11px]">
-                <div class="border-b-2 border-black pb-2 flex justify-between items-center">
+            <div id="painel-inclusao-homologacao" class="bg-purple-50 border border-purple-200 p-3 rounded-lg space-y-2 text-xs">
+                <span class="font-bold text-purple-950 block uppercase">➕ Relacionar Novo Empregado para Homologação:</span>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div>
-                        <strong class="text-sm block font-black uppercase text-blue-950">Boreal Engenharia e Medicina</strong>
-                        <span class="text-[10px] text-slate-600 font-semibold">CRM Nº 1011385 | Tel. 19 99156-7153</span>
+                        <label class="font-bold text-slate-700 block mb-0.5">Trabalhador & CPF/Matr. *</label>
+                        <input type="text" id="hom_top_trab" placeholder="EX: CARLOS SILVA - 11122" class="w-full border p-1.5 rounded font-bold bg-white">
                     </div>
-                    <div class="text-right">
-                        <strong class="text-base font-black uppercase tracking-tight">ATESTADO DE SAÚDE OCUPACIONAL - ASO</strong>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Lotação / Setor</label>
+                        <input type="text" id="hom_top_setor" placeholder="LOTAÇÃO / SETOR" class="w-full border p-1.5 rounded font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Função / Cargo</label>
+                        <input type="text" id="hom_top_cargo" placeholder="CARGO / FUNÇÃO" class="w-full border p-1.5 rounded font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-purple-950 block mb-0.5">Tempo de Afastamento *</label>
+                        <input type="number" id="hom_top_dias" value="1" placeholder="DIAS" class="w-full border p-1.5 rounded text-center font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Diagnóstico (CID-10) *</label>
+                        <input type="text" id="hom_top_cid" placeholder="CID OU DOENÇA..." class="w-full border p-1.5 rounded text-center font-bold bg-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <input type="text" id="hom_top_empresa" placeholder="EMPRESA CLIENTE" class="border p-1.5 rounded font-bold bg-white">
+                    <input type="text" id="hom_top_medico" placeholder="MÉDICO EMISSOR DO ATESTADO" class="border p-1.5 rounded font-semibold bg-white">
+                    <input type="file" id="hom_top_arquivo" class="border p-1 rounded bg-white font-semibold cursor-pointer">
+                    <button type="button" onclick="adicionarHomologacaoDireta()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold p-1.5 rounded uppercase shadow">
+                        💾 Relacionar Empregado
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-800 text-white font-bold uppercase">
+                            <th class="p-2">Empresa Cliente</th>
+                            <th class="p-2">Trabalhador & CPF</th>
+                            <th class="p-2">Lotação / Setor</th>
+                            <th class="p-2">Função / Cargo</th>
+                            <th class="p-2">Data Atestado</th>
+                            <th class="p-2 text-center">Tempo Afast.</th>
+                            <th class="p-2 text-center">CID-10</th>
+                            <th class="p-2">Médico Emissor</th>
+                            <th class="p-2 text-center">Original Escaneado</th>
+                            <th class="p-2 text-center">Status Homologação</th>
+                            <th class="p-2 text-center">Parecer & Documento</th>
+                            <th class="p-2 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="atestados-homologacao-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 6: MATRIZ PCMSO -->
+    <section id="tab-pcmso-matriz" class="tab-content hidden space-y-4">
+        <div id="pcmso-medico-header-info" class="bg-sky-900 text-white p-3.5 rounded-xl flex flex-wrap justify-between items-center gap-2 shadow border border-sky-700">
+            <div class="text-xs">
+                <span class="text-sky-300 font-extrabold uppercase block">MATRIZ DO PCMSO EM EDIÇÃO / REVISÃO MÉDICA:</span>
+                <strong id="pcmso_lbl_cliente_nome" class="text-base font-black text-amber-400">TODOS OS CLIENTES</strong>
+            </div>
+            <div class="text-xs text-right">
+                <span class="text-sky-200 font-bold block">Médico Responsável do PCMSO:</span>
+                <strong id="pcmso_lbl_medico_nome" class="text-white font-black">A DEFINIR NO CADASTRO</strong>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+            <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                <div>
+                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                        <i data-lucide="file-spreadsheet" class="w-5 h-5 text-sky-700"></i> Matriz do PCMSO Sequencial (NR-07)
+                    </h2>
+                    <p class="text-xs text-slate-500">Gestão das exposições a riscos, exames exigidos e planos de ação em saúde.</p>
+                </div>
+            </div>
+
+            <div id="pcmso-form-container" class="bg-slate-50 border p-3 rounded-lg space-y-3 text-xs">
+                <span class="font-extrabold text-slate-800 block uppercase">➕ Incluir Novo Cargo / Perigo / Risco na Matriz do PCMSO:</span>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Lotação / Setor *</label>
+                        <input type="text" id="pcmso_add_lotacao" placeholder="LOTAÇÃO / SETOR" class="w-full border p-1.5 rounded font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Processo Operacional</label>
+                        <input type="text" id="pcmso_add_processo" placeholder="PROCESSO OPERACIONAL" class="w-full border p-1.5 rounded bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Cargo / Função *</label>
+                        <input type="text" id="pcmso_add_cargo" placeholder="CARGO / FUNÇÃO" class="w-full border p-1.5 rounded font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Qtd Expostos *</label>
+                        <input type="number" id="pcmso_add_qtd" value="1" placeholder="QUANT." class="w-full border p-1.5 rounded text-center font-bold bg-white">
                     </div>
                 </div>
 
-                <div class="border border-black p-2 bg-slate-50 flex flex-wrap gap-4 font-bold text-[10px] uppercase">
-                    <span>EXAME MÉDICO:</span>
-                    <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="Admissional" checked> Admissional</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="Periódico"> Periódico</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="Retorno ao Trabalho"> Retorno ao Trabalho</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="Mudança de Risco"> Mudança de Risco</label>
-                    <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="Demissional"> Demissional</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Grupo / Categoria *</label>
+                        <select id="pcmso_add_cat" class="w-full border p-1.5 rounded font-bold text-sky-900 bg-white">
+                            <option value="ACIDENTES">Riscos de Acidentes</option>
+                            <option value="FISICOS">Riscos Físicos</option>
+                            <option value="QUIMICOS">Riscos Químicos</option>
+                            <option value="BIOLOGICOS">Riscos Biológicos</option>
+                            <option value="ERGONOMICOS">Riscos Ergonômicos</option>
+                            <option value="AUSENCIA">Ausência de Riscos</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="font-bold text-slate-700 block mb-0.5">Perigo Identificado *</label>
+                        <input type="text" id="pcmso_add_perigo_custom" placeholder="DESCREVA O PERIGO..." class="w-full border p-1.5 rounded font-bold bg-white text-blue-950">
+                    </div>
                 </div>
 
-                <div class="border border-black p-2 space-y-2">
-                    <strong class="block border-b border-black font-extrabold bg-slate-200 px-1 uppercase">IDENTIFICAÇÃO DO TRABALHADOR E CLIENTE (EDITÁVEL)</strong>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div class="md:col-span-2">
-                            <label class="font-bold block">Razão Social do Empregador *</label>
-                            <input type="text" id="aso_edit_razao" placeholder="CLIENTE / EMPREGADOR" class="w-full border p-1 font-bold bg-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Risco / Agravo à Saúde:</label>
+                        <input type="text" id="pcmso_add_risco" placeholder="DANOS OU AGRAVOS À SAÚDE..." class="w-full border p-1.5 rounded font-semibold bg-white text-rose-900">
+                    </div>
+                    <div>
+                        <label class="font-bold text-slate-700 block mb-0.5">Exames Obrigatórios & Periodicidade:</label>
+                        <input type="text" id="pcmso_add_exame" placeholder="EX: CLÍNICO ANUAL..." class="w-full border p-1.5 rounded font-semibold bg-white">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-1">
+                    <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-2 rounded uppercase shadow flex items-center gap-2">
+                        ➕ Carregar Linha no PCMSO
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto border rounded-lg">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-800 text-white font-bold uppercase">
+                            <th class="p-2">Empresa Cliente</th>
+                            <th class="p-2">Lotação</th>
+                            <th class="p-2">Processo Operacional</th>
+                            <th class="p-2">Cargo / Função</th>
+                            <th class="p-2 text-center">Qtd</th>
+                            <th class="p-2">Perigo</th>
+                            <th class="p-2">Risco (Agravo)</th>
+                            <th class="p-2">Exames</th>
+                            <th class="p-2 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pcmso-matriz-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 7: RELATÓRIO ANALÍTICO PCMSO -->
+    <section id="tab-relatorio-pcmso" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+            <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2 border-b pb-2">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-amber-600"></i> Relatório Analítico Anual do PCMSO (NR-07)
+            </h2>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-center">
+                    <span class="text-xs text-blue-800 font-bold block uppercase">Total Exames</span>
+                    <strong id="stat-total-exames" class="text-2xl font-black text-blue-950">0</strong>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-center">
+                    <span class="text-xs text-emerald-800 font-bold block uppercase">Aptos</span>
+                    <strong id="stat-total-aptos" class="text-2xl font-black text-emerald-950">0</strong>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-center">
+                    <span class="text-xs text-amber-800 font-bold block uppercase">Aptos c/ Restrição</span>
+                    <strong id="stat-total-restricao" class="text-2xl font-black text-amber-950">0</strong>
+                </div>
+                <div class="bg-red-50 border border-red-200 p-3 rounded-lg text-center">
+                    <span class="text-xs text-red-800 font-bold block uppercase">Inaptos</span>
+                    <strong id="stat-total-inaptos" class="text-2xl font-black text-red-950">0</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 8: MÓDULO FINANCEIRO -->
+    <section id="tab-producao" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+            <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                <div>
+                    <h2 class="font-extrabold text-slate-900 text-sm md:text-base uppercase flex items-center gap-2">
+                        <i data-lucide="line-chart" class="w-5 h-5 text-emerald-700"></i> Posição Financeira — Produção Real Executada
+                    </h2>
+                    <p class="text-xs text-slate-500">Apuração consolidada de quantidades executadas e valores unitários.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="salvarFechamentoPeriodo()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
+                        💾 Gravar Fechamento
+                    </button>
+                    <button type="button" onclick="enviarRelatorioEmailFinanceiro()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3 py-1.5 rounded flex items-center gap-1 shadow">
+                        ✉️ Enviar Financeiro
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border text-xs">
+                <div>
+                    <label class="font-bold block mb-0.5">Período de Execução:</label>
+                    <input type="text" id="fin_periodo_execucao" placeholder="EX: 01/10/2026 A 31/10/2026" class="w-full border p-1.5 rounded font-bold bg-white">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="font-bold block mb-0.5">Observações Gerais:</label>
+                    <input type="text" id="fin_observacoes_gerais" placeholder="OBSERVAÇÕES DE FATURAMENTO..." class="w-full border p-1.5 rounded font-semibold bg-white">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-800 text-white font-bold uppercase">
+                            <th class="p-2.5">Data</th>
+                            <th class="p-2.5">Fornecedor</th>
+                            <th class="p-2.5">Cliente</th>
+                            <th class="p-2.5">Objeto / Procedimento</th>
+                            <th class="p-2.5 text-center bg-amber-900 text-amber-200">Qtd Real</th>
+                            <th class="p-2.5 text-right">Valor Unit. (R$)</th>
+                            <th class="p-2.5 text-right font-extrabold text-emerald-400 bg-slate-950">Subtotal</th>
+                            <th class="p-2.5 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="relatorio-producao-tbody" class="divide-y divide-slate-200">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex justify-between items-center font-bold text-sm text-emerald-950">
+                <span>VALOR GLOBAL DO PERÍODO:</span>
+                <span id="valor-soma-total-producao" class="text-xl font-black text-emerald-700">R$ 0,00</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 9: CHAT PRIVADO -->
+    <section id="tab-chat" class="tab-content hidden space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+            <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2 border-b pb-2">
+                <i data-lucide="messages-square" class="w-5 h-5 text-teal-700"></i> 💬 Chat de Comunicação Direta Privada
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="bg-slate-50 border rounded-lg p-2 space-y-2 text-xs">
+                    <div>
+                        <label class="block font-bold mb-0.5">Emissor:</label>
+                        <select id="chat_remetente_select" class="w-full border p-1 rounded font-bold bg-white text-slate-800">
+                            <option value="GESTOR BOREAL">GESTOR BOREAL</option>
+                            <option value="CLIENTE">CLIENTE / RH</option>
+                            <option value="CLÍNICA">CLÍNICA CREDENCIADA</option>
+                            <option value="MÉDICO">MÉDICO</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-0.5">Destinatário:</label>
+                        <select id="chat_destinatario_select" class="w-full border p-1 rounded font-bold bg-white text-slate-800">
+                            <option value="CLÍNICA">CLÍNICA CREDENCIADA</option>
+                            <option value="CLIENTE">CLIENTE / RH</option>
+                            <option value="GESTOR BOREAL">GESTOR BOREAL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 border rounded-lg flex flex-col h-80 bg-slate-50 overflow-hidden">
+                    <div id="chat-messages-box" class="flex-1 p-3 overflow-y-auto space-y-2 text-xs">
+                        <div class="bg-white p-2 rounded border max-w-md shadow-sm">
+                            <strong class="text-teal-800 block">SISTEMA:</strong> Canal pronto para envio.
                         </div>
-                        <div>
-                            <label class="font-bold block">CNPJ *</label>
-                            <input type="text" id="aso_edit_cnpj" placeholder="00.000.000/0001-00" class="w-full border p-1 font-bold bg-white">
-                        </div>
-                        <div class="md:col-span-3">
-                            <label class="font-bold block">Nome do Empregado *</label>
-                            <input type="text" id="aso_edit_nome" placeholder="NOME DO TRABALHADOR" class="w-full border p-1 font-black text-blue-900 bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold block">Cargo *</label>
-                            <input type="text" id="aso_edit_cargo" placeholder="CARGO" class="w-full border p-1 font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold block">Função *</label>
-                            <input type="text" id="aso_edit_funcao" placeholder="FUNÇÃO" class="w-full border p-1 font-bold bg-white">
-                        </div>
-                        <div>
-                            <label class="font-bold block">Lotação / Setor *</label>
-                            <input type="text"
+                    </div>
+                    <div class="p-2 bg-white border-t flex gap-2">
+                        <input type="text" id="chat-msg-input" placeholder="DIGITE SUA MENSAGEM PRIVADA..." class="flex-1 border rounded px-2 py-1 text-xs uppercase">
+                        <button type="button" onclick="enviarMensagemChat()" class="bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-1 rounded text-xs uppercase">
+                            Enviar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABA 10: CADASTROS -->
+    <section id="tab-cadastros" class="tab-content hidden space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+            <h2 class="font-extrabold text-slate-900 text-sm uppercase flex items-center gap-2 border-b pb-2">
+                <i data-lucide="tag" class="w-4 h-4 text-emerald-700"></i> Tabela de Preços e Serviços Contratados
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs bg-slate-50 p-3 rounded border">
+                <div>
+                    <label class="font-bold block mb-1">Cliente Vinculado *</label>
+                    <select id="vinc_cli_select" class="w-full border rounded p-1.5 bg-white font-bold"></select>
+                </div>
+                <div>
+                    <label class="font-bold block mb-1">Tipo de Parceiro *</label>
+                    <select id="vinc_tipo_select" class="w-full border rounded p-1.5 bg-white font-bold" onchange="atualizarListaParceirosVinculo()">
+                        <option value="CLINICA">CLÍNICA CREDENCIADA</option>
+                        <option value="MEDICO_INDEPENDENTE">MÉDICO EXAMINADOR INDEPENDENTE</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold block mb-1">Nome do Parceiro *</label>
+                    <select id="vinc_parceiro_select" class="w-full border rounded p-1.5 bg-white font-bold"></select>
+                </div>
+                <div>
+                    <label class="font-bold block mb-1">Tipo de Contrato *</label>
+                    <select id="vinc_modalidade_contrato" class="w-full border rounded p-1.5 bg-white font-bold text-blue-900">
+                        <option value="RECORRENTE_FIXO">FIXO (RECORRENTE)</option>
+                        <option value="AVULSO">AVULSO</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="font-bold block mb-1">Valor Unitário (R$) *</label>
+                    <input type="number" step="0.01" id="vinc_unit" value="0.00" class="w-full border rounded p-1.5 bg-white font-bold text-emerald-800">
+                </div>
+                <div class="md:col-span-4">
+                    <label class="font-bold block mb-1">Descrição do Objeto / Procedimento *</label>
+                    <input type="text" id="vinc_objeto" placeholder="EX: ASO CLÍNICO, AUDIOMETRIA..." class="w-full border rounded p-1.5 bg-white font-bold">
+                </div>
+                <div class="flex items-end">
+                    <button type="button" onclick="adicionarItemTabelaPreco()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs p-2 rounded shadow">
+                        ➕ Adicionar
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b">
+                        <tr>
+                            <th class="p-2">Cliente</th>
+                            <th class="p-2">Tipo</th>
+                            <th class="p-2">Fornecedor</th>
+                            <th class="p-2">Contrato</th>
+                            <th class="p-2">Objeto</th>
+                            <th class="p-2 text-right bg-amber-50">Valor Unitário</th>
+                            <th class="p-2 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-vinculos-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- MODAL VISUALIZAR ASO ANEXADO -->
+<div id="modal-visualizar-aso-anexado" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-2 overflow-y-auto">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-4 space-y-3 max-h-[95vh] overflow-y-auto text-xs">
+        <div class="flex justify-between items-center border-b pb-2 no-print">
+            <h3 id="modal-visualizar-titulo" class="font-extrabold text-sm text-slate-900 uppercase">📄 VISUALIZAÇÃO DO ASO</h3>
+            <div class="flex gap-2">
+                <button type="button" onclick="window.print()" class="bg-blue-800 text-white px-3 py-1 rounded font-bold">🖨️ Imprimir</button>
+                <button type="button" onclick="fecharModal('modal-visualizar-aso-anexado')" class="text-slate-500 font-bold text-lg">✕</button>
+            </div>
+        </div>
+        <div id="aso-paper-visualizar"></div>
+    </div>
+</div>
+
+<!-- MODAL RESPOSTA AGENDAMENTO -->
+<div id="modal-resposta-agendamento" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl border p-5 space-y-3 text-xs">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-extrabold text-sm text-slate-900 uppercase">📅 Confirmar Horário de Agendamento</h3>
+            <button type="button" onclick="fecharModal('modal-resposta-agendamento')" class="text-slate-500 font-bold">✕</button>
+        </div>
+        <div class="space-y-2">
+            <div>
+                <label class="font-bold block mb-0.5">Trabalhador / Pedido:</label>
+                <input type="text" id="resp_trab_lbl" disabled class="w-full border p-1.5 rounded font-bold bg-slate-100">
+            </div>
+            <div>
+                <div class="flex justify-between items-center mb-0.5">
+                    <label class="font-bold">Opções de Data e Horário *</label>
+                    <button type="button" onclick="aplicarHorarioAnteriorIgual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded font-extrabold text-[10px] border border-indigo-300">
+                        ⚡ Repetir Horário Anterior ("IGUAL")
+                    </button>
+                </div>
+                <textarea id="resp_horarios" rows="3" placeholder="EX: 10/11/2026 às 08:30h" class="w-full border p-1.5 rounded font-bold bg-white"></textarea>
+            </div>
+            <div>
+                <label class="font-bold block mb-0.5">Endereço de Comparecimento:</label>
+                <input type="text" id="resp_endereco" class="w-full border p-1.5 rounded font-bold bg-amber-50">
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t pt-3">
+            <button type="button" onclick="fecharModal('modal-resposta-agendamento')" class="bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded uppercase">Cancelar</button>
+            <button type="button" onclick="confirmarRespostaAgendamento()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-1.5 rounded uppercase shadow">
+                📲 Enviar Resposta
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ANAMNESE -->
+<div id="modal-anamnese" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-5 space-y-4 max-h-[90vh] overflow-y-auto text-xs">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-extrabold text-sm text-slate-900 uppercase">📋 FICHA DE ANAMNESE OCUPACIONAL COMPLETA</h3>
+            <button type="button" onclick="fecharModal('modal-anamnese')" class="text-slate-500 font-bold text-base">✕</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 bg-slate-100 p-3 rounded font-bold text-[11px]">
+            <div><strong>Empregado:</strong> <span id="anam_nome_lbl" class="text-blue-900">-</span></div>
+            <div><strong>CPF:</strong> <span id="anam_cpf_lbl" class="text-blue-900">-</span></div>
+            <div><strong>Função / Cargo:</strong> <span id="anam_cargo_lbl" class="text-blue-900">-</span></div>
+            <div><strong>Tipo Sanguíneo:</strong> <input type="text" id="anam_sangue" value="O+" class="w-12 border rounded text-center bg-white"></div>
+        </div>
+
+        <div>
+            <label class="font-bold block mb-1">Observações Médicas Complementares:</label>
+            <textarea id="anam_obs" rows="3" placeholder="OBSERVAÇÕES DO MÉDICO..." class="w-full border rounded p-2 bg-slate-50 font-semibold"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t pt-3">
+            <button type="button" onclick="fecharModal('modal-anamnese')" class="bg-slate-300 font-bold px-4 py-1.5 rounded uppercase">Cancelar</button>
+            <button type="button" onclick="salvarAnamnese()" class="bg-blue-800 text-white font-bold px-4 py-1.5 rounded uppercase shadow">💾 Salvar Anamnese</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ASO -->
+<div id="modal-aso" class="fixed inset-0 modal-bg z-50 hidden flex items-center justify-center p-2 overflow-y-auto">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl border p-4 space-y-3 max-h-[95vh] overflow-y-auto text-xs">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="font-extrabold text-sm text-slate-900 uppercase">🩺 FORMULÁRIO OFICIAL DO ASO BOREAL ENGMED</h3>
+            <button type="button" onclick="fecharModal('modal-aso')" class="text-slate-500 font-bold text-lg">✕</button>
+        </div>
+
+        <div id="aso-boreal-documento-oficial" class="aso-boreal-paper space-y-3 text-[11px]">
+            <div class="border border-black p-2 bg-slate-50 flex flex-wrap gap-4 font-bold text-[10px] uppercase">
+                <span>EXAME MÉDICO:</span>
+                <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="ASO ADMISSONAL" checked> Admissional</label>
+                <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="ASO PERIÓDICO"> Periódico</label>
+                <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="ASO RETORNO AO TRABALHO"> Retorno ao Trabalho</label>
+                <label class="flex items-center gap-1"><input type="radio" name="aso_tp_exame" value="ASO DEMISSONAL"> Demissional</label>
+            </div>
+
+            <div class="border border-black p-2 space-y-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div class="md:col-span-2">
+                        <label class="font-bold block">Razão Social *</label>
+                        <input type="text" id="aso_edit_razao" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">CNPJ *</label>
+                        <input type="text" id="aso_edit_cnpj" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="font-bold block">Nome do Empregado *</label>
+                        <input type="text" id="aso_edit_nome" class="w-full border p-1 font-black text-blue-900 bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">CPF *</label>
+                        <input type="text" id="aso_edit_cpf" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">Cargo *</label>
+                        <input type="text" id="aso_edit_cargo" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">Função</label>
+                        <input type="text" id="aso_edit_funcao" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">Lotação / Setor</label>
+                        <input type="text" id="aso_edit_lotacao" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">Data Exame</label>
+                        <input type="text" id="aso_edit_data" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                    <div>
+                        <label class="font-bold block">Local</label>
+                        <input type="text" id="aso_edit_local" class="w-full border p-1 font-bold bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-black p-2">
+                <label class="font-bold block mb-1">Riscos Ocupacionais:</label>
+                <input type="text" id="aso_doc_agentes_especificos" value="AUSÊNCIA DE RISCOS ESPECÍFICOS" class="w-full border p-1 font-bold bg-white">
+            </div>
+
+            <div class="border border-black p-2 bg-slate-50 flex gap-4 font-bold text-[11px] uppercase">
+                <span>CONCLUSÃO:</span>
+                <label class="flex items-center gap-1 text-emerald-800"><input type="radio" name="aso_conclusao" value="Apto" checked> APTO</label>
+                <label class="flex items-center gap-1 text-red-800"><input type="radio" name="aso_conclusao" value="Inapto"> INAPTO</label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t pt-3">
+            <button type="button" onclick="fecharModal('modal-aso')" class="bg-slate-300 font-bold px-4 py-1.5 rounded uppercase">Cancelar</button>
+            <button type="button" onclick="concluirEmissaoAsoBoreal()" class="bg-blue-900 text-white font-bold px-5 py-1.5 rounded uppercase shadow">
+                ✍️ Emitir e Assinar Eletronicamente
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.lucide) { lucide.createIcons(); }
+        if (typeof inicializarSistema === "function") {
+            inicializarSistema();
+        }
+    });
+</script>
+</body>
+</html>
