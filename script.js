@@ -71,13 +71,18 @@ window.realizarLoginSistema = async function() {
         role: document.getElementById('user-role-select')?.value || 'GESTOR'
     };
 
-    // Tentativa via Supabase Auth
+    // Tentativa via Supabase Auth com timeout para evitar congelamento de tela
     if (supabaseClient && supabaseClient.auth) {
         try {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
+            const authPromise = supabaseClient.auth.signInWithPassword({
                 email: email,
                 password: senha
             });
+            
+            // Timeout de 4 segundos para a requisição de rede
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout de rede")), 4000));
+            
+            const { data, error } = await Promise.race([authPromise, timeoutPromise]);
 
             if (!error && data?.user) {
                 autenticado = true;
@@ -89,7 +94,7 @@ window.realizarLoginSistema = async function() {
         }
     }
 
-    // Fallback de contingência local se o Supabase não estiver com tabela de auth configurada
+    // Fallback de contingência local se o Supabase falhar ou não estiver configurado
     if (!autenticado) {
         const contasLocais = JSON.parse(localStorage.getItem('boreal_contas_usuarios') || '{}');
         if (contasLocais[email]) {
@@ -107,7 +112,7 @@ window.realizarLoginSistema = async function() {
                 return;
             }
         } else {
-            // Permite o primeiro acesso livre para administradores e equipe
+            // Permite o primeiro acesso livre para administradores e equipe se não houver conta local salva
             autenticado = true;
         }
     }
@@ -118,9 +123,9 @@ window.realizarLoginSistema = async function() {
         if (containerLogin) {
             containerLogin.classList.add('hidden');
         }
-        carregarCadastrosLocalStorage();
-        carregarTodosDadosSupabase();
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (typeof carregarCadastrosLocalStorage === 'function') carregarCadastrosLocalStorage();
+        if (typeof carregarTodosDadosSupabase === 'function') carregarTodosDadosSupabase();
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
     } else {
         if (erroEl) {
             erroEl.textContent = 'Credenciais não autorizadas. Tente novamente.';
@@ -167,7 +172,7 @@ window.salvarPropriaSenhaUsuario = async function() {
     localStorage.setItem('boreal_contas_usuarios', JSON.stringify(contas));
 
     alert("✅ Senha configurada com sucesso! Você já pode entrar no sistema.");
-    fecharModalPrimeiroAcesso();
+    if (typeof fecharModalPrimeiroAcesso === 'function') fecharModalPrimeiroAcesso();
 
     const loginEmail = document.getElementById('login_usuario_email');
     const loginSenha = document.getElementById('login_usuario_senha');
@@ -191,21 +196,21 @@ window.switchTab = function(tabName) {
         targetBtn.classList.add('bg-blue-800', 'text-white');
         targetBtn.classList.remove('text-slate-300');
     }
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 };
 
 window.validarTrocaPerfil = function(novoPerfil) {
     currentRole = novoPerfil;
-    renderProducaoTable();
-    renderTabelaVinculos();
-    renderPcmsoMatriz();
+    if (typeof renderProducaoTable === 'function') renderProducaoTable();
+    if (typeof renderTabelaVinculos === 'function') renderTabelaVinculos();
+    if (typeof renderPcmsoMatriz === 'function') renderPcmsoMatriz();
 };
 
 window.aoTrocarClienteFiltro = function() {
-    atualizarHeaderPcmsoMedico();
-    renderPcmsoMatriz();
-    renderProducaoTable();
-    renderMonitorTable();
+    if (typeof atualizarHeaderPcmsoMedico === 'function') atualizarHeaderPcmsoMedico();
+    if (typeof renderPcmsoMatriz === 'function') renderPcmsoMatriz();
+    if (typeof renderProducaoTable === 'function') renderProducaoTable();
+    if (typeof renderMonitorTable === 'function') renderMonitorTable();
 };
 
 // CATÁLOGO COMPLETO DE RISCOS (164 ITENS CONSOLIDADOS DO INVENTÁRIO PGR)
@@ -213,13 +218,13 @@ const CATALOGO_RISCOS = {
     "ACIDENTES": [
         { perigo: "SERVIÇOS COM SERRA", risco: "CORTE E/OU PANCADA NAS MÃOS", agravo: "PANCADA, LESÃO E DILACERAÇÃO", exame: "CLÍNICO", per: "Anual", plano: "FISCALIZAR A UTILIZAÇÃO DE EPI E EPC E ELABORAR ORDEM DE SERVIÇO." },
         { perigo: "TRABALHOS EM ESPAÇO CONFINADO", risco: "GASES TÓXICOS, INCÊNDIOS E PÂNICO", agravo: "ASFIXIA, INTOXICAÇÃO, HEMORRAGIAS, MORTE", exame: "CLÍNICO + ECG + ESPIROMETRIA", per: "Anual", plano: "ELABORAR ORDEM DE SERVIÇO, PROMOVER CURSO DE IMPLANTAÇÃO E RECICLAGEM DE NR10, NR 35, NR 33, FORNECER E FISCALIZAR A UTILIZAÇÃO DOS EPI’S E EPC’S. MANTER MANUTENÇÃO DO VEÍCULO ATUALIZADA, PROMOVER CURSO DE DIREÇÃO DEFENSIVA, REALIZAR OS EXAMES DEFINIDOS NO PCMSO." },
-        { perigo: "TRABALHO EM ALTURA", risco: "QUEDAS, SÚBITOS", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO + ECG + GLICEMIA", per: "Anual", plano: "PROMOVER TREINAMENTO EM NR 35, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, ELABORAR ORDEM DE SERVIÇO COM APR." },
+        { perigo: "TRABALHO EM ALTURA", risco: "QUEDAS, SÚBITOS", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSIMOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO + ECG + GLICEMIA", per: "Anual", plano: "PROMOVER TREINAMENTO EM NR 35, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, ELABORAR ORDEM DE SERVIÇO COM APR." },
         { perigo: "MANUTENÇÃO EM SISTEMAS ELÉTRICOS", risco: "CHOQUE ELÉTRICO", agravo: "ATAQUES CARDÍACOS, QUEIMADURA, MORTE", exame: "CLÍNICO + ECG", per: "Semestral", plano: "PROMOVER TREINAMENTO EM NR 10, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, TRABALHAR SEMPRE EM DUPLA." },
         { perigo: "MANUTENÇÃO EM SISTEMAS E EQUIPAMENTOS MECÂNICOS", risco: "CHOQUE MECÂNICO", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "PROMOVER TREINAMENTO EM NR 12, REALIZAR APR EM TODA OPERAÇÃO DE TRABALHO, FORNECER OS EPIs APROPRIADOS, ELABORAR ORDEM DE SERVIÇO COM APR." },
         { perigo: "DIREÇÃO DE VEÍCULOS", risco: "ACIDENTES DE TRÂNSITO", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "PROMOVER CURSO DE DIREÇÃO DEFENSIVA, MONITORAR A SAÚDE DO MOTORISTA." },
         { perigo: "ILUMINAÇÃO INADEQUADA", risco: "DIFICULDADE DE ACESSO E DETECÇÃO DE MATERIAIS", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "ANALISAR ÁREA DE TRABALHO, PROMOVER ILUMINAÇÃO MÓVEL." },
         { perigo: "MÁQUINAS E EQUIPAMENTOS SEM PROTEÇÃO", risco: "CORTES, DILACERAÇÃO, CHOQUE ELÉTRICO", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "ADEQUAR EQUIPAMENTOS E MÁQUINAS, PROMOVER PROTEÇÕES CONFORME NR 12." },
-        { perigo: "MÁQUINAS E EQUIPAMENTOS COM PROTEÇÃO INADEQUADA", risco: "INCÊNDIO E EXPLOSÃO (PROBABILIDADE)", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "ADEQUAR EQUIPAMENTOS E MÁQUINAS, PROMOVER PROTEÇÕES CONFORME NR 12." },
+        { perigo: "MÁQUINAS E EQUIPAMENTOS WITH PROTEÇÃO INADEQUADA", risco: "INCÊNDIO E EXPLOSÃO (PROBABILIDADE)", agravo: "TORÇÃO, PANCADA, ESCORIAÇÃO, DANOS FÍSICOS, DILACERAÇÃO FÍSICA E MORTE", exame: "CLÍNICO", per: "Anual", plano: "ADEQUAR EQUIPAMENTOS E MÁQUINAS, PROMOVER PROTEÇÕES CONFORME NR 12." },
         { perigo: "ARMAZENAMENTO INADEQUADO, ACÚMULO DE ENTULHOS", risco: "QUEDAS DE OBJETO, INSATISFAÇÃO ERGONÔMICA", agravo: "PANCADA, ESCORIAÇÃO, DANOS FÍSICOS", exame: "CLÍNICO", per: "Anual", plano: "ORGANIZAR E ADEQUAR MATERIAIS, EXPEDIR MATERIAIS SEM UTILIDADE, IMPLEMENTAR ESTANTES DE ORGANIZAÇÃO, SEPARAR MATERIAIS POR CATEGORIA, EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO." },
         { perigo: "FERRAMENTAS INADEQUADAS OU DEFEITUOSAS", risco: "CORTES E PERFURAÇÕES", agravo: "PANCADA, ESCORIAÇÃO, DANOS FÍSICOS", exame: "CLÍNICO", per: "Anual", plano: "INSPECIONAR FERRAMENTAS PERIODICAMENTE, SUBSTITUIR FERRAMENTAS DANIFICADAS." },
         { perigo: "TRABALHOS EM ENCOSTAS E ATERROS", risco: "SOTERRAMENTO", agravo: "MORTE", exame: "CLÍNICO", per: "Anual", plano: "EXPEDIR ORDEM DE SERVIÇO COM TODAS ORIENTAÇÕES E ANÁLISE PRELIMINAR DE RISCO." },
@@ -307,4 +312,11 @@ window.filtrarRiscosCat = function(idCatSelect, idAgenteSelect) {
             opt.value = item.perigo;
             opt.dataset.risco = item.risco;
             opt.dataset.agravo = item.agravo || item.risco;
-            opt.dataset.exame = item.exame || '
+            opt.dataset.exame = item.exame || 'CLÍNICO';
+            opt.dataset.per = item.per || 'Anual';
+            opt.dataset.plano = item.plano || '';
+            opt.textContent = item.perigo;
+            selAgente.appendChild(opt);
+        });
+    }
+};
