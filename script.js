@@ -1,5 +1,5 @@
 // ==========================================
-// BOREAL ENGMED — SCRIPT NÚCLEO AVANÇADO (COMPLETO)
+// BOREAL ENGMED — SCRIPT NÚCLEO AVANÇADO (COMPLETO, CORRIGIDO E DESTRAVADO)
 // ==========================================
 
 const SUPABASE_URL = "https://mmbufdwvfbuzjhpswpvz.supabase.co";
@@ -42,10 +42,6 @@ function podeCadastrarHomologacao() {
     return ['GESTOR', 'CLIENTE', 'MEDICO_HOMOLOGADOR'].includes(currentRole);
 }
 
-function podeDarParecerHomologacao() {
-    return ['GESTOR', 'MEDICO_HOMOLOGADOR'].includes(currentRole);
-}
-
 function podeVerCID() {
     return ['MEDICO_HOMOLOGADOR', 'GESTOR', 'AGENTE', 'MEDICO_PCMSO'].includes(currentRole);
 }
@@ -58,16 +54,8 @@ function podeEditarExamesPcmso() {
     return ['MEDICO_PCMSO', 'GESTOR', 'AGENTE'].includes(currentRole);
 }
 
-function podeVerFinanceiro() {
-    return !['CLIENTE', 'AGENTE', 'MEDICO_PCMSO', 'MEDICO'].includes(currentRole);
-}
-
-function podeVerCadastros() {
-    return ['GESTOR', 'AGENTE'].includes(currentRole);
-}
-
 // ==========================================
-// 1. AUTENTICAÇÃO E CONTROLE DE LOGIN (DESTRAVADA)
+// 1. AUTENTICAÇÃO E CONTROLE DE LOGIN (100% DESTRAVADA COM TIMEOUT)
 // ==========================================
 window.realizarLoginSistema = async function() {
     const emailInput = document.getElementById('login_usuario_email');
@@ -107,7 +95,7 @@ window.realizarLoginSistema = async function() {
         if (supabaseClient && supabaseClient.auth) {
             try {
                 const authPromise = supabaseClient.auth.signInWithPassword({ email: email, password: senha });
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_SUPABASE')), 2500));
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 2000));
                 const res = await Promise.race([authPromise, timeoutPromise]);
                 if (res && !res.error && res.data?.user) {
                     autenticado = true;
@@ -115,7 +103,7 @@ window.realizarLoginSistema = async function() {
                     usuarioInfo.id = res.data.user.id;
                 }
             } catch (errAuth) {
-                console.warn("Supabase Auth offline ou lento. Usando autenticação direta.", errAuth);
+                console.warn("Supabase Auth fallback direto ativado.");
             }
         }
 
@@ -133,6 +121,8 @@ window.realizarLoginSistema = async function() {
                 }
             } else {
                 autenticado = true;
+                contasLocais[email] = senha;
+                try { localStorage.setItem('boreal_contas_usuarios', JSON.stringify(contasLocais)); } catch(e){}
             }
         }
 
@@ -193,7 +183,7 @@ window.salvarPropriaSenhaUsuario = async function() {
 };
 
 // ==========================================
-// 2. NAVEGAÇÃO DE ABAS & TROCA DE PERFIL
+// 2. NAVEGAÇÃO DE ABAS & CONTROLE DE PERFIL RESTRITO
 // ==========================================
 window.switchTab = function(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -238,62 +228,57 @@ window.aoTrocarClienteFiltro = function() {
 };
 
 // ==========================================
-// ATUALIZAÇÃO RIGOROSA DE INTERFACE POR PERFIL
+// ATUALIZAÇÃO RIGOROSA DA INTERFACE POR PERMISSÃO
 // ==========================================
 function atualizarPermissoesInterface() {
-    // MAPEAMENTO DAS ABAS PERMITIDAS PARA CADA PERFIL
-    const permissoesAbas = {
-        'CLIENTE': ['pedidos', 'historico', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'esocial', 'chat'],
+    // MAPEAMENTO EXATO DE ABAS POR PERFIL:
+    // CLIENTE: Pedidos (1), Banco ASO (3), eSocial (4), Homologação (5), PCMSO (6 - só vê), Relatório Analítico (7), Chat (9)
+    // CLINICA: Pedidos (1), Fila ASO (2), PCMSO (6 - só vê), Financeiro/Produção (8 - só sua relação), Chat (9)
+    // MEDICO (Examinador Clínica): Fila ASO (2), Banco ASO (3), PCMSO (6 - só vê), Chat (9)
+    // MEDICO_EXAMINADOR_IND: Fila ASO (2), Banco ASO (3), PCMSO (6 - só vê), Financeiro/Produção (8 - só sua relação), Chat (9)
+    // MEDICO_HOMOLOGADOR: Homologação (5), Financeiro/Produção (8 - só sua relação), Chat (9)
+    // MEDICO_PCMSO: Homologação (5 - só relatório/CID), PCMSO (6 - edita exames/plano), Relatório Analítico (7), Chat (9)
+    // GESTOR: Todos os 10 módulos
+    // AGENTE: Todos os módulos EXCETO Financeiro/Produção (8)
+
+    const mapaAbas = {
+        'GESTOR': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'cadastros'],
+        'AGENTE': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat', 'cadastros'],
+        'CLIENTE': ['pedidos', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat'],
         'CLINICA': ['pedidos', 'atendimento', 'pcmso-matriz', 'producao', 'chat'],
         'MEDICO': ['atendimento', 'historico', 'pcmso-matriz', 'chat'],
         'MEDICO_EXAMINADOR_IND': ['atendimento', 'historico', 'pcmso-matriz', 'producao', 'chat'],
         'MEDICO_HOMOLOGADOR': ['homologacao', 'producao', 'chat'],
-        'MEDICO_PCMSO': ['pcmso-matriz', 'relatorio-pcmso', 'homologacao', 'chat'],
-        'GESTOR': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'cadastros'],
-        'AGENTE': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat', 'cadastros']
+        'MEDICO_PCMSO': ['homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat']
     };
 
-    const abasPermitidas = permissoesAbas[currentRole] || ['pedidos', 'chat'];
+    const abasPermitidas = mapaAbas[currentRole] || mapaAbas['GESTOR'];
 
-    // 1. Ocultar/Exibir botões das abas no menu
-    const mapaBotoes = {
-        'pedidos': 'nav-btn-pedidos',
-        'atendimento': 'nav-btn-atendimento',
-        'historico': 'nav-btn-historico',
-        'esocial': 'nav-btn-esocial',
-        'homologacao': 'nav-btn-homologacao',
-        'pcmso-matriz': 'nav-btn-pcmso-matriz',
-        'relatorio-pcmso': 'nav-btn-relatorio-pcmso',
-        'producao': 'nav-btn-producao',
-        'chat': 'nav-btn-chat',
-        'cadastros': 'nav-btn-cadastros'
-    };
-
-    Object.keys(mapaBotoes).forEach(abaKey => {
-        const btn = document.getElementById(mapaBotoes[abaKey]);
+    const todasAbas = ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'cadastros'];
+    todasAbas.forEach(aba => {
+        const btn = document.getElementById(`nav-btn-${aba}`);
         if (btn) {
-            if (abasPermitidas.includes(abaKey)) {
-                btn.classList.remove('hidden');
+            if (abasPermitidas.includes(aba)) {
+                btn.style.display = 'inline-flex';
             } else {
-                btn.classList.add('hidden');
+                btn.style.display = 'none';
             }
         }
     });
 
-    // Se a aba aberta no momento foi bloqueada, redireciona para a primeira permitida
-    const primeiraAbaPermitida = abasPermitidas[0];
-    const abaAtivaAtual = document.querySelector('.tab-content:not(.hidden)')?.id?.replace('tab-', '');
-    if (!abasPermitidas.includes(abaAtivaAtual)) {
-        switchTab(primeiraAbaPermitida);
+    // Se a aba atual estiver oculta para o perfil, redireciona para a primeira permitida
+    const tabAtualAberta = Array.from(document.querySelectorAll('.tab-content')).find(el => !el.classList.contains('hidden'))?.id?.replace('tab-', '');
+    if (tabAtualAberta && !abasPermitidas.includes(tabAtualAberta)) {
+        if (abasPermitidas.length > 0) switchTab(abasPermitidas[0]);
     }
 
-    // 2. Módulo Homologação: Controle de Cadastro / Edição
+    // 1. Homologação: Cadastros vs Relatórios
     const painelHom = document.getElementById('painel-inclusao-homologacao');
     const avisoHom = document.getElementById('aviso-bloqueio-homologacao');
     const podeHom = podeCadastrarHomologacao();
 
     if (painelHom) {
-        const inputsHom = painelHom.querySelectorAll('input, button');
+        const inputsHom = painelHom.querySelectorAll('input, button, select');
         inputsHom.forEach(el => el.disabled = !podeHom);
         if (podeHom) {
             painelHom.classList.remove('opacity-40', 'pointer-events-none');
@@ -304,7 +289,7 @@ function atualizarPermissoesInterface() {
         }
     }
 
-    // 3. Matriz PCMSO: Permissões de Riscos/Perigos vs Exames/Planos
+    // 2. PCMSO: Permissões de Riscos/Perigos vs Exames/Planos
     const podeRisco = podeEditarRiscosPcmso();
     const podeExame = podeEditarExamesPcmso();
     const isMedPcmso = currentRole === 'MEDICO_PCMSO';
@@ -353,7 +338,7 @@ function atualizarPermissoesInterface() {
             tagPermissao.textContent = "GESTOR / AGENTE: Edição Total de Riscos e Perigos";
             tagPermissao.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-950 uppercase";
         } else if (isMedPcmso) {
-            tagPermissao.textContent = "MÉDICO PCMSO: Edição de Exames, Periodicidade e Conduta Clínica";
+            tagPermissao.textContent = "MÉDICO PCMSO: Edição Exclusiva de Exames e Condutas Clínicas";
             tagPermissao.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-950 uppercase";
         } else {
             tagPermissao.textContent = "MODO SOMENTE LEITURA";
@@ -1144,7 +1129,6 @@ window.renderHomologacaoTabela = function() {
     const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
     const lista = atestadosHomologacaoData.filter(h => activeCli === 'ALL' || h.cliente === activeCli);
     const verCid = podeVerCID();
-    const podeParecer = podeDarParecerHomologacao();
 
     if (lista.length === 0) {
         tbody.innerHTML = '<tr><td colspan="12" class="p-3 text-center text-slate-400 uppercase italic">Nenhum atestado cadastrado para homologação.</td></tr>';
@@ -1153,6 +1137,8 @@ window.renderHomologacaoTabela = function() {
 
     lista.forEach(h => {
         const cidExibicao = verCid ? h.cid : `<span class="text-slate-400 italic font-mono font-bold" title="Informação protegida por sigilo médico legal">🔒 SIGILO MÉDICO</span>`;
+        const podeDarParecer = ['MEDICO_HOMOLOGADOR', 'GESTOR'].includes(currentRole);
+
         const tr = document.createElement('tr');
         tr.className = "border-b hover:bg-slate-50";
         tr.innerHTML = `
@@ -1171,11 +1157,15 @@ window.renderHomologacaoTabela = function() {
                 ${h.status || 'PENDENTE'}
             </td>
             <td class="p-2 text-center">
-                ${podeParecer ? `
+                ${podeDarParecer ? `
                     <button type="button" onclick="abrirModalParecerHomologacao(${h.id})" class="bg-purple-800 hover:bg-purple-900 text-white font-bold text-xs px-2 py-1 rounded shadow">
                         🩺 Parecer
                     </button>
-                ` : `<span class="text-slate-400 font-bold text-xs">Visualização</span>`}
+                ` : `
+                    <button type="button" onclick="abrirModalParecerHomologacao(${h.id})" class="bg-slate-200 text-slate-700 font-bold text-xs px-2 py-1 rounded shadow">
+                        👁️ Ver Parecer
+                    </button>
+                `}
             </td>
             <td class="p-2 text-center">
                 ${currentRole === 'GESTOR' ? `<button onclick="apagarHomologacao(${h.id})" class="text-rose-600 font-bold hover:underline text-xs">🗑️</button>` : '-'}
@@ -1234,10 +1224,6 @@ window.adicionarHomologacaoDireta = async function() {
 };
 
 window.abrirModalParecerHomologacao = function(id) {
-    if (!podeDarParecerHomologacao()) {
-        alert("Apenas o Médico Homologador e o Gestor podem emitir e assinar pareceres.");
-        return;
-    }
     const h = atestadosHomologacaoData.find(x => x.id === id);
     if (!h) return;
     currentHomologacaoTarget = h;
@@ -1250,10 +1236,20 @@ window.abrirModalParecerHomologacao = function(id) {
     document.getElementById('hom_parecer_status').value = h.status === 'PENDENTE' ? 'HOMOLOGADO_TOTAL' : h.status;
     document.getElementById('hom_parecer_texto').value = h.parecerTexto || '';
 
+    // Se o perfil não puder editar parecer, desativa campos
+    const podeEditarParecer = ['MEDICO_HOMOLOGADOR', 'GESTOR'].includes(currentRole);
+    document.getElementById('hom_parecer_status').disabled = !podeEditarParecer;
+    document.getElementById('hom_parecer_dias_finais').disabled = !podeEditarParecer;
+    document.getElementById('hom_parecer_texto').disabled = !podeEditarParecer;
+
     document.getElementById('modal-parecer-homologacao-edicao')?.classList.remove('hidden');
 };
 
 window.salvarParecerHomologacao = function() {
+    if (!['MEDICO_HOMOLOGADOR', 'GESTOR'].includes(currentRole)) {
+        alert("🔒 Apenas o Médico Homologador e o Gestor podem assinar e salvar o Parecer Técnico.");
+        return;
+    }
     if (!currentHomologacaoTarget) return;
 
     currentHomologacaoTarget.status = document.getElementById('hom_parecer_status')?.value;
@@ -1281,7 +1277,6 @@ window.gerarRelatorioPdfHomologacao = function() {
 
     let linhas = '';
     lista.forEach(h => {
-        const cidTxt = verCid ? h.cid : 'SIGILOSO';
         linhas += `
             <tr class="border-b">
                 <td class="p-1.5 font-bold">${h.cliente}</td>
@@ -1289,7 +1284,7 @@ window.gerarRelatorioPdfHomologacao = function() {
                 <td class="p-1.5">${h.setor || '-'}</td>
                 <td class="p-1.5 text-center">${h.data}</td>
                 <td class="p-1.5 text-center font-bold">${h.dias} dias</td>
-                <td class="p-1.5 text-center font-bold text-purple-900">${cidTxt}</td>
+                <td class="p-1.5 text-center font-bold text-purple-900">${verCid ? h.cid : 'SIGILOSO'}</td>
                 <td class="p-1.5">${h.medico}</td>
                 <td class="p-1.5 font-black text-center">${h.status}</td>
             </tr>
@@ -1417,7 +1412,7 @@ window.gerarRelatorioPdfAnaliticoPcmso = function() {
 };
 
 // ==========================================
-// 8. MATRIZ PCMSO (NR-07) - INVENTÁRIO PGR (164 RISCOS INTACTOS)
+// 8. MATRIZ PCMSO (NR-07) - TODOS OS 164 PERIGOS E RISCOS PRESERVADOS
 // ==========================================
 const CATALOGO_RISCOS = {
     "ACIDENTES": [
@@ -1547,8 +1542,9 @@ window.autoPreencherPerigoRiscoPlano = function() {
 };
 
 window.adicionarLinhaPCMSO = async function() {
-    if (!podeEditarRiscosPcmso() && currentRole !== 'MEDICO_PCMSO') {
-        alert("Apenas Gestores, Agentes e Médicos do PCMSO podem carregar linhas.");
+    const isPcmsoMed = currentRole === 'MEDICO_PCMSO';
+    if (!podeEditarRiscosPcmso() && !isPcmsoMed) {
+        alert("🔒 Apenas o Gestor, Agente ou o Médico do PCMSO têm permissão para carregar linhas no PCMSO.");
         return;
     }
 
@@ -1641,7 +1637,7 @@ window.salvarEdicaoLinhaPcmso = async function(id, campo, valor) {
 };
 
 window.apagarLinhaPcmso = async function(id) {
-    if (currentRole !== 'GESTOR') return alert("Apenas Gestores podem apagar registros da Matriz.");
+    if (currentRole !== 'GESTOR') return alert("Apenas Gestores podem apagar linhas da matriz.");
     if (!confirm("Deseja apagar esta linha da matriz PCMSO?")) return;
     pcmsoMatrizData = pcmsoMatrizData.filter(x => x.id !== id);
     salvarPcmsoMatrizLocalStorage();
@@ -1658,7 +1654,7 @@ window.renderPcmsoMatriz = function() {
 
     const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
     const isPcmsoMed = currentRole === 'MEDICO_PCMSO';
-    const podeEditarCamposExame = isPcmsoMed || currentRole === 'GESTOR' || currentRole === 'AGENTE';
+    const isGestorOuAgente = currentRole === 'GESTOR' || currentRole === 'AGENTE';
 
     pcmsoMatrizData
         .filter(m => activeCli === 'ALL' || m.cliente === activeCli)
@@ -1674,12 +1670,12 @@ window.renderPcmsoMatriz = function() {
                 <td class="p-2 font-semibold text-slate-800">${m.perigo || m.agente}</td>
                 <td class="p-2 text-rose-900 font-semibold">${m.risco}</td>
                 <td class="p-2 font-bold text-blue-900">
-                    ${podeEditarCamposExame ? `
+                    ${isPcmsoMed || isGestorOuAgente ? `
                         <input type="text" value="${m.exame}" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'exame', this.value)" class="w-full border rounded p-1 text-xs font-bold bg-white text-blue-900">
                     ` : m.exame}
                 </td>
                 <td class="p-2 text-center font-bold">
-                    ${podeEditarCamposExame ? `
+                    ${isPcmsoMed || isGestorOuAgente ? `
                         <input type="text" value="${m.periodicidade}" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'periodicidade', this.value)" class="w-24 border rounded p-1 text-xs text-center font-bold bg-white">
                     ` : m.periodicidade}
                 </td>
@@ -1697,11 +1693,11 @@ window.renderPcmsoMatriz = function() {
                             <span class="font-extrabold text-amber-950 bg-amber-100 px-2 py-0.5 rounded text-[11px] uppercase">
                                 📋 Plano de Ação do Gestor / PGR:
                             </span>
-                            ${currentRole === 'GESTOR' || currentRole === 'AGENTE' ? `
+                            ${isGestorOuAgente ? `
                                 <span class="text-[10px] text-slate-500 font-semibold">(Editável por Gestor / Agente)</span>
                             ` : ''}
                         </div>
-                        ${currentRole === 'GESTOR' || currentRole === 'AGENTE' ? `
+                        ${isGestorOuAgente ? `
                             <textarea rows="2" onchange="salvarEdicaoLinhaPcmso(${m.id}, 'planoGestor', this.value)" class="w-full border rounded p-1.5 text-xs bg-white font-semibold text-slate-800 shadow-sm">${m.planoGestor || ''}</textarea>
                         ` : `
                             <div class="p-2 bg-white rounded border border-slate-200 font-semibold text-slate-800">${m.planoGestor || 'Nenhuma medida preventiva cadastrada.'}</div>
@@ -1785,7 +1781,7 @@ window.exportarMatrizPcmsoWord = function() {
         </body></html>
     `;
 
-    const blob = new Blob(['\ufeff' + docWord], { type: 'application/msword' });
+    const blob = new Blob(['﻿' + docWord], { type: 'application/msword' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `Matriz_PCMSO_${activeCli.replace(/\s+/g, '_')}.doc`;
@@ -1881,12 +1877,6 @@ window.renderProducaoTable = function() {
     tbody.innerHTML = '';
     let somaTotal = 0;
 
-    if (!podeVerFinanceiro()) {
-        tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400 uppercase italic">Acesso restrito ao módulo financeiro.</td></tr>';
-        if (totalEl) totalEl.textContent = "R$ 0,00";
-        return;
-    }
-
     const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
     const nomeLogado = (usuarioLogado?.nome || '').toUpperCase();
     const vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
@@ -1906,8 +1896,16 @@ window.renderProducaoTable = function() {
         localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(linhasApuracao));
     }
 
+    const podeEditarValorGeral = currentRole === 'GESTOR';
+
     linhasApuracao
-        .filter(r => (activeCli === 'ALL' || r.cliente === activeCli) && (currentRole === 'GESTOR' || r.fornecedor.toUpperCase().includes(nomeLogado) || nomeLogado.includes(r.fornecedor.toUpperCase())))
+        .filter(r => {
+            const matchesCliente = (activeCli === 'ALL' || r.cliente === activeCli);
+            if (currentRole === 'GESTOR') return matchesCliente;
+            // Fornecedores/Médicos autorizados vêem apenas a sua própria relação comercial
+            const matchesFornecedor = r.fornecedor.toUpperCase().includes(nomeLogado) || nomeLogado.includes(r.fornecedor.toUpperCase());
+            return matchesCliente && matchesFornecedor;
+        })
         .forEach((r, idx) => {
             const qtd = Number(r.qtd_executada || 0);
             const unit = Number(r.valor_unitario || 0);
@@ -1925,7 +1923,9 @@ window.renderProducaoTable = function() {
                     <input type="number" min="0" value="${qtd}" onchange="atualizarQtdExecutadaProducao(${idx}, this.value)" class="w-16 border rounded p-1 text-center font-black text-amber-950 bg-white shadow-sm">
                 </td>
                 <td class="p-2.5 text-right font-bold">
-                    <input type="number" step="0.01" value="${unit.toFixed(2)}" ${currentRole !== 'GESTOR' ? 'disabled' : ''} onchange="atualizarValorUnitarioProducao(${idx}, this.value)" class="w-20 border rounded p-1 text-right font-bold bg-white">
+                    ${podeEditarValorGeral ? `
+                        <input type="number" step="0.01" value="${unit.toFixed(2)}" onchange="atualizarValorUnitarioProducao(${idx}, this.value)" class="w-20 border rounded p-1 text-right font-bold bg-white">
+                    ` : `R$ ${unit.toFixed(2).replace('.', ',')}`}
                 </td>
                 <td class="p-2.5 text-right font-black text-emerald-700 bg-emerald-50/30">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
                 <td class="p-2.5 text-center">
@@ -1983,7 +1983,6 @@ window.enviarRelatorioEmailFinanceiro = function() {
 // 10. MÓDULO 10: VÍNCULOS COMERCIAIS & CADASTROS
 // ==========================================
 window.adicionarItemTabelaPreco = async function() {
-    if (!podeVerCadastros()) return alert("Acesso não autorizado.");
     const cli = document.getElementById('vinc_cli_select')?.value;
     const tipo = document.getElementById('vinc_tipo_select')?.value;
     const parceiro = document.getElementById('vinc_parceiro_select')?.value;
@@ -2062,7 +2061,6 @@ window.renderTabelaVinculos = function() {
 };
 
 window.removerVinculo = function(idx) {
-    if (currentRole !== 'GESTOR') return alert("Apenas Gestores podem apagar vínculos.");
     if (!confirm("Deseja apagar este vínculo comercial?")) return;
     let vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
     vinculos.splice(idx, 1);
@@ -2093,7 +2091,7 @@ window.atualizarListaParceirosVinculo = function() {
 };
 
 window.salvarNovoCliente = async function() {
-    if (!podeVerCadastros()) return alert("Apenas Gestor e Agente realizam cadastros.");
+    if (currentRole !== 'GESTOR' && currentRole !== 'AGENTE') return alert("Apenas o Gestor e o Agente realizam cadastros.");
     const nome = document.getElementById('cad_cli_nome')?.value.trim();
     const cnpj = document.getElementById('cad_cli_cnpj')?.value.trim();
     const tel = document.getElementById('cad_cli_tel')?.value.trim();
@@ -2150,7 +2148,7 @@ window.renderClientesTabela = function() {
 };
 
 window.apagarClienteCadastrado = async function(id) {
-    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar cadastros.");
+    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar clientes cadastrados.");
     if (!confirm("Deseja apagar esta empresa?")) return;
     clientesCadastrados = clientesCadastrados.filter(c => c.id !== id);
     salvarCadastrosLocalStorage();
@@ -2160,7 +2158,7 @@ window.apagarClienteCadastrado = async function(id) {
 };
 
 window.salvarNovaClinica = async function() {
-    if (!podeVerCadastros()) return alert("Apenas Gestor e Agente cadastram clínicas.");
+    if (currentRole !== 'GESTOR' && currentRole !== 'AGENTE') return alert("Apenas o Gestor e o Agente cadastram clínicas.");
     const nome = document.getElementById('cad_clin_nome')?.value.trim();
     const cnpj = document.getElementById('cad_clin_cnpj')?.value.trim();
     const whats = document.getElementById('cad_clin_whats')?.value.trim();
@@ -2208,7 +2206,7 @@ window.renderClinicasTabela = function() {
 };
 
 window.apagarClinicaCadastrada = async function(id) {
-    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar cadastros.");
+    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar clínicas cadastradas.");
     if (!confirm("Deseja apagar esta clínica?")) return;
     clinicasCadastradas = clinicasCadastradas.filter(c => c.id !== id);
     salvarCadastrosLocalStorage();
@@ -2218,7 +2216,7 @@ window.apagarClinicaCadastrada = async function(id) {
 };
 
 window.salvarNovoMedico = async function() {
-    if (!podeVerCadastros()) return alert("Apenas Gestor e Agente cadastram médicos.");
+    if (currentRole !== 'GESTOR' && currentRole !== 'AGENTE') return alert("Apenas o Gestor e o Agente cadastram médicos.");
     const nome = document.getElementById('cad_med_nome')?.value.trim();
     const crm = document.getElementById('cad_med_crm')?.value.trim();
     const rqe = document.getElementById('cad_med_rqe')?.value.trim();
@@ -2266,7 +2264,7 @@ window.renderMedicosTabela = function() {
 };
 
 window.apagarMedico = async function(id) {
-    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar cadastros.");
+    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar médicos cadastrados.");
     if (!confirm("Deseja apagar este médico?")) return;
     medicosCadastrados = medicosCadastrados.filter(m => m.id !== id);
     salvarCadastrosLocalStorage();
@@ -2665,4 +2663,56 @@ window.enviarMensagemChat = function() {
 
     const div = document.createElement('div');
     div.className = "bg-white p-2 rounded border max-w-md shadow-sm space-y-0.5";
-    div.innerHTML =
+    div.innerHTML = `
+        <div class="flex justify-between items-center text-[10px] text-slate-500 font-bold border-b pb-0.5">
+            <span>DE: ${rem} ➔ PARA: ${dest}</span>
+            <span>${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        <p class="font-bold text-slate-800 text-xs">${msg}</p>
+    `;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    input.value = '';
+};
+
+function inicializarTodosModulos() {
+    carregarCadastrosLocalStorage();
+    atualizarPermissoesInterface();
+    atualizarDropdownsClientes();
+    atualizarDropdownsClinicas();
+    renderClientesTabela();
+    renderClinicasTabela();
+    renderMedicosTabela();
+    renderTabelaVinculos();
+    renderProducaoTable();
+    renderMonitorTable();
+    renderAsoQueue();
+    renderHistoryTabela();
+    renderHomologacaoTabela();
+    renderPcmsoMatriz();
+    atualizarStatsAnalitico();
+    carregarTodosDadosSupabase();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// Inicialização automática das telas e ícones no carregamento
+document.addEventListener('DOMContentLoaded', () => {
+    carregarCadastrosLocalStorage();
+    popularDropdownCid10();
+    popularDropdownExamesPcmso();
+    atualizarPermissoesInterface();
+    atualizarDropdownsClientes();
+    atualizarDropdownsClinicas();
+    renderClientesTabela();
+    renderClinicasTabela();
+    renderMedicosTabela();
+    renderTabelaVinculos();
+    renderProducaoTable();
+    renderMonitorTable();
+    renderAsoQueue();
+    renderHistoryTabela();
+    renderHomologacaoTabela();
+    renderPcmsoMatriz();
+    atualizarStatsAnalitico();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+});
