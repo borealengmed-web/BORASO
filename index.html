@@ -413,11 +413,6 @@
                     </div>
                 </div>
 
-                <!-- AVISO DE CONGELAMENTO PARA PERFIS NÃO AUTORIZADOS -->
-                <div id="aviso-bloqueio-homologacao" class="hidden bg-amber-50 border border-amber-300 p-2.5 rounded-lg text-amber-900 font-bold text-xs">
-                    🔒 Acesso restrito para cadastro: Apenas o Gestor Central, a Empresa Cliente e o Médico Homologador têm permissão para cadastrar atestados nesta área.
-                </div>
-
                 <!-- PAINEL DE INCLUSÃO DIRETA NA TELA -->
                 <div id="painel-inclusao-homologacao" class="bg-purple-50 border border-purple-200 p-3 rounded-lg space-y-2 text-xs">
                     <span class="font-bold text-purple-950 block uppercase">➕ Relacionar Novo Empregado para Homologação:</span>
@@ -439,7 +434,7 @@
                             <input type="number" id="hom_top_dias" value="1" placeholder="DIAS" class="w-full border p-1.5 rounded text-center font-bold bg-white">
                         </div>
                         <div>
-                            <label id="lbl_hom_top_cid" class="font-bold text-slate-700 block mb-0.5">Diagnóstico (CID-10) *</label>
+                            <label class="font-bold text-slate-700 block mb-0.5">Diagnóstico (CID-10) *</label>
                             <input list="lista-cid10-homologacao" type="text" id="hom_top_cid" placeholder="CID OU DOENÇA..." class="w-full border p-1.5 rounded text-center font-bold bg-white" onchange="formatarCidSelecionado(this)">
                             <datalist id="lista-cid10-homologacao"></datalist>
                         </div>
@@ -448,7 +443,7 @@
                         <input type="text" id="hom_top_empresa" placeholder="EMPRESA CLIENTE" class="border p-1.5 rounded font-bold bg-white">
                         <input type="text" id="hom_top_medico" placeholder="MÉDICO EMISSOR DO ATESTADO" class="border p-1.5 rounded font-semibold bg-white">
                         <input type="file" id="hom_top_arquivo" class="border p-1 rounded bg-white font-semibold cursor-pointer" onchange="processarArquivoAtestadoTop(event)">
-                        <button id="btn_salvar_homologacao_direta" type="button" onclick="adicionarHomologacaoDireta()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold p-1.5 rounded uppercase shadow">
+                        <button type="button" onclick="adicionarHomologacaoDireta()" class="bg-purple-800 hover:bg-purple-900 text-white font-bold p-1.5 rounded uppercase shadow">
                             💾 Relacionar Empregado
                         </button>
                     </div>
@@ -511,10 +506,7 @@
                 </div>
 
                 <div id="pcmso-form-container" class="bg-slate-50 border p-3 rounded-lg space-y-3 text-xs">
-                    <div class="flex justify-between items-center">
-                        <span class="font-extrabold text-slate-800 uppercase">➕ Incluir Novo Cargo / Perigo / Risco na Matriz do PCMSO:</span>
-                        <span id="pcmso_tag_permissao" class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-950 uppercase">PERMISSÃO DE EDIÇÃO</span>
-                    </div>
+                    <span class="font-extrabold text-slate-800 block uppercase">➕ Incluir Novo Cargo / Perigo / Risco na Matriz do PCMSO:</span>
                     
                     <!-- 1. Dados Organizacionais do Cargo -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
@@ -624,7 +616,7 @@
                     </div>
 
                     <div class="flex justify-end pt-1">
-                        <button id="btn_carregar_linha_pcmso" type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-2 rounded uppercase shadow flex items-center gap-2">
+                        <button type="button" onclick="adicionarLinhaPCMSO()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-2 rounded uppercase shadow flex items-center gap-2">
                             ➕ Carregar Linha no PCMSO
                         </button>
                     </div>
