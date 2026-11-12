@@ -27,12 +27,13 @@ let tempFileAtestadoTop = null;
 let ultimoAgendamentoSalvo = { horarios: '', endereco: '' };
 let currentAnamneseTarget = null;
 let currentHomologacaoTarget = null;
-let mostrarAcervoCompleto = false; // Controle de visualização de 8-10 registros (Item 14)
+let mostrarAcervoCompleto = false;
+let filtroLetraEmpregadoAtiva = '';
 
 let clientesCadastrados = [];
 let clinicasCadastradas = [];
 let medicosCadastrados = [];
-let empregadosCadastrados = []; // Novo cadastro administrativo (Item 8)
+let empregadosCadastrados = [];
 let asoQueueData = [];
 let asoHistoryData = [];
 let pcmsoMatrizData = [];
@@ -59,7 +60,7 @@ function podeEditarExamesPcmso() {
 }
 
 // ==========================================
-// UTILITÁRIO: GERADOR DE HASH SHA-256 E ASSINATURA ELETRÔNICA CFM (ITEM 1 e 1.1)
+// UTILITÁRIO: GERADOR DE HASH SHA-256 E ASSINATURA ELETRÔNICA CFM
 // ==========================================
 function gerarHashValidacaoDocumento(dadosString) {
     let hash = 0;
@@ -75,7 +76,7 @@ function gerarHashValidacaoDocumento(dadosString) {
 }
 
 // ==========================================
-// 1. AUTENTICAÇÃO E CONTROLE DE LOGIN (100% DESTRAVADO COM TIMEOUT)
+// 1. AUTENTICAÇÃO E CONTROLE DE LOGIN
 // ==========================================
 window.realizarLoginSistema = async function() {
     const emailInput = document.getElementById('login_usuario_email');
@@ -109,7 +110,7 @@ window.realizarLoginSistema = async function() {
         email: email,
         nome: email.split('@')[0].toUpperCase(),
         role: document.getElementById('user-role-select')?.value || 'GESTOR',
-        ipAcesso: '187.54.12.89', // Rastreabilidade CFM
+        ipAcesso: '187.54.12.89',
         timestampLogin: new Date().toISOString()
     };
 
@@ -205,7 +206,7 @@ window.salvarPropriaSenhaUsuario = async function() {
 };
 
 // ==========================================
-// 2. NAVEGAÇÃO DE ABAS & REGRAS DE PERFIS (11 MÓDULOS)
+// 2. NAVEGAÇÃO DE ABAS & REGRAS DE PERFIS (12 MÓDULOS)
 // ==========================================
 window.switchTab = function(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -238,8 +239,33 @@ window.validarTrocaPerfil = function(novoPerfil) {
     popularDropdownCid10();
 };
 
+// SINCRONIZA TODAS AS TELAS, LISTAS SUSPENSAS DE EMPREGADOS E PARCEIROS AO SELECIONAR O CLIENTE NA BARRA SUPERIOR (ITEM 11)
 window.aoTrocarClienteFiltro = function() {
+    const sel = document.getElementById('active-cliente-select');
+    const inp = document.getElementById('active-cliente-input');
+    const activeCli = sel ? sel.value : 'ALL';
+
+    if (sel && inp) {
+        inp.value = activeCli === 'ALL' ? '' : activeCli;
+    }
+
+    // Sincroniza selects de cliente nos formulários internos automaticamente
+    if (activeCli !== 'ALL') {
+        ['hom_top_empresa', 'cad_emp_cliente', 'filtro_emp_cliente_lista', 'vinc_cli_select', 'avulso_cliente', 'fin_manual_cliente'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && Array.from(el.options).some(o => o.value === activeCli)) {
+                el.value = activeCli;
+            }
+        });
+    }
+
     atualizarHeaderPcmsoMedico();
+    atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
+    atualizarSeletorDestinoPedidoManual();
+    atualizarSeletorDestinoCargaMassa();
+    atualizarDropdownsMedicosHomologadores();
+    renderEmpregadosTabela();
     renderPcmsoMatriz();
     renderProducaoTable();
     renderMonitorTable();
@@ -249,25 +275,58 @@ window.aoTrocarClienteFiltro = function() {
     atualizarStatsAnalitico();
 };
 
+window.limparFiltroClienteGlobal = function() {
+    const sel = document.getElementById('active-cliente-select');
+    const inp = document.getElementById('active-cliente-input');
+    if (sel) sel.value = 'ALL';
+    if (inp) inp.value = '';
+    aoTrocarClienteFiltro();
+};
+
 window.aoDigitarClienteFiltro = function(valor) {
-    const valLimpo = valor.trim().toUpperCase();
+    const valLimpo = (valor || '').trim().toUpperCase();
     const sel = document.getElementById('active-cliente-select');
     if (!sel) return;
 
     if (!valLimpo || valLimpo === 'TODOS' || valLimpo === 'TODOS OS CLIENTES') {
         sel.value = 'ALL';
     } else {
-        const achou = clientesCadastrados.find(c => c.nome.toUpperCase() === valLimpo || c.nome.toUpperCase().includes(valLimpo));
+        const achouExato = clientesCadastrados.find(c => c.nome.toUpperCase() === valLimpo);
+        const achouParcial = clientesCadastrados.find(c => c.nome.toUpperCase().includes(valLimpo));
+        const achou = achouExato || achouParcial;
         if (achou) {
             sel.value = achou.nome;
-            if (document.getElementById('active-cliente-input')) {
-                document.getElementById('active-cliente-input').value = achou.nome;
-            }
+            const inp = document.getElementById('active-cliente-input');
+            if (inp && achouExato) inp.value = achou.nome;
         } else {
             sel.value = 'ALL';
         }
     }
-    aoTrocarClienteFiltro();
+
+    const activeCli = sel.value;
+    if (activeCli !== 'ALL') {
+        ['hom_top_empresa', 'cad_emp_cliente', 'filtro_emp_cliente_lista', 'vinc_cli_select', 'avulso_cliente', 'fin_manual_cliente'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && Array.from(el.options).some(o => o.value === activeCli)) {
+                el.value = activeCli;
+            }
+        });
+    }
+
+    atualizarHeaderPcmsoMedico();
+    atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
+    atualizarSeletorDestinoPedidoManual();
+    atualizarSeletorDestinoCargaMassa();
+    atualizarDropdownsMedicosHomologadores();
+    renderEmpregadosTabela();
+    renderPcmsoMatriz();
+    renderProducaoTable();
+    renderMonitorTable();
+    renderAsoQueue();
+    renderHistoryTabela();
+    renderHomologacaoTabela();
+    atualizarStatsAnalitico();
 };
 
 // ==========================================
@@ -275,18 +334,18 @@ window.aoDigitarClienteFiltro = function(valor) {
 // ==========================================
 function atualizarPermissoesInterface() {
     const mapaAbas = {
-        'GESTOR': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'vinculos', 'cadastros'],
-        'AGENTE': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat', 'vinculos', 'cadastros'],
+        'GESTOR': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'vinculos', 'cadastros', 'parceiros'],
+        'AGENTE': ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat', 'vinculos', 'cadastros', 'parceiros'],
         'CLIENTE': ['pedidos', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat'],
         'CLINICA': ['pedidos', 'atendimento', 'pcmso-matriz', 'producao', 'chat', 'vinculos'],
         'MEDICO': ['atendimento', 'historico', 'pcmso-matriz', 'chat'],
         'MEDICO_EXAMINADOR_IND': ['atendimento', 'historico', 'pcmso-matriz', 'producao', 'chat', 'vinculos'],
         'MEDICO_HOMOLOGADOR': ['homologacao', 'producao', 'chat'],
-        'MEDICO_PCMSO': ['homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'chat']
+        'MEDICO_PCMSO': ['homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat']
     };
 
     const abasPermitidas = mapaAbas[currentRole] || mapaAbas['GESTOR'];
-    const todasAbas = ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'vinculos', 'cadastros'];
+    const todasAbas = ['pedidos', 'atendimento', 'historico', 'esocial', 'homologacao', 'pcmso-matriz', 'relatorio-pcmso', 'producao', 'chat', 'vinculos', 'cadastros', 'parceiros'];
     
     todasAbas.forEach(aba => {
         const btn = document.getElementById(`nav-btn-${aba}`);
@@ -300,7 +359,6 @@ function atualizarPermissoesInterface() {
         if (abasPermitidas.length > 0) switchTab(abasPermitidas[0]);
     }
 
-    // 1. Homologação: Cadastros vs Relatórios
     const painelHom = document.getElementById('painel-inclusao-homologacao');
     const avisoHom = document.getElementById('aviso-bloqueio-homologacao');
     const podeHom = podeCadastrarHomologacao();
@@ -317,7 +375,6 @@ function atualizarPermissoesInterface() {
         }
     }
 
-    // 2. PCMSO: Permissões de Riscos vs Exames
     const podeRisco = podeEditarRiscosPcmso();
     const podeExame = podeEditarExamesPcmso();
     const isMedPcmso = currentRole === 'MEDICO_PCMSO';
@@ -376,7 +433,7 @@ function atualizarPermissoesInterface() {
 }
 
 // ==========================================
-// RECONHECIMENTO DE VOZ (MICROFONE) & LIMPEZA DE FORMULÁRIOS (ITENS 10 e 11)
+// RECONHECIMENTO DE VOZ (MICROFONE) & LIMPEZA DE FORMULÁRIOS
 // ==========================================
 window.acionarMicrofoneArea = function(containerId) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -428,8 +485,94 @@ window.limparCamposFormulario = function(containerId) {
 };
 
 // ==========================================
-// NOVO CADASTRO ADMINISTRATIVO DE EMPREGADOS (ITEM 8)
+// NOVO CADASTRO ADMINISTRATIVO DE EMPREGADOS (COM IMPORTAÇÃO EXCEL EM MASSA - ITEM 10)
 // ==========================================
+window.baixarModeloPlanilhaEmpregados = function() {
+    const dadosModelo = [
+        { EMPRESA_CLIENTE: "EXEMPLO EMPRESA LTDA", NOME: "JOAO DA SILVA", CPF: "123.456.789-00", MATRICULA: "1001", NASCIMENTO: "15/05/1988", SETOR: "PRODUCAO", CARGO: "OPERADOR DE MAQUINAS" },
+        { EMPRESA_CLIENTE: "EXEMPLO EMPRESA LTDA", NOME: "MARIA OLIVEIRA", CPF: "987.654.321-11", MATRICULA: "1002", NASCIMENTO: "22/09/1992", SETOR: "ADMINISTRATIVO", CARGO: "ANALISTA ADMINISTRATIVO" }
+    ];
+    const ws = XLSX.utils.json_to_sheet(dadosModelo);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Empregados");
+    XLSX.writeFile(wb, "Modelo_Carga_Empregados_Boreal.xlsx");
+};
+
+window.processarCargaMassaEmpregados = async function(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+
+    const clienteSelecionadoForm = document.getElementById('cad_emp_cliente')?.value;
+    const activeCli = document.getElementById('active-cliente-select')?.value;
+    const clientePadrao = (activeCli && activeCli !== 'ALL') ? activeCli : (clienteSelecionadoForm || clientesCadastrados[0]?.nome || 'CLIENTE PADRÃO');
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+
+            if (!json || json.length === 0) {
+                alert("A planilha selecionada está vazia.");
+                return;
+            }
+
+            let importados = [];
+            json.forEach((linha, i) => {
+                const empNome = linha['NOME'] || linha['TRABALHADOR'] || linha['FUNCIONARIO'] || linha['EMPREGADO'];
+                if (!empNome) return;
+
+                const empCliente = linha['EMPRESA_CLIENTE'] || linha['CLIENTE'] || linha['EMPRESA'] || clientePadrao;
+                const empCpf = linha['CPF'] || '000.000.000-00';
+                const empMatr = linha['MATRICULA'] || linha['MATR'] || String(1000 + i);
+                const empNasc = linha['NASCIMENTO'] || linha['DATA_NASCIMENTO'] || linha['DATA_NASC'] || '01/01/1990';
+                const empSetor = linha['SETOR'] || linha['LOTACAO'] || linha['UNIDADE'] || 'OPERACIONAL';
+                const empCargo = linha['CARGO'] || linha['FUNCAO'] || 'OPERADOR';
+
+                const novoEmp = {
+                    id: Date.now() + i,
+                    cliente: String(empCliente).trim().toUpperCase(),
+                    nome: String(empNome).trim().toUpperCase(),
+                    cpf: String(empCpf).trim(),
+                    matr: String(empMatr).trim().toUpperCase(),
+                    nasc: String(empNasc).trim(),
+                    setor: String(empSetor).trim().toUpperCase(),
+                    cargo: String(empCargo).trim().toUpperCase(),
+                    ativo: true
+                };
+
+                // Evita duplicidade exata de CPF no mesmo cliente
+                const jaExisteIdx = empregadosCadastrados.findIndex(x => x.cpf === novoEmp.cpf && x.cliente === novoEmp.cliente && novoEmp.cpf !== '000.000.000-00');
+                if (jaExisteIdx >= 0) {
+                    empregadosCadastrados[jaExisteIdx] = { ...empregadosCadastrados[jaExisteIdx], ...novoEmp };
+                } else {
+                    empregadosCadastrados.unshift(novoEmp);
+                }
+                importados.push(novoEmp);
+            });
+
+            salvarEmpregadosLocalStorage();
+            renderEmpregadosTabela();
+            atualizarDatalistGlobalEmpregados();
+            atualizarListasSetoresCargosClienteAtivo();
+
+            if (supabaseClient && importados.length > 0) {
+                try {
+                    await supabaseClient.from('cadastros_empregados').upsert(importados);
+                } catch(e){}
+            }
+
+            evt.target.value = '';
+            alert(`✅ Importação em massa concluída! ${importados.length} empregados carregados e vinculados aos módulos do sistema.`);
+        } catch(err) {
+            alert("Erro ao ler planilha Excel: " + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+};
+
 window.salvarNovoEmpregado = async function() {
     if (currentRole !== 'GESTOR' && currentRole !== 'AGENTE') {
         alert("🔒 Apenas o Gestor e o Agente podem cadastrar empregados.");
@@ -465,6 +608,7 @@ window.salvarNovoEmpregado = async function() {
     salvarEmpregadosLocalStorage();
     renderEmpregadosTabela();
     atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
 
     if (supabaseClient) {
         try {
@@ -478,24 +622,52 @@ window.salvarNovoEmpregado = async function() {
     alert("✅ Empregado cadastrado com sucesso! As listas suspensas de todos os módulos foram atualizadas.");
 };
 
+window.filtrarEmpregadosPorLetra = function(letra) {
+    filtroLetraEmpregadoAtiva = (letra || '').trim().toUpperCase();
+    const inp = document.getElementById('filtro_emp_letra_input');
+    if (inp) inp.value = filtroLetraEmpregadoAtiva;
+    renderEmpregadosTabela();
+};
+
+function renderizarBotoesAlfabetoEmpregados() {
+    const box = document.getElementById('barra-alfabeto-empregados');
+    if (!box) return;
+    const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+    box.innerHTML = alfabeto.map(l => `
+        <button type="button" onclick="filtrarEmpregadosPorLetra('${l}')" 
+            class="px-2 py-0.5 rounded font-black text-[11px] border ${filtroLetraEmpregadoAtiva === l ? 'bg-indigo-800 text-white border-indigo-900' : 'bg-white text-indigo-950 border-indigo-200 hover:bg-indigo-100'}">
+            ${l}
+        </button>
+    `).join('');
+}
+
 window.renderEmpregadosTabela = function() {
+    renderizarBotoesAlfabetoEmpregados();
     const tbody = document.getElementById('empregados-cadastrados-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    if (empregadosCadastrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400 uppercase italic">Nenhum empregado cadastrado no banco administrativo.</td></tr>';
+    const filtroCli = document.getElementById('filtro_emp_cliente_lista')?.value || 'ALL';
+
+    const filtrados = empregadosCadastrados
+        .filter(e => filtroCli === 'ALL' || e.cliente === filtroCli)
+        .filter(e => !filtroLetraEmpregadoAtiva || (e.nome || '').trim().toUpperCase().startsWith(filtroLetraEmpregadoAtiva))
+        .sort((a, b) => (a.cliente || '').localeCompare(b.cliente || '') || (a.nome || '').localeCompare(b.nome || ''));
+
+    if (filtrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-slate-400 uppercase italic">Nenhum empregado encontrado para os critérios selecionados.</td></tr>';
         return;
     }
 
-    empregadosCadastrados.forEach(e => {
+    filtrados.forEach(e => {
         const tr = document.createElement('tr');
         tr.className = "border-b hover:bg-slate-50";
         tr.innerHTML = `
-            <td class="p-2 font-bold">${e.cliente}</td>
+            <td class="p-2 font-bold text-slate-700">${e.cliente}</td>
             <td class="p-2 font-black text-blue-950">${e.nome}</td>
             <td class="p-2 font-semibold text-slate-700">${e.cpf}</td>
             <td class="p-2">${e.matr}</td>
+            <td class="p-2">${e.nasc || '-'}</td>
             <td class="p-2">${e.cargo}</td>
             <td class="p-2">${e.setor}</td>
             <td class="p-2 text-center">
@@ -513,6 +685,7 @@ window.apagarEmpregadoCadastrado = async function(id) {
     salvarEmpregadosLocalStorage();
     renderEmpregadosTabela();
     atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
     if (supabaseClient) {
         try { await supabaseClient.from('cadastros_empregados').delete().eq('id', id); } catch(e){}
     }
@@ -522,13 +695,21 @@ function salvarEmpregadosLocalStorage() {
     try { localStorage.setItem('boreal_empregados_db', JSON.stringify(empregadosCadastrados)); } catch(e){}
 }
 
+// FILTRA A LISTA DE EMPREGADOS PELO CLIENTE SELECIONADO NA BARRA SUPERIOR (ITEM 11)
 function atualizarDatalistGlobalEmpregados() {
     const dl = document.getElementById('lista-empregados-global');
     if (!dl) return;
     dl.innerHTML = '';
-    empregadosCadastrados.forEach(emp => {
+
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
+    const filtrados = empregadosCadastrados
+        .filter(emp => activeCli === 'ALL' || emp.cliente === activeCli)
+        .sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+    filtrados.forEach(emp => {
         const opt = document.createElement('option');
         opt.value = `${emp.nome} - ${emp.cpf}`;
+        opt.label = `${emp.cliente} | ${emp.cargo} (${emp.setor})`;
         opt.dataset.nome = emp.nome;
         opt.dataset.cpf = emp.cpf;
         opt.dataset.matr = emp.matr;
@@ -540,8 +721,42 @@ function atualizarDatalistGlobalEmpregados() {
     });
 }
 
+// ALIMENTA SETORES E CARGOS DO CLIENTE ATIVO PARA A MATRIZ PCMSO E DEMAIS CAMPOS (ITEM 11)
+function atualizarListasSetoresCargosClienteAtivo() {
+    const dlSetores = document.getElementById('lista-setores-cliente-ativo');
+    const dlCargos = document.getElementById('lista-cargos-cliente-ativo');
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
+
+    const emps = empregadosCadastrados.filter(emp => activeCli === 'ALL' || emp.cliente === activeCli);
+    const setoresUnicos = [...new Set(emps.map(e => e.setor).filter(Boolean))].sort();
+    const cargosUnicos = [...new Set(emps.map(e => e.cargo).filter(Boolean))].sort();
+
+    if (dlSetores) {
+        dlSetores.innerHTML = setoresUnicos.map(s => `<option value="${s}">`).join('');
+    }
+    if (dlCargos) {
+        dlCargos.innerHTML = cargosUnicos.map(c => `<option value="${c}">`).join('');
+    }
+}
+
+function localizarEmpregadoPorTexto(val) {
+    if (!val) return null;
+    const limpo = val.trim().toUpperCase();
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
+    const pool = activeCli === 'ALL' ? empregadosCadastrados : empregadosCadastrados.filter(e => e.cliente === activeCli);
+
+    return pool.find(e =>
+        `${e.nome} - ${e.cpf}`.toUpperCase() === limpo ||
+        e.nome.toUpperCase() === limpo ||
+        e.cpf.toUpperCase() === limpo
+    ) || empregadosCadastrados.find(e =>
+        `${e.nome} - ${e.cpf}`.toUpperCase() === limpo ||
+        e.nome.toUpperCase() === limpo
+    );
+}
+
 window.autoCompletarDadosEmpregado = function(val, idSetor, idCargo, idEmpresa) {
-    const emp = empregadosCadastrados.find(e => `${e.nome} - ${e.cpf}`.toUpperCase() === val.toUpperCase() || e.nome.toUpperCase() === val.toUpperCase());
+    const emp = localizarEmpregadoPorTexto(val);
     if (!emp) return;
     if (idSetor && document.getElementById(idSetor)) document.getElementById(idSetor).value = emp.setor;
     if (idCargo && document.getElementById(idCargo)) document.getElementById(idCargo).value = emp.cargo;
@@ -549,8 +764,9 @@ window.autoCompletarDadosEmpregado = function(val, idSetor, idCargo, idEmpresa) 
 };
 
 window.autoCompletarDadosEmpregadoNoAso = function(val) {
-    const emp = empregadosCadastrados.find(e => `${e.nome} - ${e.cpf}`.toUpperCase() === val.toUpperCase() || e.nome.toUpperCase() === val.toUpperCase());
+    const emp = localizarEmpregadoPorTexto(val);
     if (!emp) return;
+    const cliObj = clientesCadastrados.find(c => c.nome === emp.cliente);
     if (document.getElementById('aso_edit_nome')) document.getElementById('aso_edit_nome').value = emp.nome;
     if (document.getElementById('aso_edit_cpf')) document.getElementById('aso_edit_cpf').value = emp.cpf;
     if (document.getElementById('aso_edit_matricula')) document.getElementById('aso_edit_matricula').value = emp.matr;
@@ -559,10 +775,11 @@ window.autoCompletarDadosEmpregadoNoAso = function(val) {
     if (document.getElementById('aso_edit_cargo')) document.getElementById('aso_edit_cargo').value = emp.cargo;
     if (document.getElementById('aso_edit_funcao')) document.getElementById('aso_edit_funcao').value = emp.cargo;
     if (document.getElementById('aso_edit_razao')) document.getElementById('aso_edit_razao').value = emp.cliente;
+    if (cliObj && document.getElementById('aso_edit_cnpj')) document.getElementById('aso_edit_cnpj').value = cliObj.cnpj || '';
 };
 
 window.autoCompletarDadosEmpregadoNoAvulso = function(val) {
-    const emp = empregadosCadastrados.find(e => `${e.nome} - ${e.cpf}`.toUpperCase() === val.toUpperCase() || e.nome.toUpperCase() === val.toUpperCase());
+    const emp = localizarEmpregadoPorTexto(val);
     if (!emp) return;
     if (document.getElementById('avulso_nome')) document.getElementById('avulso_nome').value = emp.nome;
     if (document.getElementById('avulso_cpf')) document.getElementById('avulso_cpf').value = emp.cpf;
@@ -570,7 +787,7 @@ window.autoCompletarDadosEmpregadoNoAvulso = function(val) {
 };
 
 // ==========================================
-// 3. MÓDULO 1: SOLICITADOR DE PEDIDOS & AGENDAMENTO
+// 3. MÓDULO 1: SOLICITADOR DE PEDIDOS & AGENDAMENTO (COM VÍNCULO POR CLIENTE)
 // ==========================================
 window.verificarExameOutro = function() {
     const sel = document.getElementById('ped_objeto')?.value;
@@ -589,6 +806,17 @@ window.verificarExameOutro = function() {
     }
 };
 
+function obterParceirosVinculadosAoClienteAtivo(tipoDesejado) {
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
+    const vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
+    if (activeCli === 'ALL') return null;
+
+    const vinculados = vinculos
+        .filter(v => v.cliente_nome === activeCli && v.tipo_vinculo === tipoDesejado)
+        .map(v => v.entidade_nome);
+    return [...new Set(vinculados)];
+}
+
 window.atualizarSeletorDestinoPedidoManual = function() {
     const tipo = document.getElementById('ped_destino_tipo')?.value;
     const sel = document.getElementById('ped_destino_parceiro');
@@ -596,17 +824,26 @@ window.atualizarSeletorDestinoPedidoManual = function() {
     sel.innerHTML = '';
 
     if (tipo === 'CLINICA') {
-        if (clinicasCadastradas.length === 0) {
+        const vinculados = obterParceirosVinculadosAoClienteAtivo('CLINICA');
+        let lista = clinicasCadastradas;
+        if (vinculados && vinculados.length > 0) {
+            lista = clinicasCadastradas.filter(c => vinculados.includes(c.nome));
+        }
+        if (lista.length === 0) {
             sel.innerHTML = '<option value="CLÍNICA CREDENCIADA PADRÃO">CLÍNICA CREDENCIADA PADRÃO</option>';
         } else {
-            clinicasCadastradas.forEach(c => {
+            lista.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.nome; opt.innerText = c.nome;
                 sel.appendChild(opt);
             });
         }
     } else {
-        const medicos = medicosCadastrados.filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'));
+        const vinculados = obterParceirosVinculadosAoClienteAtivo('MEDICO_INDEPENDENTE');
+        let medicos = medicosCadastrados.filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'));
+        if (vinculados && vinculados.length > 0) {
+            medicos = medicos.filter(m => vinculados.includes(m.nome));
+        }
         if (medicos.length === 0) {
             sel.innerHTML = '<option value="MÉDICO EXAMINADOR PADRÃO">MÉDICO EXAMINADOR PADRÃO</option>';
         } else {
@@ -626,17 +863,26 @@ window.atualizarSeletorDestinoCargaMassa = function() {
     sel.innerHTML = '';
 
     if (tipo === 'CLINICA') {
-        if (clinicasCadastradas.length === 0) {
+        const vinculados = obterParceirosVinculadosAoClienteAtivo('CLINICA');
+        let lista = clinicasCadastradas;
+        if (vinculados && vinculados.length > 0) {
+            lista = clinicasCadastradas.filter(c => vinculados.includes(c.nome));
+        }
+        if (lista.length === 0) {
             sel.innerHTML = '<option value="CLÍNICA CREDENCIADA PADRÃO">CLÍNICA CREDENCIADA PADRÃO</option>';
         } else {
-            clinicasCadastradas.forEach(c => {
+            lista.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c.nome; opt.innerText = c.nome;
                 sel.appendChild(opt);
             });
         }
     } else {
-        const medicos = medicosCadastrados.filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'));
+        const vinculados = obterParceirosVinculadosAoClienteAtivo('MEDICO_INDEPENDENTE');
+        let medicos = medicosCadastrados.filter(m => m.tipo.includes('EXAMINADOR') || m.tipo.includes('INDEPENDENTE'));
+        if (vinculados && vinculados.length > 0) {
+            medicos = medicos.filter(m => vinculados.includes(m.nome));
+        }
         if (medicos.length === 0) {
             sel.innerHTML = '<option value="MÉDICO EXAMINADOR PADRÃO">MÉDICO EXAMINADOR PADRÃO</option>';
         } else {
@@ -662,9 +908,17 @@ window.addOrderItem = function() {
         return;
     }
 
+    if (objeto.toUpperCase().includes('HOMOLOG')) {
+        alert("⚠️ Solicitações de Homologação de Atestados devem ser feitas diretamente no Módulo 5 (HOMOLOGAÇÃO ATESTADOS).");
+        return;
+    }
+
+    const empCadastrado = localizarEmpregadoPorTexto(trabCpf);
+
     orderItemsList.push({
         id: Date.now() + Math.random(),
         trabalhador: trabCpf.toUpperCase(),
+        empDados: empCadastrado || null,
         objeto: objeto.toUpperCase(),
         qtd: qtd,
         valor: valor
@@ -719,10 +973,13 @@ window.dispatchOrder = async function() {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
 
     for (const item of orderItemsList) {
+        const emp = item.empDados || localizarEmpregadoPorTexto(item.trabalhador);
+        const cliFinal = emp?.cliente || clienteNome;
+
         const novoPedido = {
             id: Date.now() + Math.floor(Math.random() * 1000),
             fecha: dataAtual,
-            cliente: clienteNome,
+            cliente: cliFinal,
             trab: item.trabalhador,
             obj: item.objeto,
             qtd: item.qtd,
@@ -738,12 +995,14 @@ window.dispatchOrder = async function() {
             const novoAsoFila = {
                 id: Date.now() + Math.floor(Math.random() * 1000),
                 fecha: dataAtual,
-                nome: item.trabalhador.split('-')[0].trim(),
-                cpf: item.trabalhador.includes('-') ? item.trabalhador.split('-')[1].trim() : '000.000.000-00',
-                cliente: clienteNome,
-                cargo: 'OPERACIONAL',
-                funcao: 'OPERADOR',
-                lotacao: 'GERAL',
+                nome: emp ? emp.nome : item.trabalhador.split('-')[0].trim(),
+                cpf: emp ? emp.cpf : (item.trabalhador.includes('-') ? item.trabalhador.split('-')[1].trim() : '000.000.000-00'),
+                matricula: emp ? emp.matr : '0001',
+                nasc: emp ? emp.nasc : '01/01/1990',
+                cliente: cliFinal,
+                cargo: emp ? emp.cargo : 'OPERACIONAL',
+                funcao: emp ? emp.cargo : 'OPERADOR',
+                lotacao: emp ? emp.setor : 'GERAL',
                 tipoExame: item.objeto.includes('ASO') ? item.objeto : `ASO - ${item.objeto}`,
                 medico: parceiro,
                 status: 'NA FILA'
@@ -777,7 +1036,7 @@ window.dispatchOrder = async function() {
     renderAsoQueue();
     renderProducaoTable();
 
-    alert(`✅ Pedidos despachados com sucesso para ${parceiro}!`);
+    alert(`✅ Pedidos de ASO/Exames despachados com sucesso para ${parceiro}!`);
 };
 
 window.processarCargaMassaDirecionada = function(evt) {
@@ -809,10 +1068,12 @@ window.processarCargaMassaDirecionada = function(evt) {
                 const exame = linha['EXAME'] || linha['TIPO_ASO'] || linha['OBJETO'] || 'ASO ADMISSIONAL';
                 const trabStr = `${nomeTrab} - ${cpfTrab}`.toUpperCase();
 
+                const emp = localizarEmpregadoPorTexto(trabStr);
+
                 const pedido = {
                     id: Date.now() + i,
                     fecha: dataAtual,
-                    cliente: clienteNome,
+                    cliente: emp?.cliente || clienteNome,
                     trab: trabStr,
                     obj: exame.toUpperCase(),
                     qtd: 1,
@@ -827,12 +1088,14 @@ window.processarCargaMassaDirecionada = function(evt) {
                     asoQueueData.unshift({
                         id: Date.now() + i + 100,
                         fecha: dataAtual,
-                        nome: String(nomeTrab).toUpperCase(),
-                        cpf: String(cpfTrab),
-                        cliente: clienteNome,
-                        cargo: linha['CARGO'] || 'OPERACIONAL',
-                        funcao: linha['FUNCAO'] || 'OPERADOR',
-                        lotacao: linha['SETOR'] || 'GERAL',
+                        nome: emp ? emp.nome : String(nomeTrab).toUpperCase(),
+                        cpf: emp ? emp.cpf : String(cpfTrab),
+                        matricula: emp ? emp.matr : (linha['MATRICULA'] || '0001'),
+                        nasc: emp ? emp.nasc : (linha['NASCIMENTO'] || '01/01/1990'),
+                        cliente: emp?.cliente || clienteNome,
+                        cargo: linha['CARGO'] || emp?.cargo || 'OPERACIONAL',
+                        funcao: linha['FUNCAO'] || emp?.cargo || 'OPERADOR',
+                        lotacao: linha['SETOR'] || emp?.setor || 'GERAL',
                         tipoExame: exame.toUpperCase(),
                         medico: parceiro,
                         status: 'NA FILA'
@@ -899,7 +1162,6 @@ window.aplicarHorarioAnteriorIgual = function() {
     }
 };
 
-// CONFIRMAÇÃO DE AGENDAMENTO COM DISPARO PARA WHATSAPP DO CLIENTE (ITEM 12)
 window.confirmarRespostaAgendamento = async function() {
     const horarios = document.getElementById('resp_horarios')?.value.trim();
     const endereco = document.getElementById('resp_endereco')?.value.trim();
@@ -916,15 +1178,19 @@ window.confirmarRespostaAgendamento = async function() {
     pedido.respostaAgendamento = `${horarios} | Local: ${endereco || 'Clínica Credenciada'}`;
     pedido.status = 'AGENDADO';
 
+    const emp = localizarEmpregadoPorTexto(pedido.trab);
+
     const novoAsoFila = {
         id: Date.now(),
         fecha: new Date().toLocaleDateString('pt-BR'),
-        nome: pedido.trab.split('-')[0].trim(),
-        cpf: pedido.trab.includes('-') ? pedido.trab.split('-')[1].trim() : '000.000.000-00',
+        nome: emp ? emp.nome : pedido.trab.split('-')[0].trim(),
+        cpf: emp ? emp.cpf : (pedido.trab.includes('-') ? pedido.trab.split('-')[1].trim() : '000.000.000-00'),
+        matricula: emp ? emp.matr : '0001',
+        nasc: emp ? emp.nasc : '01/01/1990',
         cliente: pedido.cliente,
-        cargo: 'OPERACIONAL',
-        funcao: 'OPERADOR',
-        lotacao: 'GERAL',
+        cargo: emp ? emp.cargo : 'OPERACIONAL',
+        funcao: emp ? emp.cargo : 'OPERADOR',
+        lotacao: emp ? emp.setor : 'GERAL',
         tipoExame: pedido.obj,
         medico: pedido.clinica,
         status: 'AGENDADO'
@@ -945,7 +1211,6 @@ window.confirmarRespostaAgendamento = async function() {
         } catch(e){}
     }
 
-    // DISPARO WHATSAPP PARA O CLIENTE
     const cliObj = clientesCadastrados.find(c => c.nome === pedido.cliente);
     const telWhats = cliObj?.tel || cliObj?.medWhats || '';
     if (telWhats) {
@@ -1018,15 +1283,19 @@ window.salvarAsoAvulso = function() {
         return;
     }
 
+    const emp = localizarEmpregadoPorTexto(`${nome} - ${cpf}`) || localizarEmpregadoPorTexto(nome);
+
     asoQueueData.unshift({
         id: Date.now(),
         fecha: new Date().toLocaleDateString('pt-BR'),
-        nome: nome.toUpperCase(),
-        cpf: cpf || '000.000.000-00',
-        cliente: cli,
-        cargo: 'OPERACIONAL',
-        funcao: 'OPERADOR',
-        lotacao: 'GERAL',
+        nome: emp ? emp.nome : nome.toUpperCase(),
+        cpf: emp ? emp.cpf : (cpf || '000.000.000-00'),
+        matricula: emp ? emp.matr : '0001',
+        nasc: emp ? emp.nasc : '01/01/1990',
+        cliente: emp ? emp.cliente : cli,
+        cargo: emp ? emp.cargo : 'OPERACIONAL',
+        funcao: emp ? emp.cargo : 'OPERADOR',
+        lotacao: emp ? emp.setor : 'GERAL',
         tipoExame: tipo,
         medico: 'DR. MÉDICO EXAMINADOR',
         status: 'NA FILA'
@@ -1041,18 +1310,20 @@ window.salvarAsoAvulso = function() {
 };
 
 // ==========================================
-// 5. MÓDULO 3: ANAMNESE E EMISSÃO DE ASO COM ASSINATURA ELETRÔNICA (ITEM 1)
+// 5. MÓDULO 3: ANAMNESE E EMISSÃO DE ASO COM ASSINATURA ELETRÔNICA
 // ==========================================
 window.abrirModalAnamnese = function(id) {
     const item = asoQueueData.find(a => a.id === id) || asoHistoryData.find(a => a.id === id);
     if (!item) return;
     currentAnamneseTarget = item;
 
-    document.getElementById('anam_nome_lbl').textContent = item.nome;
-    document.getElementById('anam_cpf_lbl').textContent = item.cpf;
-    document.getElementById('anam_cargo_lbl').textContent = item.cargo || 'OPERACIONAL';
-    document.getElementById('anam_unidade').value = item.cliente || '';
-    document.getElementById('anam_setor').value = item.lotacao || '';
+    const emp = localizarEmpregadoPorTexto(`${item.nome} - ${item.cpf}`) || localizarEmpregadoPorTexto(item.nome);
+
+    document.getElementById('anam_nome_lbl').textContent = emp ? emp.nome : item.nome;
+    document.getElementById('anam_cpf_lbl').textContent = emp ? emp.cpf : item.cpf;
+    document.getElementById('anam_cargo_lbl').textContent = emp ? emp.cargo : (item.cargo || 'OPERACIONAL');
+    document.getElementById('anam_unidade').value = emp ? emp.cliente : (item.cliente || '');
+    document.getElementById('anam_setor').value = emp ? emp.setor : (item.lotacao || '');
 
     if (item.anamneseDados) {
         document.getElementById('anam_obs').value = item.anamneseDados.obs || '';
@@ -1089,17 +1360,19 @@ window.abrirModalAso = function(id) {
     if (!item) return;
     selectedAsoId = id;
 
-    const cli = clientesCadastrados.find(c => c.nome === item.cliente);
+    const emp = localizarEmpregadoPorTexto(`${item.nome} - ${item.cpf}`) || localizarEmpregadoPorTexto(item.nome);
+    const clienteFinal = emp ? emp.cliente : item.cliente;
+    const cli = clientesCadastrados.find(c => c.nome === clienteFinal);
 
-    document.getElementById('aso_edit_razao').value = item.cliente;
+    document.getElementById('aso_edit_razao').value = clienteFinal;
     document.getElementById('aso_edit_cnpj').value = cli?.cnpj || '00.000.000/0001-00';
-    document.getElementById('aso_edit_nome').value = item.nome;
-    document.getElementById('aso_edit_cargo').value = item.cargo || 'OPERADOR';
-    document.getElementById('aso_edit_funcao').value = item.funcao || 'OPERACIONAL';
-    document.getElementById('aso_edit_lotacao').value = item.lotacao || 'GERAL';
-    document.getElementById('aso_edit_matricula').value = item.matricula || '0001';
-    document.getElementById('aso_edit_cpf').value = item.cpf;
-    document.getElementById('aso_edit_nasc').value = item.nasc || '01/01/1990';
+    document.getElementById('aso_edit_nome').value = emp ? emp.nome : item.nome;
+    document.getElementById('aso_edit_cargo').value = emp ? emp.cargo : (item.cargo || 'OPERADOR');
+    document.getElementById('aso_edit_funcao').value = emp ? emp.cargo : (item.funcao || 'OPERACIONAL');
+    document.getElementById('aso_edit_lotacao').value = emp ? emp.setor : (item.lotacao || 'GERAL');
+    document.getElementById('aso_edit_matricula').value = emp ? emp.matr : (item.matricula || '0001');
+    document.getElementById('aso_edit_cpf').value = emp ? emp.cpf : item.cpf;
+    document.getElementById('aso_edit_nasc').value = emp ? emp.nasc : (item.nasc || '01/01/1990');
     document.getElementById('aso_edit_local').value = 'PAULÍNIA / SP';
     document.getElementById('aso_edit_data').value = new Date().toLocaleDateString('pt-BR');
     document.getElementById('aso_med_nome').value = item.medico || 'DR. MÉDICO EXAMINADOR — CRM SP 123456';
@@ -1126,7 +1399,6 @@ window.concluirEmissaoAsoBoreal = async function() {
     const nomeMed = document.getElementById('aso_med_nome')?.value || 'DR. EXAMINADOR';
     const cpfTrab = document.getElementById('aso_edit_cpf')?.value || '';
     
-    // GERAÇÃO DE ASSINATURA ELETRÔNICA AVANÇADA CFM COM TRILHA DE AUDITORIA (ITEM 1)
     const hashUnico = gerarHashValidacaoDocumento(`${cpfTrab}_${nomeMed}_${conclusao}`);
     const dataHoraExata = new Date().toLocaleString('pt-BR');
     const ipAssinatura = usuarioLogado?.ipAcesso || '187.54.12.89';
@@ -1152,7 +1424,6 @@ window.concluirEmissaoAsoBoreal = async function() {
         agentes: document.getElementById('aso_doc_agentes_especificos')?.value || 'AUSÊNCIA DE RISCOS',
         riscosChecks: riscosChecks,
         anamneseDados: itemQueue?.anamneseDados || null,
-        // DADOS DA AUDITORIA CFM / LEI 14.063/2020:
         hashValidacao: hashUnico,
         trilhaAuditoria: {
             assinante: usuarioLogado?.nome || nomeMed,
@@ -1203,7 +1474,6 @@ window.concluirEmissaoAsoBoreal = async function() {
 Código Hash de Autenticidade CFM: ${hashUnico}`);
 };
 
-// GAVETA DO BANCO DE ASOS: MOSTRA 8 A 10 REGISTROS PARA NÃO POLUIR A TELA (ITEM 14)
 window.toggleAcervoCompleto = function() {
     mostrarAcervoCompleto = !mostrarAcervoCompleto;
     const btn = document.getElementById('btn_toggle_acervo_completo');
@@ -1226,7 +1496,6 @@ window.renderHistoryTabela = function() {
         return;
     }
 
-    // Regra da gaveta de 8 a 10 registros (Item 14)
     const totalGeral = lista.length;
     if (!mostrarAcervoCompleto && lista.length > 10) {
         lista = lista.slice(0, 10);
@@ -1236,7 +1505,7 @@ window.renderHistoryTabela = function() {
     if (boxAlerta) {
         boxAlerta.textContent = mostrarAcervoCompleto 
             ? `Exibindo o acervo completo de ${totalGeral} registros arquivados no Banco Permanente.` 
-            : `Exibindo os ${lista.length} registros mais recentes (de ${totalGeral} no total). Utilize o botão acima ou filtre pelo Cliente para consultar o histórico completo.`;
+            : `Exibindo os ${lista.length} registros mais recentes (de ${totalGeral} no total).`;
     }
 
     lista.forEach(a => {
@@ -1266,7 +1535,6 @@ window.renderHistoryTabela = function() {
     });
 };
 
-// IMPRESSÃO OFICIAL DO ASO COM ASSINATURA ELETRÔNICA AVANÇADA CFM E HASH (ITEM 1)
 window.visualizarAsoBanco = function(id) {
     const a = asoHistoryData.find(x => x.id === id);
     if (!a) return;
@@ -1368,7 +1636,6 @@ window.visualizarAsoBanco = function(id) {
                 </div>
             </div>
 
-            <!-- BLOCO DE ASSINATURA ELETRÔNICA AVANÇADA COM CHAVE HASH CFM (ITEM 1) -->
             <div class="border border-black p-2 space-y-2">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div class="border-t border-black text-center pt-1">
@@ -1387,7 +1654,6 @@ window.visualizarAsoBanco = function(id) {
                 </div>
             </div>
 
-            <!-- RODAPÉ DE VALIDAÇÃO DE AUTENTICIDADE E TRILHA DE AUDITORIA (ITEM 1) -->
             <div class="border-t-2 border-black pt-1.5 flex justify-between items-center text-[9px] text-slate-700 font-mono">
                 <div>
                     <strong>CÓDIGO DE VALIDAÇÃO:</strong> <span class="font-black text-black">${hashDoc}</span><br>
@@ -1422,7 +1688,7 @@ window.apagarAsoHistorico = async function(id) {
 };
 
 // ==========================================
-// 6. MÓDULO 5: HOMOLOGAÇÃO DE ATESTADOS COM PARCEIRO E ASSINATURA CFM (ITENS 1.1, 2, 3, 4, 5)
+// 6. MÓDULO 5: HOMOLOGAÇÃO DE ATESTADOS
 // ==========================================
 window.renderHomologacaoTabela = function() {
     const tbody = document.getElementById('atestados-homologacao-tbody');
@@ -1470,7 +1736,7 @@ window.renderHomologacaoTabela = function() {
                 </button>
             </td>
             <td class="p-2 text-center">
-                ${currentRole === 'GESTOR' ? `<button onclick="apagarHomologacao(${h.id})" class="text-rose-600 font-bold hover:underline text-xs">🗑️</button>` : '-'}
+                ${currentRole === 'GESTOR' ? `<button type="button" onclick="apagarHomologacao(${h.id})" class="text-rose-600 font-bold hover:underline text-xs">🗑️ Apagar</button>` : '-'}
             </td>
         `;
         tbody.appendChild(tr);
@@ -1489,7 +1755,6 @@ window.anexarAtestadoLinhaHomologacao = function(id, evt) {
     alert(`✅ Atestado anexado com sucesso para ${h.trab}!`);
 };
 
-// CADASTRO DE HOMOLOGAÇÃO COM SELETOR DE PARCEIRO E NOVO CID (ITENS 2 e 4)
 window.adicionarHomologacaoDireta = async function() {
     if (!podeCadastrarHomologacao()) {
         alert("🔒 Acesso restrito: Somente o Gestor, o Cliente e o Médico Homologador podem cadastrar e relacionar empregados na Homologação.");
@@ -1504,7 +1769,10 @@ window.adicionarHomologacaoDireta = async function() {
     const cidCustom = document.getElementById('hom_top_cid_custom')?.value.trim();
     const cid = cidCustom || cidLista;
 
-    const empresa = document.getElementById('hom_top_empresa')?.value.trim() || 'CLIENTE PADRÃO';
+    const empresaSel = document.getElementById('hom_top_empresa')?.value.trim();
+    const filtroAtivo = document.getElementById('active-cliente-select')?.value;
+    const empresa = empresaSel || (filtroAtivo && filtroAtivo !== 'ALL' ? filtroAtivo : (clientesCadastrados[0]?.nome || 'CLIENTE PADRÃO'));
+
     const parceiroHomologador = document.getElementById('hom_top_parceiro_destino')?.value || 'DR. MÉDICO HOMOLOGADOR';
     const medicoEmissor = document.getElementById('hom_top_medico')?.value.trim() || 'DR. MÉDICO EXTERNO';
 
@@ -1535,15 +1803,67 @@ window.adicionarHomologacaoDireta = async function() {
     salvarHomologacaoLocal();
     renderHomologacaoTabela();
 
+    if (supabaseClient) {
+        try {
+            await supabaseClient.from('atestados_homologacao').upsert([{
+                id: novo.id,
+                cliente: novo.cliente,
+                trab: novo.trab,
+                setor: novo.setor,
+                cargo: novo.cargo,
+                data: novo.data,
+                dias: novo.dias,
+                dias_homologados: novo.diasHomologados,
+                cid: novo.cid,
+                medico: novo.medico,
+                status: novo.status,
+                parecer_texto: novo.parecerTexto,
+                medico_homologador: novo.medicoHomologador,
+                arquivo_nome: novo.arquivoNome,
+                arquivo_url: novo.arquivoUrl,
+                ativo: true
+            }]);
+        } catch(e){}
+    }
+
     document.getElementById('hom_top_trab').value = '';
     if (document.getElementById('hom_top_cid')) document.getElementById('hom_top_cid').value = '';
     if (document.getElementById('hom_top_cid_custom')) document.getElementById('hom_top_cid_custom').value = '';
     tempFileAtestadoTop = null;
-    alert(`✅ Empregado relacionado para Homologação com ${parceiroHomologador}!`);
+    alert(`✅ Empregado relacionado e salvo permanentemente na Homologação com ${parceiroHomologador}!`);
 };
 
-// CARGA EM MASSA DE HOMOLOGAÇÃO COM PARCEIRO (ITEM 2 e 3)
-window.processarCargaMassaHomologacao = function(evt) {
+window.salvarRegistrosHomologacaoExplicitamente = async function() {
+    salvarHomologacaoLocal();
+    if (supabaseClient) {
+        try {
+            const payload = atestadosHomologacaoData.map(h => ({
+                id: h.id,
+                cliente: h.cliente,
+                trab: h.trab,
+                setor: h.setor,
+                cargo: h.cargo,
+                data: h.data,
+                dias: h.dias,
+                dias_homologados: h.diasHomologados || h.dias,
+                cid: h.cid,
+                medico: h.medico,
+                status: h.status,
+                parecer_texto: h.parecerTexto || '',
+                medico_homologador: h.medicoHomologador || '',
+                arquivo_nome: h.arquivoNome || '',
+                arquivo_url: h.arquivoUrl || '#',
+                ativo: true
+            }));
+            if (payload.length > 0) {
+                await supabaseClient.from('atestados_homologacao').upsert(payload);
+            }
+        } catch(e){}
+    }
+    alert("💾 Todas as alterações e exclusões do Módulo de Homologação foram gravadas definitivamente!");
+};
+
+window.processarCargaMassaHomologacao = async function(evt) {
     const file = evt.target.files[0];
     if (!file) return;
 
@@ -1553,7 +1873,7 @@ window.processarCargaMassaHomologacao = function(evt) {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
@@ -1567,13 +1887,14 @@ window.processarCargaMassaHomologacao = function(evt) {
                 const dias = parseInt(linha['DIAS'] || linha['AFASTAMENTO']) || 1;
                 const cid = linha['CID'] || 'M54.5';
                 const medico = linha['MEDICO_EMISSOR'] || 'DR. CLÍNICO GERAL';
+                const emp = localizarEmpregadoPorTexto(String(nomeTrab));
 
                 atestadosHomologacaoData.unshift({
                     id: Date.now() + i,
-                    cliente: clienteNome.toUpperCase(),
-                    trab: String(nomeTrab).toUpperCase(),
-                    setor: linha['SETOR'] || 'OPERACIONAL',
-                    cargo: linha['CARGO'] || 'OPERADOR',
+                    cliente: emp?.cliente || clienteNome.toUpperCase(),
+                    trab: emp ? `${emp.nome} - ${emp.cpf}` : String(nomeTrab).toUpperCase(),
+                    setor: linha['SETOR'] || emp?.setor || 'OPERACIONAL',
+                    cargo: linha['CARGO'] || emp?.cargo || 'OPERADOR',
                     data: dataAtual,
                     dias: dias,
                     diasHomologados: dias,
@@ -1589,7 +1910,8 @@ window.processarCargaMassaHomologacao = function(evt) {
 
             salvarHomologacaoLocal();
             renderHomologacaoTabela();
-            alert(`✅ Carga em massa concluída! ${json.length} colaboradores importados para homologação com ${parceiro}.`);
+            await salvarRegistrosHomologacaoExplicitamente();
+            alert(`✅ Carga em massa concluída e gravada! ${json.length} colaboradores importados para homologação com ${parceiro}.`);
         } catch(err) {
             alert("Erro ao ler planilha: " + err.message);
         }
@@ -1618,8 +1940,7 @@ window.abrirModalParecerHomologacao = function(id) {
     document.getElementById('modal-parecer-homologacao-edicao')?.classList.remove('hidden');
 };
 
-// ASSINATURA ELETRÔNICA AVANÇADA NO PARECER DE HOMOLOGAÇÃO (ITEM 1.1)
-window.salvarParecerHomologacao = function() {
+window.salvarParecerHomologacao = async function() {
     if (!['MEDICO_HOMOLOGADOR', 'GESTOR'].includes(currentRole)) {
         alert("🔒 Apenas o Médico Homologador e o Gestor podem assinar e salvar o Parecer Técnico.");
         return;
@@ -1638,12 +1959,12 @@ window.salvarParecerHomologacao = function() {
 
     salvarHomologacaoLocal();
     renderHomologacaoTabela();
+    await salvarRegistrosHomologacaoExplicitamente();
     fecharModal('modal-parecer-homologacao-edicao');
-    alert(`✅ Parecer Técnico Assinado Digitalmente com Sucesso!
+    alert(`✅ Parecer Técnico Assinado Digitalmente e Gravado com Sucesso!
 Código de Autenticidade CFM: ${hashHom}`);
 };
 
-// IMPRESSÃO OFICIAL DO PARECER DE HOMOLOGAÇÃO COM ASSINATURA ELETRÔNICA (ITEM 5)
 window.imprimirParecerHomologacaoDocumento = function() {
     if (!currentHomologacaoTarget) return;
     const h = currentHomologacaoTarget;
@@ -1776,11 +2097,25 @@ window.gerarRelatorioPdfHomologacao = function() {
     document.getElementById('modal-visualizar-aso-anexado')?.classList.remove('hidden');
 };
 
-window.apagarHomologacao = function(id) {
-    if (!confirm("Deseja apagar este atestado?")) return;
-    atestadosHomologacaoData = atestadosHomologacaoData.filter(x => x.id !== id);
+window.apagarHomologacao = async function(id) {
+    if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar registros de homologação.");
+    if (!confirm("Deseja apagar definitivamente este atestado?")) return;
+    
+    const numId = Number(id);
+    atestadosHomologacaoData = atestadosHomologacaoData.filter(x => Number(x.id) !== numId);
     salvarHomologacaoLocal();
+
+    let excluidosHom = JSON.parse(localStorage.getItem('boreal_homologacao_excluidos_ids') || '[]');
+    if (!excluidosHom.includes(numId)) excluidosHom.push(numId);
+    localStorage.setItem('boreal_homologacao_excluidos_ids', JSON.stringify(excluidosHom));
+
     renderHomologacaoTabela();
+
+    if (supabaseClient) {
+        try {
+            await supabaseClient.from('atestados_homologacao').delete().eq('id', numId);
+        } catch(e){}
+    }
 };
 
 function salvarHomologacaoLocal() {
@@ -2230,7 +2565,7 @@ window.exportarMatrizPcmsoWord = function() {
         </body></html>
     `;
 
-    const blob = new Blob(['﻿' + docWord], { type: 'application/msword' });
+    const blob = new Blob(['\ufeff' + docWord], { type: 'application/msword' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `Matriz_PCMSO_${activeCli.replace(/\s+/g, '_')}.doc`;
@@ -2308,18 +2643,49 @@ window.gerarRelatorioPdfMatrizPcmso = function() {
 };
 
 // ==========================================
-// 8. MÓDULO 8: FINANCEIRO & PRODUÇÃO (TEMPO REAL E IMPRESSÃO CORRIGIDA - ITENS 6 e 9)
+// 8. MÓDULO 8: FINANCEIRO & PRODUÇÃO (INDIVIDUAL POR PERFIL, HOMOLOGADOR & PCMSO)
 // ==========================================
-window.removerItemApuracao = function(idx) {
+window.removerItemApuracao = function(id) {
     if (currentRole !== 'GESTOR') return alert("Apenas o Gestor pode apagar registros financeiros!");
     if (!confirm("Deseja apagar este lançamento financeiro da apuração?")) return;
     let apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
-    apuracao.splice(idx, 1);
+    apuracao = apuracao.filter(a => Number(a.id) !== Number(id));
     localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(apuracao));
     renderProducaoTable();
 };
 
-// SINCRONIZAÇÃO EM TEMPO REAL: Toda vinculação cadastrada já cria a linha na produção (Item 6)
+window.adicionarLancamentoManualFinanceiro = function() {
+    const cliente = document.getElementById('fin_manual_cliente')?.value || (clientesCadastrados[0]?.nome || 'CLIENTE PADRÃO');
+    const objeto = document.getElementById('fin_manual_objeto')?.value.trim();
+    const qtd = parseFloat(document.getElementById('fin_manual_qtd')?.value) || 1;
+    const valor = parseFloat(document.getElementById('fin_manual_valor')?.value) || 0;
+
+    if (!objeto) {
+        alert("Informe a descrição do serviço ou procedimento realizado.");
+        return;
+    }
+
+    let apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
+    const nomePrestador = usuarioLogado?.nome || currentRole;
+
+    apuracao.unshift({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        data: new Date().toLocaleDateString('pt-BR'),
+        fornecedor: nomePrestador,
+        perfil_origem: currentRole,
+        cliente: cliente.toUpperCase(),
+        objeto: objeto.toUpperCase(),
+        qtd_executada: qtd,
+        valor_unitario: valor
+    });
+
+    localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(apuracao));
+    document.getElementById('fin_manual_objeto').value = '';
+    document.getElementById('fin_manual_qtd').value = '1';
+    renderProducaoTable();
+    alert("✅ Produção lançada com sucesso!");
+};
+
 function sincronizarVinculosComApuracao() {
     const vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
     let apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
@@ -2328,91 +2694,174 @@ function sincronizarVinculosComApuracao() {
         const jaExiste = apuracao.find(a => a.vinculo_id === v.id || (a.fornecedor === v.entidade_nome && a.cliente === v.cliente_nome && a.objeto === v.objeto));
         if (!jaExiste) {
             apuracao.push({
-                id: Date.now() + Math.random(),
+                id: Date.now() + Math.floor(Math.random() * 10000),
                 vinculo_id: v.id,
                 data: new Date().toLocaleDateString('pt-BR'),
                 fornecedor: v.entidade_nome,
+                perfil_origem: v.tipo_vinculo || 'PARCEIRO',
                 cliente: v.cliente_nome,
                 objeto: v.objeto,
                 qtd_executada: 0,
                 valor_unitario: Number(v.valor_unitario || 0)
             });
         } else {
-            // Atualiza preço se tiver mudado no cadastro
             jaExiste.valor_unitario = Number(v.valor_unitario || 0);
+            if (!jaExiste.perfil_origem) jaExiste.perfil_origem = v.tipo_vinculo || 'PARCEIRO';
+        }
+    });
+
+    atestadosHomologacaoData.forEach(h => {
+        const medHom = h.medicoAssinante || h.medicoHomologador;
+        if (!medHom) return;
+        const chaveHom = `HOM_${h.id}`;
+        const jaExisteHom = apuracao.find(a => a.chave_hom === chaveHom);
+        if (!jaExisteHom && (h.status === 'HOMOLOGADO_TOTAL' || h.status === 'HOMOLOGADO_PARCIAL' || h.status === 'RECUSADO_APTO')) {
+            const vincHom = vinculos.find(v => v.tipo_vinculo === 'MEDICO_HOMOLOGADOR' && v.cliente_nome === h.cliente);
+            apuracao.unshift({
+                id: Date.now() + Math.floor(Math.random() * 10000),
+                chave_hom: chaveHom,
+                data: h.data,
+                fornecedor: medHom,
+                perfil_origem: 'MEDICO_HOMOLOGADOR',
+                cliente: h.cliente,
+                objeto: `HOMOLOGAÇÃO DE ATESTADO (${h.trab})`,
+                qtd_executada: 1,
+                valor_unitario: vincHom ? Number(vincHom.valor_unitario || 0) : 25.00
+            });
+        }
+    });
+
+    clientesCadastrados.forEach(cli => {
+        if (!cli.medPcmso) return;
+        const chavePcmso = `PCMSO_CLI_${cli.id}`;
+        const jaExistePcmso = apuracao.find(a => a.chave_pcmso === chavePcmso);
+        if (!jaExistePcmso) {
+            const vincPcmso = vinculos.find(v => v.tipo_vinculo === 'MEDICO_PCMSO' && v.cliente_nome === cli.nome);
+            apuracao.push({
+                id: Date.now() + Math.floor(Math.random() * 10000),
+                chave_pcmso: chavePcmso,
+                data: new Date().toLocaleDateString('pt-BR'),
+                fornecedor: cli.medPcmso,
+                perfil_origem: 'MEDICO_PCMSO',
+                cliente: cli.nome,
+                objeto: `COORDENAÇÃO & ASSINATURA DE PCMSO (NR-07) — ${cli.nome}`,
+                qtd_executada: vincPcmso ? 1 : 0,
+                valor_unitario: vincPcmso ? Number(vincPcmso.valor_unitario || 0) : 350.00
+            });
         }
     });
 
     localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(apuracao));
 }
 
+function filtrarApuracaoPorPerfil(apuracao, activeCli) {
+    const nomeLogado = (usuarioLogado?.nome || '').toUpperCase();
+
+    return apuracao.filter(r => {
+        const matchesCliente = (activeCli === 'ALL' || r.cliente === activeCli);
+        if (!matchesCliente) return false;
+
+        if (currentRole === 'GESTOR') return true;
+
+        const forn = (r.fornecedor || '').toUpperCase();
+        const perfilItem = (r.perfil_origem || '').toUpperCase();
+
+        if (currentRole === 'MEDICO_HOMOLOGADOR') {
+            return perfilItem === 'MEDICO_HOMOLOGADOR' || forn.includes('HOMOLOG') || (nomeLogado && forn.includes(nomeLogado));
+        }
+        if (currentRole === 'MEDICO_PCMSO') {
+            return perfilItem === 'MEDICO_PCMSO' || (r.objeto || '').includes('PCMSO') || (nomeLogado && forn.includes(nomeLogado));
+        }
+        if (currentRole === 'MEDICO_EXAMINADOR_IND') {
+            return perfilItem === 'MEDICO_INDEPENDENTE' || perfilItem === 'MEDICO_EXAMINADOR_IND' || (nomeLogado && forn.includes(nomeLogado));
+        }
+        if (currentRole === 'CLINICA') {
+            return perfilItem === 'CLINICA' || (nomeLogado && forn.includes(nomeLogado));
+        }
+        return nomeLogado && (forn.includes(nomeLogado) || nomeLogado.includes(forn));
+    });
+}
+
 window.renderProducaoTable = function() {
     sincronizarVinculosComApuracao();
     const tbody = document.getElementById('relatorio-producao-tbody');
     const totalEl = document.getElementById('valor-soma-total-producao');
+    const tituloEl = document.getElementById('titulo-modulo-financeiro');
     if (!tbody) return;
     tbody.innerHTML = '';
     let somaTotal = 0;
 
+    if (tituloEl) {
+        const rotulos = {
+            'GESTOR': 'POSIÇÃO FINANCEIRA GLOBAL — VISÃO DO GESTOR CENTRAL',
+            'MEDICO_HOMOLOGADOR': 'POSIÇÃO FINANCEIRA — RELATÓRIO DE PRODUÇÃO DO MÉDICO HOMOLOGADOR',
+            'MEDICO_PCMSO': 'POSIÇÃO FINANCEIRA — CONTROLE DE PCMSOS ASSINADOS (MÉDICO PCMSO)',
+            'MEDICO_EXAMINADOR_IND': 'POSIÇÃO FINANCEIRA — PRODUÇÃO DO MÉDICO EXAMINADOR INDEPENDENTE',
+            'CLINICA': 'POSIÇÃO FINANCEIRA — PRODUÇÃO DA CLÍNICA CREDENCIADA'
+        };
+        tituloEl.innerHTML = `<i data-lucide="line-chart" class="w-5 h-5 text-emerald-700"></i> ${rotulos[currentRole] || 'POSIÇÃO FINANCEIRA INDIVIDUAL'}`;
+    }
+
     const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
-    const nomeLogado = (usuarioLogado?.nome || '').toUpperCase();
-    let linhasApuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
+    const linhasApuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
+    const filtradas = filtrarApuracaoPorPerfil(linhasApuracao, activeCli);
 
     const podeEditarValorGeral = currentRole === 'GESTOR';
 
-    linhasApuracao
-        .filter(r => {
-            const matchesCliente = (activeCli === 'ALL' || r.cliente === activeCli);
-            if (currentRole === 'GESTOR') return matchesCliente;
-            // Parceiros só vêem sua própria produção comercial
-            const matchesFornecedor = r.fornecedor.toUpperCase().includes(nomeLogado) || nomeLogado.includes(r.fornecedor.toUpperCase());
-            return matchesCliente && matchesFornecedor;
-        })
-        .forEach((r, idx) => {
-            const qtd = Number(r.qtd_executada || 0);
-            const unit = Number(r.valor_unitario || 0);
-            const subtotal = qtd * unit;
-            somaTotal += subtotal;
+    if (filtradas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400 uppercase italic font-bold">Nenhum serviço financeiro registrado para o seu perfil neste filtro. Utilize o formulário acima para lançar sua produção.</td></tr>';
+        if (totalEl) totalEl.textContent = 'R$ 0,00';
+        return;
+    }
 
-            const tr = document.createElement('tr');
-            tr.className = "border-b hover:bg-slate-50";
-            tr.innerHTML = `
-                <td class="p-2.5">${r.data}</td>
-                <td class="p-2.5 font-bold">${r.fornecedor}</td>
-                <td class="p-2.5">${r.cliente}</td>
-                <td class="p-2.5 font-bold text-blue-900">${r.objeto}</td>
-                <td class="p-2.5 text-center bg-amber-50/70 border-x">
-                    <input type="number" min="0" value="${qtd}" onchange="atualizarQtdExecutadaProducao(${idx}, this.value)" class="w-16 border rounded p-1 text-center font-black text-amber-950 bg-white shadow-sm">
-                </td>
-                <td class="p-2.5 text-right font-bold">
-                    ${podeEditarValorGeral ? `
-                        <input type="number" step="0.01" value="${unit.toFixed(2)}" onchange="atualizarValorUnitarioProducao(${idx}, this.value)" class="w-20 border rounded p-1 text-right font-bold bg-white">
-                    ` : `R$ ${unit.toFixed(2).replace('.', ',')}`}
-                </td>
-                <td class="p-2.5 text-right font-black text-emerald-700 bg-emerald-50/30">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
-                <td class="p-2.5 text-center">
-                    ${currentRole === 'GESTOR' ? `<button onclick="removerItemApuracao(${idx})" class="text-rose-600 font-bold hover:underline">🗑️</button>` : '-'}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+    filtradas.forEach(r => {
+        const qtd = Number(r.qtd_executada || 0);
+        const unit = Number(r.valor_unitario || 0);
+        const subtotal = qtd * unit;
+        somaTotal += subtotal;
+
+        const tr = document.createElement('tr');
+        tr.className = "border-b hover:bg-slate-50";
+        tr.innerHTML = `
+            <td class="p-2.5">${r.data}</td>
+            <td class="p-2.5 font-bold">${r.fornecedor}</td>
+            <td class="p-2.5 text-[10px] font-bold text-slate-600">${r.perfil_origem || '-'}</td>
+            <td class="p-2.5 font-semibold">${r.cliente}</td>
+            <td class="p-2.5 font-bold text-blue-900">${r.objeto}</td>
+            <td class="p-2.5 text-center bg-amber-50/70 border-x">
+                <input type="number" min="0" value="${qtd}" onchange="atualizarQtdExecutadaProducao(${r.id}, this.value)" class="w-16 border rounded p-1 text-center font-black text-amber-950 bg-white shadow-sm">
+            </td>
+            <td class="p-2.5 text-right font-bold">
+                ${podeEditarValorGeral ? `
+                    <input type="number" step="0.01" value="${unit.toFixed(2)}" onchange="atualizarValorUnitarioProducao(${r.id}, this.value)" class="w-20 border rounded p-1 text-right font-bold bg-white">
+                ` : `R$ ${unit.toFixed(2).replace('.', ',')}`}
+            </td>
+            <td class="p-2.5 text-right font-black text-emerald-700 bg-emerald-50/30">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+            <td class="p-2.5 text-center">
+                ${currentRole === 'GESTOR' ? `<button onclick="removerItemApuracao(${r.id})" class="text-rose-600 font-bold hover:underline">🗑️</button>` : '-'}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
 
     if (totalEl) totalEl.textContent = `R$ ${somaTotal.toFixed(2).replace('.', ',')}`;
 };
 
-window.atualizarQtdExecutadaProducao = function(idx, val) {
+window.atualizarQtdExecutadaProducao = function(id, val) {
     let apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
-    if (!apuracao[idx]) return;
-    apuracao[idx].qtd_executada = parseFloat(val) || 0;
+    const item = apuracao.find(a => Number(a.id) === Number(id));
+    if (!item) return;
+    item.qtd_executada = parseFloat(val) || 0;
     localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(apuracao));
     renderProducaoTable();
 };
 
-window.atualizarValorUnitarioProducao = function(idx, val) {
+window.atualizarValorUnitarioProducao = function(id, val) {
     if (currentRole !== 'GESTOR') return;
     let apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
-    if (!apuracao[idx]) return;
-    apuracao[idx].valor_unitario = parseFloat(val) || 0;
+    const item = apuracao.find(a => Number(a.id) === Number(id));
+    if (!item) return;
+    item.valor_unitario = parseFloat(val) || 0;
     localStorage.setItem('boreal_apuracao_financeira_db', JSON.stringify(apuracao));
     renderProducaoTable();
 };
@@ -2425,6 +2874,7 @@ window.salvarFechamentoPeriodo = function() {
     let historico = JSON.parse(localStorage.getItem('boreal_historico_fechamentos') || '[]');
     historico.unshift({
         id: Date.now(),
+        perfil: currentRole,
         data_fechamento: new Date().toLocaleDateString('pt-BR'),
         periodo,
         observacoes: obs,
@@ -2439,22 +2889,22 @@ window.enviarRelatorioEmailFinanceiro = function() {
     const total = document.getElementById('valor-soma-total-producao')?.textContent || 'R$ 0,00';
     const corpo = encodeURIComponent(`Prezados,
 
-Segue o resumo da posição financeira consolidada do período ${periodo}.
+Segue o resumo da posição financeira (${currentRole}) do período ${periodo}.
 Total apurado: ${total}.
 
 Relatório gerado pelo Sistema Boreal Engmed.`);
-    window.location.href = `mailto:financeiro@boreal.eng.br?subject=Fechamento Financeiro - ${periodo}&body=${corpo}`;
+    window.location.href = `mailto:financeiro@boreal.eng.br?subject=Fechamento Financeiro (${currentRole}) - ${periodo}&body=${corpo}`;
 };
 
-// IMPRESSÃO CORRIGIDA DA POSIÇÃO FINANCEIRA (SEM PÁGINA EM BRANCO - ITEM 9)
 window.imprimirRelatorioFinanceiro = function() {
-    const activeCli = document.getElementById('active-cliente-select')?.value || 'TODOS';
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
     const periodo = document.getElementById('fin_periodo_execucao')?.value || 'Período Atual';
     const total = document.getElementById('valor-soma-total-producao')?.textContent || 'R$ 0,00';
     const apuracao = JSON.parse(localStorage.getItem('boreal_apuracao_financeira_db') || '[]');
+    const filtradas = filtrarApuracaoPorPerfil(apuracao, activeCli);
 
     let linhas = '';
-    apuracao.forEach(r => {
+    filtradas.forEach(r => {
         const subtotal = (Number(r.qtd_executada || 0) * Number(r.valor_unitario || 0)).toFixed(2).replace('.', ',');
         linhas += `
             <tr style="border-bottom: 1px solid #ddd;">
@@ -2471,21 +2921,21 @@ window.imprimirRelatorioFinanceiro = function() {
 
     const paper = document.getElementById('aso-paper-visualizar');
     const modalTitulo = document.getElementById('modal-visualizar-titulo');
-    if (modalTitulo) modalTitulo.textContent = "📄 RELATÓRIO DE POSIÇÃO FINANCEIRA / PRODUÇÃO";
+    if (modalTitulo) modalTitulo.textContent = `📄 RELATÓRIO FINANCEIRO — ${currentRole}`;
 
     if (paper) {
         paper.className = "bg-white p-6 max-w-4xl mx-auto text-slate-900 border-2 border-black text-[11px] folha-homologacao-print";
         paper.innerHTML = `
             <div style="border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px;">
                 <h2 style="margin: 0; font-size: 14px; text-transform: uppercase;">BOREAL ENGENHARIA E MEDICINA OCUPACIONAL</h2>
-                <p style="margin: 0; font-size: 10px; color: #555;">CRM Nº 1011385 | POSIÇÃO FINANCEIRA DE PRODUÇÃO</p>
+                <p style="margin: 0; font-size: 10px; color: #555;">CRM Nº 1011385 | POSIÇÃO FINANCEIRA — PERFIL: ${currentRole}</p>
             </div>
-            <p><strong>FILTRO:</strong> ${activeCli} | <strong>PERÍODO:</strong> ${periodo} | <strong>EMISSÃO:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+            <p><strong>FILTRO CLIENTE:</strong> ${activeCli} | <strong>PERÍODO:</strong> ${periodo} | <strong>EMISSÃO:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
             <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-top: 8px;">
                 <thead>
                     <tr style="background: #1e3a8a; color: white;">
                         <th style="padding: 6px;">Data</th>
-                        <th style="padding: 6px;">Fornecedor</th>
+                        <th style="padding: 6px;">Prestador</th>
                         <th style="padding: 6px;">Cliente</th>
                         <th style="padding: 6px;">Procedimento</th>
                         <th style="padding: 6px; text-align: center;">Qtd</th>
@@ -2504,7 +2954,7 @@ window.imprimirRelatorioFinanceiro = function() {
 };
 
 // ==========================================
-// 10. MÓDULO 10: VÍNCULOS COMERCIAIS & TABELA DE PREÇOS (ITEM 7)
+// 10. MÓDULO 10: VÍNCULOS COMERCIAIS & TABELA DE PREÇOS
 // ==========================================
 window.adicionarItemTabelaPreco = async function() {
     const cli = document.getElementById('vinc_cli_select')?.value;
@@ -2537,8 +2987,11 @@ window.adicionarItemTabelaPreco = async function() {
 
     renderTabelaVinculos();
     renderProducaoTable();
+    atualizarSeletorDestinoPedidoManual();
+    atualizarSeletorDestinoCargaMassa();
+    atualizarDropdownsMedicosHomologadores();
     document.getElementById('vinc_objeto').value = '';
-    alert("✅ Item e preço vinculados com sucesso! Sincronizado instantaneamente na Posição Financeira.");
+    alert("✅ Item e preço vinculados com sucesso! Sincronizado instantaneamente na Posição Financeira e nos seletores do cliente.");
 };
 
 window.atualizarPrecoItemClinica = function(idx, novoValor) {
@@ -2558,9 +3011,11 @@ window.renderTabelaVinculos = function() {
     const vinculos = JSON.parse(localStorage.getItem('boreal_vinculos_db') || '[]');
     const isClinica = currentRole === 'CLINICA';
     const nomeLogado = (usuarioLogado?.nome || '').toUpperCase();
+    const activeCli = document.getElementById('active-cliente-select')?.value || 'ALL';
 
     vinculos
-        .filter(v => currentRole === 'GESTOR' || currentRole === 'AGENTE' || (isClinica && (v.entidade_nome.toUpperCase().includes(nomeLogado) || nomeLogado.includes(v.entidade_nome.toUpperCase()))))
+        .filter(v => (activeCli === 'ALL' || v.cliente_nome === activeCli))
+        .filter(v => currentRole === 'GESTOR' || currentRole === 'AGENTE' || (v.entidade_nome.toUpperCase().includes(nomeLogado) || nomeLogado.includes(v.entidade_nome.toUpperCase())))
         .forEach((v, index) => {
             const tr = document.createElement('tr');
             tr.className = "border-b hover:bg-slate-50";
@@ -2605,6 +3060,14 @@ window.atualizarListaParceirosVinculo = function() {
             opt.value = c.nome; opt.innerText = c.nome;
             selParceiro.appendChild(opt);
         });
+    } else if (tipo === 'MEDICO_PCMSO') {
+        const medsPcmso = medicosCadastrados.filter(m => m.tipo.includes('PCMSO'));
+        const lista = medsPcmso.length > 0 ? medsPcmso : medicosCadastrados;
+        lista.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.nome; opt.innerText = `${m.nome} (${m.crm || ''})`;
+            selParceiro.appendChild(opt);
+        });
     } else {
         medicosCadastrados.forEach(m => {
             const opt = document.createElement('option');
@@ -2615,7 +3078,7 @@ window.atualizarListaParceirosVinculo = function() {
 };
 
 // ==========================================
-// 11. MÓDULO 11: CADASTROS GERAIS (CLIENTES, CLÍNICAS, MÉDICOS & EMPREGADOS)
+// 11. MÓDULO 11 & 12: CADASTRO DE CLIENTES (COM EMPREGADOS) E CADASTRO DE PARCEIROS
 // ==========================================
 window.salvarNovoCliente = async function() {
     if (currentRole !== 'GESTOR' && currentRole !== 'AGENTE') return alert("Apenas o Gestor e o Agente realizam cadastros.");
@@ -2632,7 +3095,7 @@ window.salvarNovoCliente = async function() {
     if (!nome || !cnpj) return alert("Preencha Razão Social e CNPJ.");
 
     const id = Date.now();
-    const novoCli = { id, nome, cnpj, tel, email, end, medPcmso, crmPcmso, medWhats, medEmail, ativo: true };
+    const novoCli = { id, nome: nome.toUpperCase(), cnpj, tel, email, end, medPcmso: medPcmso.toUpperCase(), crmPcmso, medWhats, medEmail, ativo: true };
     clientesCadastrados.push(novoCli);
     salvarCadastrosLocalStorage();
     renderClientesTabela();
@@ -2641,7 +3104,7 @@ window.salvarNovoCliente = async function() {
     if (supabaseClient) {
         try {
             await supabaseClient.from('cadastros_clientes').upsert([{
-                id, nome, cnpj, tel, email, endereco: end, med_pcmso: medPcmso, crm_pcmso: crmPcmso, med_whats: medWhats, med_email: medEmail, ativo: true
+                id, nome: novoCli.nome, cnpj, tel, email, endereco: end, med_pcmso: novoCli.medPcmso, crm_pcmso: crmPcmso, med_whats: medWhats, med_email: medEmail, ativo: true
             }]);
         } catch(e){}
     }
@@ -2655,11 +3118,12 @@ window.renderClientesTabela = function() {
     const tbody = document.getElementById('clientes-cadastrados-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    clientesCadastrados.forEach(c => {
+    const ordenados = [...clientesCadastrados].sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+    ordenados.forEach(c => {
         const tr = document.createElement('tr');
         tr.className = "border-b";
         tr.innerHTML = `
-            <td class="p-2 font-bold">${c.nome}</td>
+            <td class="p-2 font-bold text-blue-950">${c.nome}</td>
             <td class="p-2">${c.cnpj}</td>
             <td class="p-2">${c.tel}</td>
             <td class="p-2">${c.email || '-'}</td>
@@ -2694,14 +3158,14 @@ window.salvarNovaClinica = async function() {
     if (!nome) return alert("Preencha o nome da clínica.");
 
     const id = Date.now();
-    const novaClin = { id, nome, cnpj, whats, email, endereco, ativo: true };
+    const novaClin = { id, nome: nome.toUpperCase(), cnpj, whats, email, endereco, ativo: true };
     clinicasCadastradas.push(novaClin);
     salvarCadastrosLocalStorage();
     renderClinicasTabela();
     atualizarDropdownsClinicas();
 
     if (supabaseClient) {
-        try { await supabaseClient.from('cadastros_clinicas').upsert([{ id, nome, cnpj, whats, email, endereco, ativo: true }]); } catch(e){}
+        try { await supabaseClient.from('cadastros_clinicas').upsert([{ id, nome: novaClin.nome, cnpj, whats, email, endereco, ativo: true }]); } catch(e){}
     }
 
     document.getElementById('cad_clin_nome').value = '';
@@ -2753,14 +3217,14 @@ window.salvarNovoMedico = async function() {
     if (!nome || !crm) return alert("Preencha Nome e CRM.");
 
     const id = Date.now();
-    const novoMed = { id, nome, crm, rqe, tipo, tel, email, ativo: true };
+    const novoMed = { id, nome: nome.toUpperCase(), crm, rqe, tipo, tel, email, ativo: true };
     medicosCadastrados.push(novoMed);
     salvarCadastrosLocalStorage();
     renderMedicosTabela();
     atualizarDropdownsMedicosHomologadores();
 
     if (supabaseClient) {
-        try { await supabaseClient.from('cadastros_medicos').upsert([{ id, nome, crm, rqe, tipo, tel, email, ativo: true }]); } catch(e){}
+        try { await supabaseClient.from('cadastros_medicos').upsert([{ id, nome: novoMed.nome, crm, rqe, tipo, tel, email, ativo: true }]); } catch(e){}
     }
 
     document.getElementById('cad_med_nome').value = '';
@@ -2825,7 +3289,10 @@ function carregarCadastrosLocalStorage() {
         const rp = localStorage.getItem('boreal_monitor_requests_db');
         if (rp) monitorRequestsData = JSON.parse(rp);
         const rhom = localStorage.getItem('boreal_homologacao_db');
-        if (rhom) atestadosHomologacaoData = JSON.parse(rhom);
+        if (rhom) {
+            const excluidosHom = JSON.parse(localStorage.getItem('boreal_homologacao_excluidos_ids') || '[]');
+            atestadosHomologacaoData = JSON.parse(rhom).filter(h => !excluidosHom.includes(Number(h.id)));
+        }
         const rpcmso = localStorage.getItem('boreal_pcmso_matriz_db');
         if (rpcmso) pcmsoMatrizData = JSON.parse(rpcmso);
     } catch(e){}
@@ -2837,63 +3304,75 @@ function atualizarDropdownsClientes() {
     const s2 = document.getElementById('vinc_cli_select');
     const s3 = document.getElementById('avulso_cliente');
     const s4 = document.getElementById('cad_emp_cliente');
+    const s5 = document.getElementById('filtro_emp_cliente_lista');
+    const s6 = document.getElementById('hom_top_empresa');
+    const s7 = document.getElementById('fin_manual_cliente');
+
+    const clientesOrdenados = [...clientesCadastrados].sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
 
     if (s1) {
+        const valorAtual = s1.value;
         s1.innerHTML = '<option value="ALL">TODOS OS CLIENTES</option>';
-        clientesCadastrados.forEach(c => {
+        clientesOrdenados.forEach(c => {
             const o = document.createElement('option');
             o.value = c.nome; o.innerText = c.nome;
             s1.appendChild(o);
         });
+        if (valorAtual && Array.from(s1.options).some(opt => opt.value === valorAtual)) {
+            s1.value = valorAtual;
+        }
     }
 
     if (dlFiltro) {
         dlFiltro.innerHTML = '<option value="TODOS OS CLIENTES">';
-        clientesCadastrados.forEach(c => {
+        clientesOrdenados.forEach(c => {
             const o = document.createElement('option');
             o.value = c.nome;
             dlFiltro.appendChild(o);
         });
     }
 
-    if (s2) {
-        s2.innerHTML = '';
-        clientesCadastrados.forEach(c => {
+    if (s5) {
+        const val5 = s5.value;
+        s5.innerHTML = '<option value="ALL">TODOS OS CLIENTES</option>';
+        clientesOrdenados.forEach(c => {
             const o = document.createElement('option');
             o.value = c.nome; o.innerText = c.nome;
-            s2.appendChild(o);
+            s5.appendChild(o);
         });
+        if (val5) s5.value = val5;
     }
 
-    if (s3) {
-        s3.innerHTML = '';
-        clientesCadastrados.forEach(c => {
+    [s2, s3, s4, s6, s7].forEach(sel => {
+        if (!sel) return;
+        const valAnt = sel.value;
+        sel.innerHTML = '';
+        clientesOrdenados.forEach(c => {
             const o = document.createElement('option');
             o.value = c.nome; o.innerText = c.nome;
-            s3.appendChild(o);
+            sel.appendChild(o);
         });
-    }
-
-    if (s4) {
-        s4.innerHTML = '';
-        clientesCadastrados.forEach(c => {
-            const o = document.createElement('option');
-            o.value = c.nome; o.innerText = c.nome;
-            s4.appendChild(o);
-        });
-    }
+        if (valAnt && Array.from(sel.options).some(opt => opt.value === valAnt)) {
+            sel.value = valAnt;
+        }
+    });
 }
 
 function atualizarDropdownsClinicas() {
     atualizarSeletorDestinoPedidoManual();
     atualizarSeletorDestinoCargaMassa();
     atualizarDropdownsMedicosHomologadores();
+    atualizarListaParceirosVinculo();
 }
 
 function atualizarDropdownsMedicosHomologadores() {
     const s1 = document.getElementById('hom_top_parceiro_destino');
     const s2 = document.getElementById('hom_carga_parceiro');
-    const medicosHom = medicosCadastrados.filter(m => m.tipo.includes('HOMOLOGADOR') || m.tipo.includes('EXAMINADOR'));
+    const vinculados = obterParceirosVinculadosAoClienteAtivo('MEDICO_HOMOLOGADOR');
+    let medicosHom = medicosCadastrados.filter(m => m.tipo.includes('HOMOLOGADOR') || m.tipo.includes('EXAMINADOR'));
+    if (vinculados && vinculados.length > 0) {
+        medicosHom = medicosHom.filter(m => vinculados.includes(m.nome));
+    }
 
     [s1, s2].forEach(sel => {
         if (!sel) return;
@@ -2923,8 +3402,32 @@ async function carregarTodosDadosSupabase() {
             carregarCadastrosClientesDoBanco(),
             carregarCadastrosClinicasDoBanco(),
             carregarCadastrosMedicosDoBanco(),
+            carregarEmpregadosDoBanco(),
             carregarPcmsoDoBanco()
         ]);
+    } catch(e){}
+}
+
+async function carregarEmpregadosDoBanco() {
+    try {
+        const { data, error } = await supabaseClient.from('cadastros_empregados').select('*');
+        if (!error && data && data.length > 0) {
+            empregadosCadastrados = data.map(d => ({
+                id: Number(d.id),
+                cliente: d.cliente,
+                nome: d.nome,
+                cpf: d.cpf,
+                matr: d.matr || '001',
+                nasc: d.nasc || '01/01/1990',
+                setor: d.setor || 'GERAL',
+                cargo: d.cargo || 'OPERACIONAL',
+                ativo: d.ativo !== false
+            }));
+            salvarEmpregadosLocalStorage();
+            renderEmpregadosTabela();
+            atualizarDatalistGlobalEmpregados();
+            atualizarListasSetoresCargosClienteAtivo();
+        }
     } catch(e){}
 }
 
@@ -2990,25 +3493,28 @@ async function carregarHomologacaoDoBanco() {
     try {
         const { data, error } = await supabaseClient.from('atestados_homologacao').select('*').order('id', { ascending: false });
         if (!error && data && data.length > 0) {
-            atestadosHomologacaoData = data.map(d => ({
-                id: Number(d.id),
-                cliente: d.cliente,
-                trab: d.trab,
-                setor: d.setor,
-                cargo: d.cargo,
-                data: d.data,
-                dias: parseInt(d.dias) || 1,
-                diasHomologados: d.dias_homologados || d.dias,
-                cid: d.cid,
-                medico: d.medico,
-                status: d.status,
-                parecerTexto: d.parecer_texto || '',
-                medicoHomologador: d.medico_homologador || 'DR. MÉDICO HOMOLOGADOR',
-                crmHomologador: d.crm_homologador || 'CRM SP 000000',
-                arquivoNome: d.arquivo_nome || 'Atestado.pdf',
-                arquivoUrl: d.arquivo_url || '#',
-                ativo: d.ativo !== false
-            }));
+            const excluidosHom = JSON.parse(localStorage.getItem('boreal_homologacao_excluidos_ids') || '[]');
+            atestadosHomologacaoData = data
+                .filter(d => !excluidosHom.includes(Number(d.id)))
+                .map(d => ({
+                    id: Number(d.id),
+                    cliente: d.cliente,
+                    trab: d.trab,
+                    setor: d.setor,
+                    cargo: d.cargo,
+                    data: d.data,
+                    dias: parseInt(d.dias) || 1,
+                    diasHomologados: d.dias_homologados || d.dias,
+                    cid: d.cid,
+                    medico: d.medico,
+                    status: d.status,
+                    parecerTexto: d.parecer_texto || '',
+                    medicoHomologador: d.medico_homologador || 'DR. MÉDICO HOMOLOGADOR',
+                    crmHomologador: d.crm_homologador || 'CRM SP 000000',
+                    arquivoNome: d.arquivo_nome || 'Atestado.pdf',
+                    arquivoUrl: d.arquivo_url || '#',
+                    ativo: d.ativo !== false
+                }));
             salvarHomologacaoLocal();
             renderHomologacaoTabela();
         }
@@ -3214,7 +3720,7 @@ window.atualizarHeaderPcmsoMedico = function() {
     const cli = clientesCadastrados.find(c => c.nome === sel);
     const lblMed = document.getElementById('pcmso_lbl_medico_nome');
     const lblCli = document.getElementById('pcmso_lbl_cliente_nome');
-    if (lblCli) lblCli.textContent = sel;
+    if (lblCli) lblCli.textContent = sel === 'ALL' ? 'TODOS OS CLIENTES' : sel;
     if (lblMed) lblMed.textContent = cli ? `${cli.medPcmso} (${cli.crmPcmso})` : "A DEFINIR NO CADASTRO";
 };
 
@@ -3265,6 +3771,7 @@ function inicializarTodosModulos() {
     renderMedicosTabela();
     renderEmpregadosTabela();
     atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
     renderTabelaVinculos();
     renderProducaoTable();
     renderMonitorTable();
@@ -3277,7 +3784,6 @@ function inicializarTodosModulos() {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-// Inicialização automática das telas e ícones no carregamento
 document.addEventListener('DOMContentLoaded', () => {
     carregarCadastrosLocalStorage();
     popularDropdownCid10();
@@ -3290,6 +3796,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMedicosTabela();
     renderEmpregadosTabela();
     atualizarDatalistGlobalEmpregados();
+    atualizarListasSetoresCargosClienteAtivo();
     renderTabelaVinculos();
     renderProducaoTable();
     renderMonitorTable();
